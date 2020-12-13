@@ -93,56 +93,29 @@ public class first : MonoBehaviour
         up against a plat.
         */
 
-        if (collision.gameObject.layer == 8)
-        {
-            if (collision.GetComponent<SpriteRenderer>().color != blue)
-            {
-                collision.GetComponent<SpriteRenderer>().color = blue;
-            }
-            if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A)))
-            {
-                if (Input.GetKey(KeyCode.A))
-                {
-                    side = -1;
-                }
-                else if (Input.GetKey(KeyCode.D))
-                {
-                    side = 1;
-                }
-            }
-        }
-        Debug.Log(side);
+        Check(collision);
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
+        Check(collision);
+    }
+    
+    private void Check(Collider2D collision)
+    {
         if (collision.gameObject.layer == 8)
         {
-            if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A)))
+
+            if (collision.gameObject.transform.position.x < transform.position.x)
             {
-                if (Input.GetKey(KeyCode.A))
-                {
-                    side = -1;
-                }
+                side = -1;
+            }
 
-                if (Input.GetKey(KeyCode.D))
-                {
-                    side = 1;
-                }
-                if (side == -1 && Input.GetKey(KeyCode.D))
-                {
-                    xS = 10;
-                }
-
-                if (side == 1 && Input.GetKey(KeyCode.A))
-                {
-                    xS = -10f;
-                }
-
-                rgb.velocity = new Vector2(xS, rgb.velocity.y);
+            if (collision.gameObject.transform.position.x > transform.position.x)
+            {
+                side = 1;
             }
         }
     }
-    
     private void OnTriggerExit2D(Collider2D collision)
     {
         side = 0;
