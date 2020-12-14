@@ -37,33 +37,17 @@ public class first : MonoBehaviour
     {
         xS = 0;
 
-        if (!(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A)))
+
+        if (Input.GetKey(KeyCode.D))
         {
-            if (side == 0)
-            {
-                if (Input.GetKey(KeyCode.D))
-                {
-                    xS = 10;
+            xS = 10;
 
-                    //transform.position += m * Time.deltaTime;
-                }
-                if (Input.GetKey(KeyCode.A))
-                {
-                    xS = -10f;
-                    //transform.position += m * Time.deltaTime;
-                }
-            }
-
-            if (side == -1 && Input.GetKey(KeyCode.D))
-            {
-                xS = 10;
-            }
-
-            if (side == 1 && Input.GetKey(KeyCode.A))
-            {
-                xS = -10f;
-                //transform.position += m * Time.deltaTime;
-            }
+            //transform.position += m * Time.deltaTime;
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            xS = -10f;
+            //transform.position += m * Time.deltaTime;
         }
 
         if (Input.GetKeyDown(KeyCode.W))
@@ -78,47 +62,12 @@ public class first : MonoBehaviour
         }
 
         rgb.velocity = new Vector2(xS, rgb.velocity.y);
+
         if (jump)
         {
             rgb.velocity = new Vector2(rgb.velocity.x, xY);
             jump = false;
         }
 
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        /*in other words(side = 1 / -1) when it's pressed up against 
-        a plat or another it's pressed up on another block pressed 
-        up against a plat.
-        */
-
-        Check(collision);
-    }
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        Check(collision);
-    }
-    
-    private void Check(Collider2D collision)
-    {
-        if (collision.gameObject.layer == 8)
-        {
-
-            if (collision.gameObject.transform.position.x < transform.position.x)
-            {
-                side = -1;
-            }
-
-            if (collision.gameObject.transform.position.x > transform.position.x)
-            {
-                side = 1;
-            }
-        }
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        side = 0;
-        sx = 0;
     }
 }
