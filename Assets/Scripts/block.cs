@@ -4,63 +4,43 @@ using UnityEngine;
 
 public class block : MonoBehaviour
 {
-    public GameObject p;
-    public int sx;
-    private bool side;
+    private GameObject p;
+    private SpriteRenderer spr;
     private Rigidbody2D rgb;
+    public bool follow;
+    public float thr_s = 5f;
     // Start is called before the first frame update
     void Start()
     {
+        p = GameObject.Find("pic");
         rgb = GetComponent<Rigidbody2D>();
+        spr = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void Update()
     {
- 
-    }
+        if (follow)
+        {
+            transform.position = new Vector3(
+                p.transform.position.x,
+                p.transform.position.y + 1.5f,
+                0f);
 
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        var obj = collision.gameObject;
-     
-        if (obj.layer == 8 || obj.layer == 9)
-        {
-            sx = Check(collision);
-        }
-    }
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        var obj = collision.gameObject;
-        sx = 0;
-        if (obj.layer == 9)
-        {
-            sx = Check(collision.collider);
-            if(sx != 0)
-            {
-               
-            }
+            spr.flipX = p.GetComponent<SpriteRenderer>().flipX;
+            rgb.simulated = false;
         }
     }
 
-    private int Check(Collider2D collision)
+    public void thrown()
     {
-        if (collision.gameObject.transform.position.x < transform.position.x)
-        {
-            return -1;
-        }
-
-        if (collision.gameObject.transform.position.x > transform.position.x)
-        {
-            return 1;
-        }
-
-        return 0;
-    }
-       
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        sx = 0;
+        follow = false;
+        rgb.simulated = true;
+        rgb.velocity = new Vector2((50 * p.GetComponent<first>().di), thr_s);
     }
 
-}
+    private void dis()
+    {
+    }
+
+} 
