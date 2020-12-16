@@ -90,7 +90,7 @@ public class first : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.J))
         {
-            StartCoroutine(camm.GetComponent<cam>().Shake(sh_dur,sh_mag));
+            StartCoroutine(camm.GetComponent<cam>().Shake());
         }
     }
 

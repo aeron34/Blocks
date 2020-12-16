@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class cam : MonoBehaviour
 {
+    public float duration, magnitude;
     // Start is called before the first frame update
     void Start()
     {
-        
+        duration = 0.1f;
+        magnitude = 0.3f;
     }
 
     // Update is called once per frame
@@ -15,7 +17,7 @@ public class cam : MonoBehaviour
     {
         
     }
-    public IEnumerator Shake(float duration, float magnitude)
+    public IEnumerator Shake()
     {
         Vector3 orignalPosition = transform.position;
         float elapsed = 0f;
@@ -30,6 +32,8 @@ public class cam : MonoBehaviour
             yield return 0;
         }
         transform.position = orignalPosition;
+        duration = 0.1f;
+        magnitude = 0.3f;
     }
 
 }
