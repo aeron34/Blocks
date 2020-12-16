@@ -12,7 +12,8 @@ public class block : MonoBehaviour
     private Animator ani;
     public bool follow;
 
-    public int combo, ni = 0,    die = 0;
+    public int combo, ni = 0, die = 0;
+    public bool t = false;
     public string color;
     public float thr_s = 5f;
     // Start is called before the first frame update
@@ -37,37 +38,42 @@ public class block : MonoBehaviour
 
     public void Check()
     {
-        var c = Physics2D.OverlapCircleAll(transform.position, 15f);
-        var b = c.GroupBy(a => a.gameObject.name).Select(a => a.First()).ToList();
-        var d = b.Where(a => a.gameObject.layer == 9 && 
+        var c = Physics2D.OverlapCircleAll(transform.position, 4f);
+        var b = c.Where(a => a.gameObject.layer == 9 && 
         a.gameObject.GetComponent<block>().color == color
-        ).ToArray();
+        ).ToArray(); 
+        var d = b.GroupBy(a => a.gameObject.name).Select(a => a.First()).ToArray();
 
-        Debug.Log(d.Length);
+        /*coll_objs is the object that counts how many objects are
+        touching inside the OverlapCirlce (defined above).
+        if they all 5 blocks are touching, in which the only
+        thing they CAN touch is a block of the same color (thanks
+        to the filter above), then
+        trigger a chain explosion.
+        */
+        var coll_objs = 0;
+
         if (d.Length >= 5)
         {
+            Debug.Log("sioaj");
             foreach (Collider2D h in d)
             {
-                if (GetComponent<BoxCollider2D>().IsTouching(h))
+                Debug.Log(h.gameObject.name);
+                if (h.GetComponent<block>().t)
                 {
-                    h.gameObject.GetComponent<block>().die = 1;
+                    coll_objs++;
                 }
             }
         }
-        
-        /*Debug.Log(a);
-        if (c.Length >= 5)
-        {     
-            foreach (Collider2D h in c)
+
+        if (coll_objs >= 5)
+        {
+            die = 1;
+            foreach (Collider2D h in d)
             {
-                if (GetComponent<BoxCollider2D>().IsTouching(h)
-                && h.gameObject.layer == 9 &&
-                h.gameObject.GetComponent<block>().color == color)
-                {
-                    h.gameObject.GetComponent<block>().die = 1;
-                }
+                h.gameObject.GetComponent<block>().die = 1;
             }
-        }*/
+        }
     }
     // Update is called once per frame
     void Update()
@@ -134,7 +140,12 @@ public class block : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-       
+        if (collision.gameObject.layer == 9)
+        {
+            t = true;
+            Check();
+        }
+          
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
