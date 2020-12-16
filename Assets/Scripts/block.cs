@@ -41,7 +41,7 @@ public class block : MonoBehaviour
         var c = Physics2D.OverlapCircleAll(transform.position, 4f);
         var b = c.Where(a => a.gameObject.layer == 9 && 
         a.gameObject.GetComponent<block>().color == color
-        ).ToArray(); 
+        && a.gameObject.GetComponent<block>().t).ToArray(); 
         var d = b.GroupBy(a => a.gameObject.name).Select(a => a.First()).ToArray();
 
         /*coll_objs is the object that counts how many objects are
@@ -59,7 +59,8 @@ public class block : MonoBehaviour
             foreach (Collider2D h in d)
             {
                 Debug.Log(h.gameObject.name);
-                if (h.GetComponent<block>().t)
+                if (h.GetComponent<block>().t
+                && h.GetComponent<block>().color == color)
                 {
                     coll_objs++;
                 }
@@ -127,7 +128,7 @@ public class block : MonoBehaviour
 
     private void explode()
     {
-        Check();
+        //Check();
         spr.color = new Color(1, 1, 1);
 
         ani.Play("explode");
@@ -140,7 +141,8 @@ public class block : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == 9)
+        if (collision.gameObject.layer == 9
+            &&collision.gameObject.GetComponent<block>().color == color)
         {
             t = true;
             Check();

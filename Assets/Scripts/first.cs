@@ -104,6 +104,15 @@ public class first : MonoBehaviour
             block = collision.gameObject;
         }
     }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == 9
+        && pickup < 2)
+        {
+            pickup = 1;
+            block = collision.gameObject;
+        }
+    }
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (pickup != 2)
