@@ -9,9 +9,10 @@ public class block : MonoBehaviour
     private GameObject p;
     private SpriteRenderer spr;
     private Rigidbody2D rgb;
+    private bool chk = false;
     private Animator ani;
     public bool follow;
-
+    public List<GameObject> touching;
     public int combo, ni = 0, die = 0;
     public bool t = false;
     public string color;
@@ -19,17 +20,17 @@ public class block : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        touching = new List<GameObject>();
         p = GameObject.Find("pic");
         ani = GetComponent<Animator>();
         rgb = GetComponent<Rigidbody2D>();
         spr = GetComponent<SpriteRenderer>();
-        switch(color)
+        switch (color)
         {
             case "blue":
-                spr.color = new Color(0, (float)(92/255), (float)(236/255));
+                spr.color = new Color(0, (float)(92 / 255), (float)(236 / 255));
                 break;
             case "green":
-                Debug.Log("j");
                 spr.color = new Color(0.0f, 1.0f, 0.05f, 1.0f);
                 break;
         }
@@ -38,48 +39,51 @@ public class block : MonoBehaviour
 
     public void Check()
     {
-        var c = Physics2D.OverlapCircleAll(transform.position, 4f);
+        /*var c = Physics2D.OverlapCircleAll(transform.position, 4f);
         var b = c.Where(a => a.gameObject.layer == 9 && 
         a.gameObject.GetComponent<block>().color == color
         && a.gameObject.GetComponent<block>().t).ToArray(); 
         var d = b.GroupBy(a => a.gameObject.name).Select(a => a.First()).ToArray();
 
-        /*coll_objs is the object that counts how many objects are
+        coll_objs is the object that counts how many objects are
         touching inside the OverlapCirlce (defined above).
         if they all 5 blocks are touching, in which the only
         thing they CAN touch is a block of the same color (thanks
         to the filter above), then
         trigger a chain explosion.
         */
-        var coll_objs = 0;
 
-        if (d.Length >= 5)
+        int coll_objs = 1, last_len = 0, i = 0;
+        touching.Add(gameObject);
+        touching = touching.GroupBy(a => a.gameObject.name).Select(a => a.First()).ToList();
+        
+        while (true)
         {
-            Debug.Log("sioaj");
-            foreach (Collider2D h in d)
+            last_len = touching.ToArray().Length;
+            touching.AddRange(touching.ElementAt(i).GetComponent<block>().touching);
+            touching = touching.GroupBy(a => a.gameObject.name).Select(a => a.First()).ToList();
+            i++;
+            if(i >= touching.ToArray().Length || touching.ToArray().Length > 4)
             {
-                Debug.Log(h.gameObject.name);
-                if (h.GetComponent<block>().t
-                && h.GetComponent<block>().color == color)
-                {
-                    coll_objs++;
-                }
+                break;
+            }
+           
+           // yield return null;
+        }
+        
+        if(touching.ToArray().Length > 4)
+        {
+            foreach (GameObject n in touching)
+            {
+                n.GetComponent<block>().die = 1;
             }
         }
-
-        if (coll_objs >= 5)
-        {
-            die = 1;
-            foreach (Collider2D h in d)
-            {
-                h.gameObject.GetComponent<block>().die = 1;
-            }
-        }
+        chk = false;
     }
     // Update is called once per frame
     void Update()
     {
-        if (die ==0)
+        if (die == 0)
         {
             if (follow)
             {
@@ -112,7 +116,7 @@ public class block : MonoBehaviour
                 rgb.simulated = false;
             }
         }
-        if(die == 1)
+        if (die == 1)
         {
             explode();
             die = 2;
@@ -130,38 +134,34 @@ public class block : MonoBehaviour
     {
         //Check();
         spr.color = new Color(1, 1, 1);
-
+        //StopAllCoroutines();
         ani.Play("explode");
         GetComponent<BoxCollider2D>().enabled = false;
         rgb.simulated = false;
         StartCoroutine(Camera.main.GetComponent<cam>().Shake());
+        Destroy(gameObject, 1f);
 
-     
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.layer == 9
-            &&collision.gameObject.GetComponent<block>().color == color)
-        {
-            t = true;
-            Check();
-        }
-          
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        var obj = collision.gameObject;
-
-        if (obj.layer == 9)
-        {
-//            combo += 1;
-        }
-    }
     private void OnTriggerStay2D(Collider2D collision)
     {
-        var obj = collision.gameObject;
-
+        if (collision.gameObject.layer == 9
+        && collision.gameObject.GetComponent<block>().color == color)
+        {
+            if (!touching.Contains(collision.gameObject))
+            {
+                touching.Add(collision.gameObject);Check();
+            }
+           // touching.Add(GameObject.Find("block (11)");
+        }   
     }
-} 
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if(collision.gameObject.layer == 9
+        && collision.gameObject.GetComponent<block>().color == color)
+        {
+            touching.Remove(collision.gameObject);
+        }
+    }
+}

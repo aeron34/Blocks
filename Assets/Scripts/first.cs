@@ -11,11 +11,11 @@ public class first : MonoBehaviour
     public Animator ani;
     private SpriteRenderer spr;
     public float xS = 0, xY = 15, di;
-    bool jump = false;
+    public bool jump = false, t_e, c_e;
     public int pickup;
     GameObject block = null;
     Camera camm;
-    public float sh_dur = 0, sh_mag = 0;
+    public float sh_dur = 0, sh_mag = 0, drag;
     void Start()
     {
         camm = Camera.main;
@@ -36,7 +36,14 @@ public class first : MonoBehaviour
 
     void Update()
     {
-        xS = 0;
+        if (xS > 0)
+        {
+            xS -= drag;
+            if (xS <= 0)
+            {
+                xS = 0;
+            }
+        }
 
 
         if (Input.GetKey(KeyCode.D))
@@ -48,11 +55,14 @@ public class first : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.A))
         {
-            xS = -10f;
+            xS = 10;
             di = -1;
             spr.flipX = true;
             //transform.position += m * Time.deltaTime;
         }
+
+        
+        rgb.velocity = new Vector2(xS*di, rgb.velocity.y);
 
         if (Input.GetKeyDown(KeyCode.W))
         {
@@ -80,44 +90,63 @@ public class first : MonoBehaviour
             }
         }
 
-        rgb.velocity = new Vector2(xS, rgb.velocity.y);
-
         if (jump)
         {
             rgb.velocity = new Vector2(rgb.velocity.x, xY);
             jump = false;
         }
 
+
         if (Input.GetKeyDown(KeyCode.J))
         {
-            GameObject.Find("block (3)").GetComponent<block>().Check();
+           Debug.Log(GameObject.Find("block (2)").GetComponent<block>().touching.ToArray().Length);
             //StartCoroutine(camm.GetComponent<cam>().Shake());
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == 9
-        && pickup < 2)
+        /*if (collision.gameObject.layer == 9)
         {
-            pickup = 1;
-            block = collision.gameObject;
+            c_e = true;
+            if (pickup < 2)
+            {
+                pickup = 1;
+                block = collision.gameObject;
+            }
+        }*/
+    }
+    
+    private void FixedUpdate()
+    {
+        if(pickup != 2)
+                {
+            pickup = 0;
+            block = null;
+
+        }
+        RaycastHit2D hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
+            Vector2.right*di, 3f, LayerMask.GetMask("blocks")); 
+
+        if (hit.collider != null)
+        {
+            if (pickup < 2)
+            {
+                pickup = 1;
+                block = hit.collider.gameObject;
+                //Debug.Log(block.name);
+            }
         }
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == 9
-        && pickup < 2)
-        {
-            pickup = 1;
-            block = collision.gameObject;
-        }
+        
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (pickup != 2)
+        /*if (collision.gameObject.layer == 9)
         {
-            pickup = 0;
-        }
+            c_e = false;
+        }*/
     }
 }
