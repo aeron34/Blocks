@@ -1,0 +1,58 @@
+
+o Implement block falling
+system:
+
+	- Create an array of
+	X points, as all blocks
+	will have the same 
+	Y.
+	
+	- Give blocks random
+	spawn times.
+
+	- Make it so if block
+	falls on head of player,
+	heart is lost.
+
+o Implement heart/lives system:
+
+	- Get an Image for the hearts
+
+	- Anchor in top left with canvas.
+
+o Implement block swap system.
+
+o Create the main menu.
+
+o When blocks fall, until they're
+touched by player they are in
+locked mode (x position is frozen).
+
+o Implement auto snap feat on
+blocks, basically they gravitate
+horizon. to the closest block:
+	
+	- block below's lock_x
+	bool has to be true
+	
+	- if two blocks below
+	have the same distance
+	from said block's center,
+	randomly pick between
+	the 2.
+
+o Add Top bar on UI to show which
+blocks are about to fall in advance:
+
+	- use a queue style
+	linked list, popping
+	from the front, after	
+	said block falls.
+
+
+END X: -20.3
+MAX X: 20.3
+
+Create an array of 
+20 float containing
+the X values.

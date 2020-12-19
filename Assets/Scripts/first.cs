@@ -25,6 +25,7 @@ public class first : MonoBehaviour
         ani = GetComponent<Animator>();
         spr = GetComponent<SpriteRenderer>();
         // transform.position = cam.ViewportToWorldPoint(new Vector3(2 / (cam.orthographicSize * 4 * cam.aspect), 0.5f, 1));
+        // transform.position = cam.ViewportToWorldPoint(new Vector3(2 / (cam.orthographicSize * 4 * cam.aspect), 0.5f, 1));
     }
 
 
@@ -96,12 +97,6 @@ public class first : MonoBehaviour
             jump = false;
         }
 
-
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-           Debug.Log(GameObject.Find("block (2)").GetComponent<block>().touching.ToArray().Length);
-            //StartCoroutine(camm.GetComponent<cam>().Shake());
-        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
