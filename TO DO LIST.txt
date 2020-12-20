@@ -55,4 +55,5 @@ MAX X: 20.3
 
 Create an array of 
 20 float containing
-the X values.
+the X values, each
+value differing by 2.
