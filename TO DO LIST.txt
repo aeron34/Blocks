@@ -32,22 +32,24 @@ o Implement auto snap feat on
 blocks, basically they gravitate
 horizon. to the closest block:
 	
+	- add a base on the bottom, 
+	these will just be dull blocks
+	that can't be picked up or combo'd,
+	nothing. Only for alignment purposes.
+
 	- block below's lock_x
 	bool has to be true
 	
-	- if two blocks below
+	- (TRY 1ST) Use a raycast
+	to detect the object below,
+	and snap to it.
+
+	- (MAYBE) if two blocks below
 	have the same distance
 	from said block's center,
 	randomly pick between
 	the 2.
 
-o Add Top bar on UI to show which
-blocks are about to fall in advance:
-
-	- use a queue style
-	linked list, popping
-	from the front, after	
-	said block falls.
 
 
 END X: -20.3

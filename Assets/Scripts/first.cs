@@ -34,7 +34,6 @@ public class first : MonoBehaviour
         ani.Play("idle");
     }
     // Update is called once per frame
-
     void Update()
     {
         if (xS > 0)
