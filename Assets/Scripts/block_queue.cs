@@ -10,10 +10,13 @@ public class block_queue : MonoBehaviour
     float s = 0.5f, drp_tm;
     bool end_of_list;
     Queue<GameObject> q = new Queue<GameObject>();
+    public GameObject colm;
     GameObject c_b = null;
     float t_m = 0.05f, bts = 0.05f;
     System.Random random = new System.Random();
     int c_n = 0;
+
+    float[] pos = new float[21];
     Queue<string> color = new Queue<string>();
     // Start is called before the first frame update
     void Start()
@@ -24,7 +27,42 @@ public class block_queue : MonoBehaviour
 
         c_b = a.gameObject;
         StartCoroutine(move(c_b));
+        pos[0] = -20.3f;
 
+        for(int i = 1; i < 21; i++)
+        {
+            double n = (pos[i - 1] + 2);
+            pos[i] = (float)(Math.Round(n, 2));
+        }
+        for(int i = 0; i < 21; i++)
+        {
+            var blk = Instantiate(colm, colm.transform);
+            blk.transform.position = new Vector3(pos[i], 5.14f, 0);
+        }
+
+        
+
+        float st_y = -9;
+
+        string[] cols = { "green", "blue", "red" };
+        int col_i = 0;
+
+        for(int i = 0; i < 3; i++)
+        {
+            for(int b = 0; b < 21; b++)
+            {
+                if(col_i > 2)
+                {
+                    col_i = 0;
+                }
+                var blk = Instantiate(block, blk_spn.position, blk_spn.rotation);
+                blk.transform.position = new Vector3(pos[b], st_y, 0);
+                blk.GetComponent<block>().color = cols[col_i];
+                col_i++;
+            } 
+
+            st_y += 2;
+        }
         //rect.anchoredPosition = new Vector2(-41f);
 
     }
@@ -87,6 +125,7 @@ public class block_queue : MonoBehaviour
                 drp_tm = 0;
                 var n_b = Instantiate(block, blk_spn.position, blk_spn.rotation);
                 StartCoroutine(kill(q.Dequeue()));
+                n_b.GetComponent<block>().color = color.Peek();                
                 color.Dequeue();
                 c_b = q.Peek();
             }
@@ -107,6 +146,12 @@ public class block_queue : MonoBehaviour
         }
       
     }
+
+    /* Create a list of how many blocks are currently 
+     in the column. Reason being that when one is 
+    remove (picked up by player) it will update and 
+    turn on the Y axis of the blocks above the taken
+    out block.*/
 
     public IEnumerator move(GameObject obj, float b_d=1)
     {
@@ -144,12 +189,12 @@ public class block_queue : MonoBehaviour
     }
     public IEnumerator kill(GameObject obj)
     {
-        float al = 255;
+        float al = 119;
         var s_r = obj.GetComponent<Image>();
         var rect = obj.GetComponent<RectTransform>();
         while (al > 0)
         {
-            al -= 8f;
+            al -= 3f;
             rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, rect.anchoredPosition.y - 3);
             Color c = obj.GetComponent<Image>().color;
             

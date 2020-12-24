@@ -12,10 +12,10 @@ public class first : MonoBehaviour
     private SpriteRenderer spr;
     public float xS = 0, xY = 15, di;
     public bool jump = false, t_e, c_e;
-    public int pickup;
+    public int pickup, thr_v = 50;
     GameObject block = null;
     Camera camm;
-    public float sh_dur = 0, sh_mag = 0, drag;
+    public float thr_i = 0, sh_dur = 0, sh_mag = 0, drag;
     void Start()
     {
         camm = Camera.main;
@@ -44,7 +44,7 @@ public class first : MonoBehaviour
                 xS = 0;
             }
         }
-
+        thr_i += 0.05f;
 
         if (Input.GetKey(KeyCode.D))
         {
@@ -75,18 +75,22 @@ public class first : MonoBehaviour
             //Instantiate(n, t.position, t.rotation);
             if (pickup == 1)
             {
+                block.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
                 block.GetComponent<block>().follow = true;
-                GetComponent<BoxCollider2D>().offset = new Vector2(-0.006f, 0.09f);
-                GetComponent<BoxCollider2D>().size = new Vector2(0.4f, 0.82f);
+                block.GetComponent<block>().columns.Clear();
+                GetComponent<BoxCollider2D>().offset = new Vector2(-0.0015f, 0.08f);
+                GetComponent<BoxCollider2D>().size = new Vector2(0.4f, 0.96f);
                 pickup = 2;
-
+                thr_i = 0;
             }
-            else if (pickup == 2)
+            else if (pickup == 2 && thr_i >= 1.0) 
             {
-                GetComponent<BoxCollider2D>().offset = new Vector2(-0.003f, -0.08f);
-                GetComponent<BoxCollider2D>().size = new Vector2(0.33f, 0.46f);
-                block.GetComponent<block>().thrown();
+                GetComponent<BoxCollider2D>().offset = new Vector2(-0.004f, -0.12f);
+                GetComponent<BoxCollider2D>().size = new Vector2(0.33f, 0.56f);
+                block.GetComponent<block>().thrown(thr_v);
+                block.GetComponent<block>().spcl_grnd = false;
                 pickup = 0;
+                thr_i = 0;
             }
         }
 
@@ -124,6 +128,8 @@ public class first : MonoBehaviour
 
         if (hit.collider != null)
         {
+            Debug.Log(hit.collider.name);
+                
             if (pickup < 2)
             {
                 pickup = 1;
@@ -131,7 +137,19 @@ public class first : MonoBehaviour
                 //Debug.Log(block.name);
             }
         }
+
+        RaycastHit2D hit2 = Physics2D.Raycast(transform.position,
+          Vector2.right * di, 6f, LayerMask.GetMask("blocks"));
+        if (hit2.collider != null)
+        {
+            thr_v = 20;
+        }
+        else
+        {
+            thr_v = 50;
+        }
     }
+
     private void OnTriggerExit2D(Collider2D collision)
     {
         

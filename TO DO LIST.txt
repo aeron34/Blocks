@@ -35,7 +35,7 @@ horizon. to the closest block:
 	- add a base on the bottom, 
 	these will just be dull blocks
 	that can't be picked up or combo'd,
-	nothing. Only for alignment purposes.
+	nothing. O.nly for alignment purposes.
 
 	- block below's lock_x
 	bool has to be true

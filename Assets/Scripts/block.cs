@@ -9,35 +9,43 @@ public class block : MonoBehaviour
     private GameObject p;
     private SpriteRenderer spr;
     private Rigidbody2D rgb;
-    private bool chk = false;
+    private bool chk = false, strt_al = true;
     private Animator ani;
     public bool follow;
     public List<GameObject> touching;
+    public List<GameObject> columns;
     public int combo, ni = 0, die = 0;
     public bool t = false;
     public string color;
+    public bool locked = false, spcl_grnd, grounded, ran = false;
+    float last_pos;
     public float thr_s = 5f;
+    private float[] dists = new float[4];
     // Start is called before the first frame update
     void Start()
     {
         touching = new List<GameObject>();
+        columns = new List<GameObject>();
         p = GameObject.Find("pic");
         ani = GetComponent<Animator>();
         rgb = GetComponent<Rigidbody2D>();
         spr = GetComponent<SpriteRenderer>();
-       
+        MyColor();
 
     }
 
-    public void setColor()
+    public void MyColor()
     {
         switch (color)
         {
             case "blue":
-                spr.color = new Color(0, (float)(92 / 255), (float)(236 / 255));
+                spr.color = new Color(0.09f, 0.44f, 1f, 1f);
                 break;
             case "green":
                 spr.color = new Color(0.0f, 1.0f, 0.05f, 1.0f);
+                break; 
+            case "red":
+                spr.color = new Color(1.0f, 0.0f, 0f, 1.0f);
                 break;
         }
      }
@@ -62,7 +70,6 @@ public class block : MonoBehaviour
            // yield return null;
         }
 
-        Debug.Log("OBJ: " + gameObject.name + " " +touching.ToArray().Length);
         if(touching.ToArray().Length > 4)
         {
             foreach (GameObject n in touching)
@@ -72,9 +79,87 @@ public class block : MonoBehaviour
         }
         chk = false;
     }
+
+    public IEnumerator move()
+    {
+        if(locked)
+        {
+            StopCoroutine("move");
+        }
+        if(!ran && !locked)
+        {
+            ran = true;
+            last_pos = transform.position.x;
+
+            yield return new WaitForSeconds(2);
+
+            if ((Math.Round(last_pos, 2)) == (Math.Round(transform.position.x, 2)))
+            {
+                
+                int ind = 0;
+
+                locked = false;
+                var i = 0;
+                dists = new float[4] { 2, 2, 9, 2 };
+                foreach (GameObject n in columns)
+                {
+                    dists[i] = Math.Abs(Math.Abs(n.transform.position.x) - Math.Abs(transform.position.x));
+                    i++;
+                }
+
+                float min = dists.Min();
+                ind = Array.IndexOf(dists, min);
+
+                if (grounded && columns.ToArray().Length != 0)
+                {
+                    Lock(ind);
+                    locked = true;
+                }
+            }
+
+            ran = false;
+           // spcl_grnd = false;
+            StopAllCoroutines();
+        }                     
+    }
+    public void Lock(int ind, GameObject col=null)
+    {
+        Vector3 pos = new Vector3(0,0,0);
+        if (ind >= 0)
+        {
+            if (ind < columns.ToArray().Length)
+            {
+                if (!columns.ElementAt(ind).GetComponent<column>().blocks.Contains(gameObject))
+                {
+                    columns.ElementAt(ind).GetComponent<column>().blocks.Add(gameObject);
+                }
+                pos = columns.ElementAt(ind).transform.position;
+            }
+            else
+            {
+                return;
+            }
+            
+        }
+        if(ind < 0)
+        {
+            if (!col.GetComponent<column>().blocks.Contains(gameObject))
+            {
+                col.GetComponent<column>().blocks.Add(gameObject);
+            }
+
+            pos = col.transform.position;
+        }
+        rgb.position = new Vector2(pos.x, rgb.position.y);
+        rgb.constraints = RigidbodyConstraints2D.FreezeAll;
+        rgb.SetRotation(0);
+    }
     // Update is called once per frame
     void Update()
     {
+       
+        StartCoroutine(move());
+
         if (die == 0)
         {
             if (follow)
@@ -84,6 +169,8 @@ public class block : MonoBehaviour
                     p.transform.position.y + 1.5f,
                     0f);
 
+                grounded = false;
+                locked = false;
                 spr.flipX = p.GetComponent<SpriteRenderer>().flipX;
 
 
@@ -102,7 +189,7 @@ public class block : MonoBehaviour
 
                     n.Set(0f, 0f, (int)((ind + 1) * 90), 0f);
                     transform.rotation = n;
-                    rgb.rotation = ((ind + 1) * 90);
+                    rgb.SetRotation((ind + 1) * 90);
 
                 }
                 rgb.simulated = false;
@@ -115,27 +202,12 @@ public class block : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position,
-        Vector2.down, 1f, LayerMask.GetMask("blocks"));
-        if (hit.collider != null && hit.collider.gameObject.layer == 9)
-        {
-           /*hit.collider.gameObject.GetComponent<Rigidbody2D>().freezeRotation = true;
-            hit.collider.gameObject.GetComponent<Rigidbody2D>().SetRotation(0);
-            hit.collider.gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX
-                | RigidbodyConstraints2D.FreezeRotation;
-            rgb.MovePosition(transform.position - transform.right * Time.deltaTime); */
 
-          Debug.Log(hit.collider.gameObject.name);
-        }
-    }
-
-    public void thrown()
+    public void thrown(int vel)
     {
         follow = false;
         rgb.simulated = true;
-        rgb.velocity = new Vector2((50 * p.GetComponent<first>().di), thr_s);
+        rgb.velocity = new Vector2((vel * p.GetComponent<first>().di), thr_s);
     }
 
     private void explode()
@@ -152,35 +224,77 @@ public class block : MonoBehaviour
     }
 
 
-    
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
+
         if (collision.gameObject.layer == 9
-        && collision.gameObject.GetComponent<block>().color == color)
+          && collision.gameObject.GetComponent<block>().color == color)
         {
             if (!touching.Contains(collision.gameObject))
             {
-                touching.Add(collision.gameObject);Check();
+                touching.Add(collision.gameObject);
+                Check();
             }
-           // touching.Add(GameObject.Find("block (11)");
-        }   
+            // touching.Add(GameObject.Find("block (11)");
+        }
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+
+
+        if (collision.gameObject.layer == 13)
+        {
+            if (!columns.Contains(collision.gameObject))
+            {
+                columns.Add(collision.gameObject);
+            }
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        
+        if(collision.gameObject.layer == 8 || collision.gameObject.layer == 9)
+        {
+            grounded = true;
+         
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == 9
-        && transform.position.y > collision.gameObject.transform.position.y)
+        if (collision.gameObject.layer == 8||collision.gameObject.layer == 9)
         {
-          //  Debug.Log(collision.gameObject.name);
+            grounded = true;
         }
     }
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if(collision.gameObject.layer == 8 ||
+        collision.gameObject.layer == 9)
+        {
+            grounded = false;
+        }
+        if (collision.gameObject.layer == 9)
+        {
+            touching.Remove(collision.gameObject);
+        }
+    }
+    /* Make a raycast on the player so when an
+     * object is detected too close to him
+     * his throw speed will slow down to
+     * somethign that won't break the physics.
+     */
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if(collision.gameObject.layer == 9
-        && collision.gameObject.GetComponent<block>().color == color)
+        if (collision.gameObject.layer == 9)
         {
             touching.Remove(collision.gameObject);
+        }
+        if (collision.gameObject.layer == 13)
+        {
+            columns.Remove(collision.gameObject);
         }
     }
 }
