@@ -13,8 +13,7 @@ public class block : MonoBehaviour
     private Animator ani;
     public bool follow;
     public List<GameObject> touching;
-    public List<GameObject> columns;
-    GameObject colm;
+    public GameObject colm, v_blk, h_blk;
     public int combo, ni = 0, die = 0;
     public bool t = false;
     public string color;
@@ -26,13 +25,11 @@ public class block : MonoBehaviour
     void Start()
     {
         touching = new List<GameObject>();
-        columns = new List<GameObject>();
         p = GameObject.Find("pic");
         ani = GetComponent<Animator>();
         rgb = GetComponent<Rigidbody2D>();
         spr = GetComponent<SpriteRenderer>();
         MyColor();
-        rgb.constraints = RigidbodyConstraints2D.FreezeRotation;
         if (color == "none")
         {
             Destroy(GetComponent<block>());
@@ -72,7 +69,7 @@ public class block : MonoBehaviour
             touching.AddRange(touching.ElementAt(i).GetComponent<block>().touching);
             touching = touching.GroupBy(a => a.gameObject).Select(a => a.First()).ToList();
             i++;
-            if(i >= touching.ToArray().Length || touching.ToArray().Length > 4)
+            if(i >= touching.ToArray().Length || touching.ToArray().Length >= 3)
             {
                 break;
             }
@@ -80,7 +77,9 @@ public class block : MonoBehaviour
            // yield return null;
         }
 
-        if(touching.ToArray().Length > 4)
+        //Debug.Log(touching.ToArray().Length);
+
+        if(touching.ToArray().Length >= 3)
         {
             foreach (GameObject n in touching)
             {
@@ -88,61 +87,87 @@ public class block : MonoBehaviour
             }
         }
         chk = false;
+        //        touching.Clear();
+
     }
 
-    public IEnumerator move()
+    public void swap(int mode=0)
     {
-        if(locked)
+        Debug.Log("js");
+ 
+        if (mode == 0 && h_blk != null)
         {
-            StopCoroutine("move");
-        }
-        if(!ran && !locked)
-        {
-            ran = true;
-            last_pos = transform.position.x;
+            Vector2 a = gameObject.transform.position;
+            Vector2 b = h_blk.GetComponent<Rigidbody2D>().position;
+            GameObject pc = colm;
 
-            yield return new WaitForSeconds(1.25f);
-
-            if ((Math.Round(last_pos, 2)) == (Math.Round(transform.position.x, 2)))
-            {
+            rgb.constraints = RigidbodyConstraints2D.None;
+            h_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None; 
                 
-                int ind = 0;
+            transform.position = new Vector3(b.x, b.y, 0);
+            h_blk.transform.position = new Vector3(a.x, a.y, 0);
+            colm = h_blk.GetComponent<block>().colm;
+            h_blk.GetComponent<block>().colm = pc;
 
-                locked = false;
-                var i = 0;
-                dists = new float[4] { 2, 2, 9, 2 };
-                foreach (GameObject n in columns)
-                {
-                    dists[i] = Math.Abs(Math.Abs(n.transform.position.x) - Math.Abs(transform.position.x));
-                    i++;
-                }
+            h_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX |
+            RigidbodyConstraints2D.FreezeRotation;
+        }
 
-                float min = dists.Min();
-                ind = Array.IndexOf(dists, min);
+        if(mode==1 && v_blk != null)
+        {
+            Vector2 a = gameObject.transform.position;
+            Vector2 b = v_blk.GetComponent<Rigidbody2D>().position;
+            GameObject pc = colm;
 
-                if (grounded && columns.ToArray().Length != 0)
-                {
-                    Lock(ind);
-                    locked = true;
-                }
-            }
+            rgb.constraints = RigidbodyConstraints2D.None;
+            v_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
 
-            ran = false;
-           // spcl_grnd = false;
-            StopAllCoroutines();
-        }                     
+            transform.position = new Vector3(b.x, b.y, 0);
+            v_blk.transform.position = new Vector3(a.x, a.y, 0);
+                
+            v_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX |
+            RigidbodyConstraints2D.FreezeRotation;
+        }
+
+        touching.Clear();
+        rgb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+
+        return;        
     }
+    private void FixedUpdate()
+    {
+        // Debug.Log();
+
+        var hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
+        Vector2.right * -1, 2f, LayerMask.GetMask("blocks")) ;
+
+        if (hit.collider != null)
+        {
+            h_blk = hit.collider.gameObject;
+        }     
+        
+        var hit2 = Physics2D.Raycast(transform.GetChild(1).transform.position,
+        Vector2.up, 2f, LayerMask.GetMask("blocks"));
+
+        if (hit2.collider != null)
+        {
+            v_blk = hit2.collider.gameObject;
+        }
+    }
+
     public void pickup()
     {
+       
         if (colm != null)
         {
              colm.GetComponent<column>().Takeoff(gameObject);
         }
 
-        columns.Clear();
+        //columns.Clear();
         touching.Clear();
+
     }
-    public void Lock(int ind, GameObject col=null)
+    /*public void Lock(int ind, GameObject col=null)
     {
         Vector3 pos = new Vector3(0,0,0);
         colm = null;
@@ -175,12 +200,12 @@ public class block : MonoBehaviour
         rgb.position = new Vector2(pos.x, rgb.position.y);
         rgb.constraints =  RigidbodyConstraints2D.FreezeRotation;
         rgb.SetRotation(0);
-    }
+    }*/
     // Update is called once per frame
     void Update()
     {
-       
-        StartCoroutine(move());
+
+        //StartCoroutine(move());
 
         if (die == 0)
         {
@@ -236,7 +261,7 @@ public class block : MonoBehaviour
     private void explode()
     {
         //Check();
-        pickup();
+        //pickup();
         spr.color = new Color(1, 1, 1);
         //StopAllCoroutines();
         ani.Play("explode");
@@ -250,11 +275,9 @@ public class block : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-
         if (collision.gameObject.layer == 9
          && collision.gameObject.GetComponent<block>().color == color)
         {
-            touching.Clear();
             if (!touching.Contains(collision.gameObject))
             {
                 touching.Add(collision.gameObject);
@@ -262,21 +285,23 @@ public class block : MonoBehaviour
             }
             // touching.Add(GameObject.Find("block (11)");
         }   
-        
-        if (collision.gameObject.layer == 13)
-        {
-            if (!columns.Contains(collision.gameObject))
-            {
-                locked = false;
-                columns.Add(collision.gameObject);
-            }
-        }
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        
-        if(collision.gameObject.layer == 8 || collision.gameObject.layer == 9)
+        if (collision.gameObject.layer == 9
+        && collision.gameObject.GetComponent<block>().color == color)
+        {
+
+            if (!touching.Contains(collision.gameObject))
+            {
+                touching.Add(collision.gameObject);
+                Check();
+            }
+            // touching.Add(GameObject.Find("block (11)");
+        }
+
+        if (collision.gameObject.layer == 8 || collision.gameObject.layer == 9)
         {
             grounded = true;
         }
@@ -315,11 +340,6 @@ public class block : MonoBehaviour
         {
 
             touching.Clear();
-        }
-        if (collision.gameObject.layer == 13)
-        {
-            locked = false;
-            columns.Remove(collision.gameObject);
         }
     }
 }

@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Linq;
+
 public class block_queue : MonoBehaviour
 {
 
-    public Transform g, block, blk_spn;
+    public Transform g, blk_spn ;
     float s = 0.5f, drp_tm;
     bool end_of_list;
     Queue<GameObject> q = new Queue<GameObject>();
-    public GameObject colm;
+    public GameObject colm, n_block,block;
     GameObject c_b = null;
     float t_m = 0.05f, bts = 0.05f;
     System.Random random = new System.Random();
@@ -18,6 +20,7 @@ public class block_queue : MonoBehaviour
 
     float[] pos = new float[19];
     Queue<string> color = new Queue<string>();
+    List<GameObject> colms = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
     {
@@ -38,27 +41,38 @@ public class block_queue : MonoBehaviour
         for(int i = 0; i < 19; i++)
         {
             var blk = Instantiate(colm, 
-            new Vector3((pos[i]),5.14f,0), blk_spn.rotation); 
+            new Vector3((pos[i]),5.14f,0), blk_spn.rotation);
+            //blk.GetComponent<column>().block = block;
+            colms.Add(blk);
         }
 
         float st_y = -9;
-
+        
         string[] cols = { "green", "blue", "red" };
         int col_i = 0;
 
-        for(int i = 0; i < 2; i++)
+        for(int i = 0; i < 4; i++)
         {
-            for(int b = 0; b < 19; b++)
+            for (int b = 0; b < 19; b++)
             {
-                if(col_i > 2)
+                if (col_i > 2)
                 {
                     col_i = 0;
                 }
-                var blk = Instantiate(block, blk_spn.position, blk_spn.rotation);
-                blk.transform.position = new Vector3(pos[b], st_y, 0);
-                blk.GetComponent<block>().color = "none";
-                blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
-                col_i++;
+                if (i < 2)
+                {
+                    var blk = Instantiate(n_block, blk_spn.position, blk_spn.rotation);
+                    blk.transform.position = new Vector3(pos[b], st_y, 0);
+                    col_i++;
+                }
+                else
+                {
+                    var blk = Instantiate(block, blk_spn.position, blk_spn.rotation);
+                    blk.transform.position = new Vector3(pos[b], st_y, 0);
+                    blk.GetComponent<block>().color = cols[col_i];
+                    blk.GetComponent<block>().colm = colms[b];
+                    col_i++;
+                }
             } 
 
             st_y += 2;
@@ -125,9 +139,8 @@ public class block_queue : MonoBehaviour
                 drp_tm = 0;
                 System.Random r = new System.Random();
                 int ax = r.Next(0, 19);
-                var n_b = Instantiate(block, new Vector2(pos[ax], blk_spn.position.y), blk_spn.rotation);
                 StartCoroutine(kill(q.Dequeue()));
-                n_b.GetComponent<block>().color = color.Peek();                
+                colms.ElementAt(ax).GetComponent<column>().drop(color.Peek());
                 color.Dequeue();
                 c_b = q.Peek();
             }

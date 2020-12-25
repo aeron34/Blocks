@@ -22,17 +22,29 @@ o Implement heart/lives system:
 
 o Create the main menu.
 
-o Implement block swap system:
-
-	-
-	
-
-o Use the block object itself as the
-object that calls the column it belongs
-to's methods, give the block a collumn
-gameobject.
 
 
+o Implement Vertical Swap - CURRENTLY
+
+o Implement Distance swapping
+
+o Implement RayGun that
+blows up any blocks a straight
+line.
+
+o Make it so you can only
+use one assist at a time,
+(btw assists are the spiders, 
+ray guns, and all that)
+
+o Implement Spider.
+
+o Implem. grenade up any 
+blocks in the vinicity
+
+o HAVE 3 CHARS in the beginning,
+only increase the amount after 
+viewership increases.
 
 END X: -20.3
 MAX X: 20.3
