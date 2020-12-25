@@ -6,7 +6,7 @@ public class column : MonoBehaviour
 {
     public List<GameObject> blocks;
     bool run = false;
-    //float t = 0;
+    float t = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,26 +16,19 @@ public class column : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
     }
 
-   private void OnTriggerEnter2D(Collider2D collision)
+    public void Takeoff(GameObject a)
     {
- 
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.gameObject.layer == 9)
+        foreach (GameObject n in blocks)
         {
-            var scr = collision.gameObject.GetComponent<block>();
-         
-            blocks.Remove(collision.gameObject);
-            foreach (GameObject n in blocks)
+            if (n != null)
             {
                 n.GetComponent<block>().locked = false;
-                n.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePositionY;
+                n.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX |
+                    RigidbodyConstraints2D.FreezeRotation;
             }
         }
+        blocks.Clear();
     }
 }

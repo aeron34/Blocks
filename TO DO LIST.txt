@@ -20,35 +20,17 @@ o Implement heart/lives system:
 
 	- Anchor in top left with canvas.
 
-o Implement block swap system.
-
 o Create the main menu.
 
-o When blocks fall, until they're
-touched by player they are in
-locked mode (x position is frozen).
+o Implement block swap system:
 
-o Implement auto snap feat on
-blocks, basically they gravitate
-horizon. to the closest block:
+	-
 	
-	- add a base on the bottom, 
-	these will just be dull blocks
-	that can't be picked up or combo'd,
-	nothing. O.nly for alignment purposes.
 
-	- block below's lock_x
-	bool has to be true
-	
-	- (TRY 1ST) Use a raycast
-	to detect the object below,
-	and snap to it.
-
-	- (MAYBE) if two blocks below
-	have the same distance
-	from said block's center,
-	randomly pick between
-	the 2.
+o Use the block object itself as the
+object that calls the column it belongs
+to's methods, give the block a collumn
+gameobject.
 
 
 

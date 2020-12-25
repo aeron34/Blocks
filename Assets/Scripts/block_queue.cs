@@ -16,7 +16,7 @@ public class block_queue : MonoBehaviour
     System.Random random = new System.Random();
     int c_n = 0;
 
-    float[] pos = new float[21];
+    float[] pos = new float[19];
     Queue<string> color = new Queue<string>();
     // Start is called before the first frame update
     void Start()
@@ -29,27 +29,26 @@ public class block_queue : MonoBehaviour
         StartCoroutine(move(c_b));
         pos[0] = -20.3f;
 
-        for(int i = 1; i < 21; i++)
+        for(int i = 1; i < 19; i++)
         {
-            double n = (pos[i - 1] + 2);
+            double n = (pos[i - 1] + 2.2);
             pos[i] = (float)(Math.Round(n, 2));
         }
-        for(int i = 0; i < 21; i++)
-        {
-            var blk = Instantiate(colm, colm.transform);
-            blk.transform.position = new Vector3(pos[i], 5.14f, 0);
-        }
 
-        
+        for(int i = 0; i < 19; i++)
+        {
+            var blk = Instantiate(colm, 
+            new Vector3((pos[i]),5.14f,0), blk_spn.rotation); 
+        }
 
         float st_y = -9;
 
         string[] cols = { "green", "blue", "red" };
         int col_i = 0;
 
-        for(int i = 0; i < 3; i++)
+        for(int i = 0; i < 2; i++)
         {
-            for(int b = 0; b < 21; b++)
+            for(int b = 0; b < 19; b++)
             {
                 if(col_i > 2)
                 {
@@ -57,7 +56,8 @@ public class block_queue : MonoBehaviour
                 }
                 var blk = Instantiate(block, blk_spn.position, blk_spn.rotation);
                 blk.transform.position = new Vector3(pos[b], st_y, 0);
-                blk.GetComponent<block>().color = cols[col_i];
+                blk.GetComponent<block>().color = "none";
+                blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
                 col_i++;
             } 
 
@@ -123,7 +123,9 @@ public class block_queue : MonoBehaviour
             }else
             {
                 drp_tm = 0;
-                var n_b = Instantiate(block, blk_spn.position, blk_spn.rotation);
+                System.Random r = new System.Random();
+                int ax = r.Next(0, 19);
+                var n_b = Instantiate(block, new Vector2(pos[ax], blk_spn.position.y), blk_spn.rotation);
                 StartCoroutine(kill(q.Dequeue()));
                 n_b.GetComponent<block>().color = color.Peek();                
                 color.Dequeue();

@@ -12,7 +12,7 @@ public class first : MonoBehaviour
     private SpriteRenderer spr;
     public float xS = 0, xY = 15, di;
     public bool jump = false, t_e, c_e;
-    public int pickup, thr_v = 50;
+    public int pickup, thr_v = 25;
     GameObject block = null;
     Camera camm;
     public float thr_i = 0, sh_dur = 0, sh_mag = 0, drag;
@@ -77,7 +77,7 @@ public class first : MonoBehaviour
             {
                 block.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
                 block.GetComponent<block>().follow = true;
-                block.GetComponent<block>().columns.Clear();
+                block.GetComponent<block>().pickup();
                 GetComponent<BoxCollider2D>().offset = new Vector2(-0.0015f, 0.08f);
                 GetComponent<BoxCollider2D>().size = new Vector2(0.4f, 0.96f);
                 pickup = 2;
@@ -88,7 +88,6 @@ public class first : MonoBehaviour
                 GetComponent<BoxCollider2D>().offset = new Vector2(-0.004f, -0.12f);
                 GetComponent<BoxCollider2D>().size = new Vector2(0.33f, 0.56f);
                 block.GetComponent<block>().thrown(thr_v);
-                block.GetComponent<block>().spcl_grnd = false;
                 pickup = 0;
                 thr_i = 0;
             }
@@ -142,11 +141,11 @@ public class first : MonoBehaviour
           Vector2.right * di, 6f, LayerMask.GetMask("blocks"));
         if (hit2.collider != null)
         {
-            thr_v = 20;
+            thr_v = 25/2;
         }
         else
         {
-            thr_v = 50;
+            thr_v =25;
         }
     }
 

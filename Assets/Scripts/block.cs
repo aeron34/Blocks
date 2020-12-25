@@ -14,6 +14,7 @@ public class block : MonoBehaviour
     public bool follow;
     public List<GameObject> touching;
     public List<GameObject> columns;
+    GameObject colm;
     public int combo, ni = 0, die = 0;
     public bool t = false;
     public string color;
@@ -31,7 +32,13 @@ public class block : MonoBehaviour
         rgb = GetComponent<Rigidbody2D>();
         spr = GetComponent<SpriteRenderer>();
         MyColor();
-
+        rgb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        if (color == "none")
+        {
+            Destroy(GetComponent<block>());
+            gameObject.layer = 8;
+            rgb.constraints = RigidbodyConstraints2D.FreezeAll;
+        }
     }
 
     public void MyColor()
@@ -51,7 +58,10 @@ public class block : MonoBehaviour
      }
     public void Check()
     {
-
+        if(color == "none")
+        {
+            return;
+        }
         int coll_objs = 1, last_len = 0, i = 0;
         touching.Add(gameObject);
         touching = touching.GroupBy(a => a.gameObject).Select(a => a.First()).ToList();
@@ -91,7 +101,7 @@ public class block : MonoBehaviour
             ran = true;
             last_pos = transform.position.x;
 
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(1.25f);
 
             if ((Math.Round(last_pos, 2)) == (Math.Round(transform.position.x, 2)))
             {
@@ -122,9 +132,20 @@ public class block : MonoBehaviour
             StopAllCoroutines();
         }                     
     }
+    public void pickup()
+    {
+        if (colm != null)
+        {
+             colm.GetComponent<column>().Takeoff(gameObject);
+        }
+
+        columns.Clear();
+        touching.Clear();
+    }
     public void Lock(int ind, GameObject col=null)
     {
         Vector3 pos = new Vector3(0,0,0);
+        colm = null;
         if (ind >= 0)
         {
             if (ind < columns.ToArray().Length)
@@ -134,6 +155,7 @@ public class block : MonoBehaviour
                     columns.ElementAt(ind).GetComponent<column>().blocks.Add(gameObject);
                 }
                 pos = columns.ElementAt(ind).transform.position;
+                colm = columns.ElementAt(ind).gameObject;
             }
             else
             {
@@ -147,11 +169,11 @@ public class block : MonoBehaviour
             {
                 col.GetComponent<column>().blocks.Add(gameObject);
             }
-
+            colm = col;
             pos = col.transform.position;
         }
         rgb.position = new Vector2(pos.x, rgb.position.y);
-        rgb.constraints = RigidbodyConstraints2D.FreezeAll;
+        rgb.constraints =  RigidbodyConstraints2D.FreezeRotation;
         rgb.SetRotation(0);
     }
     // Update is called once per frame
@@ -207,12 +229,14 @@ public class block : MonoBehaviour
     {
         follow = false;
         rgb.simulated = true;
+        rgb.constraints = RigidbodyConstraints2D.FreezeRotation;
         rgb.velocity = new Vector2((vel * p.GetComponent<first>().di), thr_s);
     }
 
     private void explode()
     {
         //Check();
+        pickup();
         spr.color = new Color(1, 1, 1);
         //StopAllCoroutines();
         ani.Play("explode");
@@ -224,28 +248,26 @@ public class block : MonoBehaviour
     }
 
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
 
         if (collision.gameObject.layer == 9
-          && collision.gameObject.GetComponent<block>().color == color)
+         && collision.gameObject.GetComponent<block>().color == color)
         {
+            touching.Clear();
             if (!touching.Contains(collision.gameObject))
             {
                 touching.Add(collision.gameObject);
                 Check();
             }
             // touching.Add(GameObject.Find("block (11)");
-        }
-    }
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-
-
+        }   
+        
         if (collision.gameObject.layer == 13)
         {
             if (!columns.Contains(collision.gameObject))
             {
+                locked = false;
                 columns.Add(collision.gameObject);
             }
         }
@@ -257,8 +279,8 @@ public class block : MonoBehaviour
         if(collision.gameObject.layer == 8 || collision.gameObject.layer == 9)
         {
             grounded = true;
-         
         }
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -277,8 +299,9 @@ public class block : MonoBehaviour
         }
         if (collision.gameObject.layer == 9)
         {
-            touching.Remove(collision.gameObject);
+            touching.Clear();
         }
+
     }
     /* Make a raycast on the player so when an
      * object is detected too close to him
@@ -290,10 +313,12 @@ public class block : MonoBehaviour
     {
         if (collision.gameObject.layer == 9)
         {
-            touching.Remove(collision.gameObject);
+
+            touching.Clear();
         }
         if (collision.gameObject.layer == 13)
         {
+            locked = false;
             columns.Remove(collision.gameObject);
         }
     }

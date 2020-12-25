@@ -19,7 +19,7 @@ public class cam : MonoBehaviour
     }
     public IEnumerator Shake()
     {
-        Vector3 orignalPosition = transform.position;
+        Vector3 orignalPosition = new Vector3(-0.5f, 0, -10);
         float elapsed = 0f;
 
         while (elapsed < duration)
