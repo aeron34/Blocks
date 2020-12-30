@@ -38,7 +38,7 @@ public class column : MonoBehaviour
         {
             if (n != null)
             {
-                n.GetComponent<block>().locked = false;
+               // n.GetComponent<block>().locked = false;
             }
         }
         blocks.Clear();

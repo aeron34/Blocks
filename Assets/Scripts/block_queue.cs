@@ -14,7 +14,7 @@ public class block_queue : MonoBehaviour
     Queue<GameObject> q = new Queue<GameObject>();
     public GameObject colm, n_block,block;
     GameObject c_b = null;
-    float t_m = 0.05f, bts = 0.05f;
+    float t_m = 0.05f, bts = 0.1f;
     System.Random random = new System.Random();
     int c_n = 0;
 
@@ -47,26 +47,32 @@ public class block_queue : MonoBehaviour
         }
 
         float st_y = -9;
-        
-        string[] cols = { "green", "blue", "red" };
-        int col_i = 0;
 
-        for(int i = 0; i < 4; i++)
+        string[] cols = { "green", "blue", "red", "purple", "white", "yellow" };
+
+        int col_i = -1, c_c=0;
+
+        int[,] orien = new int[2, 4]{ { 0, 1, 2, 3},{ 2, 3, 0, 1} };
+        
+        for(int i = 0; i < 6; i++)
         {
+
+            col_i++;
             for (int b = 0; b < 19; b++)
             {
-                if (col_i > 2)
+                if (col_i > 5)
                 {
                     col_i = 0;
                 }
                 if (i < 2)
                 {
+                    //These are the white blocks
                     var blk = Instantiate(n_block, blk_spn.position, blk_spn.rotation);
                     blk.transform.position = new Vector3(pos[b], st_y, 0);
-                    col_i++;
                 }
                 else
                 {
+                    //These are the actual blocks
                     var blk = Instantiate(block, blk_spn.position, blk_spn.rotation);
                     blk.transform.position = new Vector3(pos[b], st_y, 0);
                     blk.GetComponent<block>().color = cols[col_i];
@@ -81,9 +87,10 @@ public class block_queue : MonoBehaviour
 
     }
 
+
     public void setColor(GameObject a)
     {
-        c_n = random.Next(3) + 1;
+        c_n = random.Next(6) + 1;
 
         switch (c_n)
         {
@@ -99,8 +106,20 @@ public class block_queue : MonoBehaviour
                 color.Enqueue("red");
                 a.GetComponent<Image>().color = new Color(255f, 0, 0, (.4f));
                 break;
+            case 4:
+                color.Enqueue("purple");
+                a.GetComponent<Image>().color = new Color(133f, 0, 221, (.4f));
+                break;
+            case 5:
+                color.Enqueue("white");
+                a.GetComponent<Image>().color = new Color(255f, 255f, 255f, (.4f));
+                break;  
+            case 6:
+                color.Enqueue("yellow");
+                a.GetComponent<Image>().color = new Color(255f, 255f, 0f, (.4f));
+                break;
         }
-
+        //"purple", "white", "yellow"
     }
     // Update is called once per frame
     void Update()
@@ -191,7 +210,7 @@ public class block_queue : MonoBehaviour
                 if(act_dist == -2350)
                 {
                     end_of_list = true;
-                    bts = 0.15f;
+                    bts = 0.55f;
                 }
                 yield return 0;
                 break;

@@ -9,18 +9,14 @@ public class block : MonoBehaviour
     private GameObject p;
     private SpriteRenderer spr;
     private Rigidbody2D rgb;
-    private bool chk = false, strt_al = true;
     private Animator ani;
     public bool follow;
     public List<GameObject> touching;
     public GameObject colm, v_blk, h_blk;
-    public int combo, ni = 0, die = 0;
-    public bool t = false;
+    public int die = 0;
+    public float nt = 0;
     public string color;
-    public bool locked = false, spcl_grnd, grounded, ran = false;
-    float last_pos;
-    public float thr_s = 5f;
-    private float[] dists = new float[4];
+    public bool grounded;
     // Start is called before the first frame update
     void Start()
     {
@@ -51,8 +47,18 @@ public class block : MonoBehaviour
             case "red":
                 spr.color = new Color(1.0f, 0.0f, 0f, 1.0f);
                 break;
+            case "purple":
+                spr.color = new Color(133/255f, 0, 221/255, (1f));
+                break;
+            case "white":
+                spr.color = new Color(255/255f, 255/255f, 255/255f, (1f));
+                break;
+            case "yellow":
+                spr.color = new Color(255f, 255f, 0f, 1f);
+                break;
         }
-     }
+    }
+     
     public void Check()
     {
         if(color == "none")
@@ -86,7 +92,6 @@ public class block : MonoBehaviour
                 n.GetComponent<block>().die = 1;
             }
         }
-        chk = false;
         //        touching.Clear();
 
     }
@@ -117,7 +122,6 @@ public class block : MonoBehaviour
         {
             Vector2 a = gameObject.transform.position;
             Vector2 b = v_blk.GetComponent<Rigidbody2D>().position;
-            GameObject pc = colm;
 
             rgb.constraints = RigidbodyConstraints2D.None;
             v_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
@@ -217,7 +221,6 @@ public class block : MonoBehaviour
                     0f);
 
                 grounded = false;
-                locked = false;
                 spr.flipX = p.GetComponent<SpriteRenderer>().flipX;
 
 
@@ -249,14 +252,6 @@ public class block : MonoBehaviour
         }
     }
 
-
-    public void thrown(int vel)
-    {
-        follow = false;
-        rgb.simulated = true;
-        rgb.constraints = RigidbodyConstraints2D.FreezeRotation;
-        rgb.velocity = new Vector2((vel * p.GetComponent<first>().di), thr_s);
-    }
 
     private void explode()
     {

@@ -8,15 +8,13 @@ public class first : MonoBehaviour
     // Start is called before the first frame update
 
     Rigidbody2D rgb;
-    public float c_l, c_h, off;
     public Animator ani;
     private SpriteRenderer spr;
     public float xS = 0, xY = 15, di;
     public bool jump = false, t_e, c_e;
-    GameObject h_blk = null, v_blk = null;
-    public GameObject dist_blk;
+    GameObject h_blk = null, v_blk = null, dist_blk;
     Camera camm;
-    public float thr_i = 0, sh_dur = 0, sh_mag = 0, drag;
+    public float thr_i = 0, drag;
     void Start()
     {
         camm = Camera.main;

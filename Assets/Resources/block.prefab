@@ -210,17 +210,11 @@ MonoBehaviour:
   follow: 0
   touching: []
   colm: {fileID: 0}
-  blk: {fileID: 0}
-  combo: 0
-  ni: 0
+  v_blk: {fileID: 0}
+  h_blk: {fileID: 0}
   die: 0
-  t: 0
   color: 
-  locked: 0
-  spcl_grnd: 0
   grounded: 0
-  ran: 0
-  thr_s: 5
 --- !u!95 &2474155211500712622
 Animator:
   serializedVersion: 3
@@ -264,5 +258,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.5, y: 2.5}
+  m_Size: {x: 2.2, y: 2.2}
   m_EdgeRadius: 0
