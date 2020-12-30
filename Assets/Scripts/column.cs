@@ -12,7 +12,7 @@ public class column : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        blocks = new List<GameObject>();
+       // blocks = new List<GameObject>();
         block = Resources.Load<GameObject>("block");
   
 
@@ -27,10 +27,12 @@ public class column : MonoBehaviour
     public void drop(string col="")
     {
         var n_b = Instantiate(block, transform.position, transform.rotation);
-
+       
         n_b.transform.position = new Vector3(transform.position.x, 10.14f, 0);
         n_b.GetComponent<Rigidbody2D>().simulated = true;
         n_b.GetComponent<block>().color = col;
+        n_b.GetComponent<block>().colm = gameObject; 
+       // blocks.Add(n_b);
     }
     public void Takeoff(GameObject a)
     {
@@ -38,9 +40,10 @@ public class column : MonoBehaviour
         {
             if (n != null)
             {
-               // n.GetComponent<block>().locked = false;
+                n.GetComponent<block>().sChk = true;
             }
         }
-        blocks.Clear();
+        blocks.Remove(a);
+        //blocks.Clear();
     }
 }

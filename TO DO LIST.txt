@@ -2,14 +2,6 @@
 o Implement block falling
 system:
 
-	- Create an array of
-	X points, as all blocks
-	will have the same 
-	Y.
-	
-	- Give blocks random
-	spawn times.
-
 	- Make it so if block
 	falls on head of player,
 	heart is lost.
@@ -31,8 +23,6 @@ use one assist at a time,
 (btw assists are the spiders, 
 ray guns, and all that)
 
-o Implement Spider - CURRENTLY
-
 o Make it so that the more 
 points you earn, the less
 real money you must spend.
@@ -41,7 +31,7 @@ of simp., for every 1000 points
 10 cents is taken off.
 
 o Implem. grenade up any 
-blocks in the vinicity
+blocks in the vinicity - CURRENTLY
 
 o HAVE 3 CHARS in the beginning,
 only increase the amount after 

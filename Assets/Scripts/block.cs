@@ -16,7 +16,7 @@ public class block : MonoBehaviour
     public int die = 0;
     public float nt = 0;
     public string color;
-    public bool grounded;
+    public bool grounded, sChk;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +32,7 @@ public class block : MonoBehaviour
             gameObject.layer = 8;
             rgb.constraints = RigidbodyConstraints2D.FreezeAll;
         }
+        colm.GetComponent<column>().blocks.Add(gameObject);
     }
 
     public void MyColor()
@@ -61,10 +62,12 @@ public class block : MonoBehaviour
      
     public void Check()
     {
+        
         if(color == "none")
         {
             return;
         }
+
         int coll_objs = 1, last_len = 0, i = 0;
         touching.Add(gameObject);
         touching = touching.GroupBy(a => a.gameObject).Select(a => a.First()).ToList();
@@ -143,7 +146,7 @@ public class block : MonoBehaviour
         // Debug.Log();
 
         var hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.right * -1, 2f, LayerMask.GetMask("blocks")) ;
+        Vector2.right * -1, 2f, LayerMask.GetMask("blocks"));
 
         if (hit.collider != null)
         {
@@ -171,45 +174,13 @@ public class block : MonoBehaviour
         touching.Clear();
 
     }
-    /*public void Lock(int ind, GameObject col=null)
-    {
-        Vector3 pos = new Vector3(0,0,0);
-        colm = null;
-        if (ind >= 0)
-        {
-            if (ind < columns.ToArray().Length)
-            {
-                if (!columns.ElementAt(ind).GetComponent<column>().blocks.Contains(gameObject))
-                {
-                    columns.ElementAt(ind).GetComponent<column>().blocks.Add(gameObject);
-                }
-                pos = columns.ElementAt(ind).transform.position;
-                colm = columns.ElementAt(ind).gameObject;
-            }
-            else
-            {
-                return;
-            }
-            
-        }
-        if(ind < 0)
-        {
-            if (!col.GetComponent<column>().blocks.Contains(gameObject))
-            {
-                col.GetComponent<column>().blocks.Add(gameObject);
-            }
-            colm = col;
-            pos = col.transform.position;
-        }
-        rgb.position = new Vector2(pos.x, rgb.position.y);
-        rgb.constraints =  RigidbodyConstraints2D.FreezeRotation;
-        rgb.SetRotation(0);
-    }*/
+
     // Update is called once per frame
     void Update()
     {
 
         //StartCoroutine(move());
+
 
         if (die == 0)
         {
@@ -244,6 +215,15 @@ public class block : MonoBehaviour
                 }
                 rgb.simulated = false;
             }
+            if(sChk && nt <= 40.0)
+            {
+                nt += 0.2f;
+            }
+            if(sChk && nt > 40)
+            {
+                sChk = false;
+                nt = 0;
+            }
         }
         if (die == 1)
         {
@@ -253,10 +233,12 @@ public class block : MonoBehaviour
     }
 
 
-    private void explode()
+    public void explode()
     {
         //Check();
         //pickup();
+        colm.GetComponent<column>().Takeoff(gameObject);
+
         spr.color = new Color(1, 1, 1);
         //StopAllCoroutines();
         ani.Play("explode");
@@ -276,7 +258,10 @@ public class block : MonoBehaviour
             if (!touching.Contains(collision.gameObject))
             {
                 touching.Add(collision.gameObject);
-                Check();
+                if (sChk)
+                {
+                    Check();
+                }
             }
             // touching.Add(GameObject.Find("block (11)");
         }   
@@ -291,7 +276,10 @@ public class block : MonoBehaviour
             if (!touching.Contains(collision.gameObject))
             {
                 touching.Add(collision.gameObject);
-                Check();
+                if (sChk)
+                {
+                    Check();
+                }
             }
             // touching.Add(GameObject.Find("block (11)");
         }
@@ -333,7 +321,6 @@ public class block : MonoBehaviour
     {
         if (collision.gameObject.layer == 9)
         {
-
             touching.Clear();
         }
     }

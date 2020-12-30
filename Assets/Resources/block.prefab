@@ -213,8 +213,10 @@ MonoBehaviour:
   v_blk: {fileID: 0}
   h_blk: {fileID: 0}
   die: 0
+  nt: 0
   color: 
   grounded: 0
+  sChk: 0
 --- !u!95 &2474155211500712622
 Animator:
   serializedVersion: 3
@@ -258,5 +260,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.2, y: 2.2}
+  m_Size: {x: 2.75, y: 2.75}
   m_EdgeRadius: 0

@@ -13,6 +13,7 @@ public class first : MonoBehaviour
     public float xS = 0, xY = 15, di;
     public bool jump = false, t_e, c_e;
     GameObject h_blk = null, v_blk = null, dist_blk;
+    public GameObject gren;
     Camera camm;
     public float thr_i = 0, drag;
     void Start()
@@ -74,11 +75,34 @@ public class first : MonoBehaviour
             {
                 v_blk.GetComponent<block>().swap(1);
             }
+        }           
+        
+        if(Input.GetKeyDown(KeyCode.I))
+        {
+            if(h_blk != null)
+            {
+                h_blk.GetComponent<block>().Check();
+            }
+        }   
+        
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            if(v_blk != null)
+            {
+                v_blk.GetComponent<block>().Check();
+            }
         }        
         
         if(Input.GetKeyDown(KeyCode.K))
         {
             GetDist();
+        } 
+        
+        if(Input.GetKeyDown(KeyCode.O))
+        {
+            var g = Instantiate(gren, transform.position, transform.rotation);
+            g.GetComponent<grenade>().di = di;
+            g.GetComponent<Rigidbody2D>().velocity = new Vector2((32 * di), 10);
         }
 
         rgb.velocity = new Vector2(xS*di, rgb.velocity.y);
