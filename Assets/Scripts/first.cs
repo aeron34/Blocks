@@ -204,12 +204,4 @@ public class first : MonoBehaviour
             hurt_b = false;
         }
     }
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.layer == 9)
-        {
-
-        }
-    }
-
 }

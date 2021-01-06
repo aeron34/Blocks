@@ -8,22 +8,27 @@ using System.Linq;
 public class block_queue : MonoBehaviour
 {
 
-    public Transform g, blk_spn ;
+    public Transform g, blk_spn;
     float s = 0.5f, drp_tm;
-    bool end_of_list;
+    double time_passed = 0;
+    bool moving;
     Queue<GameObject> q = new Queue<GameObject>();
-    public GameObject colm, n_block,block;
+    public GameObject colm, n_block, block;
     GameObject c_b = null;
-    float t_m = 0.05f, bts = 0.1f;
+    float t_m = 0.05f, bts = 0.055f;
     System.Random random = new System.Random();
     int c_n = 0;
-
+    float[] mins = { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f };
     float[] pos = new float[19];
     Queue<string> color = new Queue<string>();
     List<GameObject> colms = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
     {
+        for(int i = 0; i < 10; i++)
+        {
+            mins[i] = mins[i] * 60f;
+        }
         var a = Instantiate(g, gameObject.transform);
         q.Enqueue(a.gameObject);
         setColor(a.gameObject);
@@ -125,21 +130,16 @@ public class block_queue : MonoBehaviour
     {
         drop();
 
-        if (!end_of_list)
+        time_passed += Time.deltaTime;
+        time_passed = Math.Round(time_passed, 2);
+        
+        for(int i = 0; i< 10; i++)
         {
-            if (t_m <= 20)
+            if(time_passed == mins[i])
             {
-                t_m += 0.065f;
+                Debug.Log("eq");
+                bts += 0.055f;
             }
-            else
-            {
-                t_m = 0.05f;
-                UP_List();
-            }
-        }
-        else
-        {
-
         }
     }
 
@@ -176,14 +176,15 @@ public class block_queue : MonoBehaviour
                     
                     
                  */
-
                 drp_tm = 0;
                 System.Random r = new System.Random();
                 int ax = r.Next(0, 19);
                 StartCoroutine(kill(q.Dequeue()));
                 colms.ElementAt(ax).GetComponent<column>().drop(color.Peek());
                 color.Dequeue();
+                 UP_List();
                 c_b = q.Peek();
+               
             }
             var bar = c_b.transform.Find("bar").gameObject;
 
@@ -212,42 +213,24 @@ public class block_queue : MonoBehaviour
 
     public IEnumerator move(GameObject obj, float b_d=1)
     {
+        
         var rect = obj.GetComponent<RectTransform>();
         var x = rect.anchoredPosition.x;
         var a_x = Math.Abs(rect.anchoredPosition.x);
-        float dist = a_x + (100f * b_d);
-        float act_dist = x - (100f * b_d);
+        float dist = a_x + (-1280 * b_d);
+        float act_dist = -1280;
 
-        while (x > act_dist)
+        while (rect.anchoredPosition.x > act_dist + 1)
         {
-           
-            float sx = Math.Abs(((dist - a_x) * 0.05f));
-            a_x += sx;
-            x -= sx;
-            if (obj != null)
-            {
-                if (x <= act_dist + 2)
-                {
-                    x = act_dist;
-                    a_x = dist;
-                    rect.anchoredPosition = new Vector2(x, -50f);
-                
-                    if(act_dist == -2350)
-                    {
-                        end_of_list = true;
-                        bts = 0.55f;
-                    }
-                    yield return 0;
-                    break;
-                }
-            
-                rect.anchoredPosition = new Vector2(x, -50f);
-                x = rect.anchoredPosition.x;
-            }
-            
+            moving = true;
+            rect.anchoredPosition = Vector3.Lerp(rect.anchoredPosition,
+            new Vector3(-1280f, -50f, obj.transform.position.z),
+            0.1f);
+
             yield return 0;
            // break;
         }
+        moving = false;
     }
     public IEnumerator kill(GameObject obj)
     {
@@ -263,10 +246,6 @@ public class block_queue : MonoBehaviour
             
             obj.GetComponent<Image>().color = new Color(c.r, c.g, c.b, al/255);
             yield return 0;
-        }
-        if(end_of_list)
-        {
-            UP_List();
         }
         Destroy(obj, .1f);  
     }
