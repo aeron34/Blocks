@@ -18,6 +18,40 @@ o Implement RayGun that
 blows up any blocks a straight
 line.
 
+o Have the objective of the game be to 
+get the highest block chain. There are
+2 main conditions in this game:
+
+	- Getting the longest block
+	chain automatically puts you
+	in the lead.
+
+	- But, Ultimately the person
+	with the highest score
+	wins. You can increase
+	your score by getting matches
+	and combo's. As for chains,
+	they work on a multiplier, 
+	of which the formula is:
+
+	(how_many_blocks * .25)^5 = how many points you earn.
+
+	//so for example:
+		//16 blocks
+		(16 * .25)^5 = 1024;
+
+
+o Play a beeping sound when the player is in the 
+column a block is about to fall in.
+
+o Make meteors fall within a 5 column vacinity.
+meaning, 2 left colms from the player, 2 right
+colms from the player, and the colm the 
+player is in.
+
+Make meterors destroy blocks, potentially 
+fucking up combos.
+
 o Make it so you can only
 use one assist at a time,
 (btw assists are the spiders, 
@@ -30,17 +64,7 @@ let's say for the sake
 of simp., for every 1000 points
 10 cents is taken off.
 
-o Implem. grenade up any 
-blocks in the vinicity - CURRENTLY
 
 o HAVE 3 CHARS in the beginning,
 only increase the amount after 
 viewership increases.
-
-END X: -20.3
-MAX X: 20.3
-
-Create an array of 
-20 float containing
-the X values, each
-value differing by 2.

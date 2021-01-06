@@ -42,11 +42,10 @@ public class block_queue : MonoBehaviour
         {
             var blk = Instantiate(colm, 
             new Vector3((pos[i]),5.14f,0), blk_spn.rotation);
-            //blk.GetComponent<column>().block = block;
             colms.Add(blk);
         }
 
-        float st_y = -9;
+        float st_y = -11;
 
         string[] cols = { "green", "blue", "red", "purple", "white", "yellow" };
 
@@ -146,15 +145,38 @@ public class block_queue : MonoBehaviour
 
     public void drop()
     {
-        var bar = c_b.transform.Find("bar").gameObject;
 
         if(true)
         { 
             if(drp_tm < 1)
             {
                 drp_tm += bts*.025f;
-            }else
-            {
+            }else{
+
+                /*
+                    This is the code that manages a block drop.
+                    
+                    1st, there's a var called drp_tm, which stands
+                    for drop timer. It increments by (bts*.25f) (see above)
+                    and bts is a variable that ranges from 0 - 1, if it's
+                    1 then the drop timer will increment extremely fast, 
+                    if it's almost zero then it will be slow. Back to drp_tm,
+                    we set it back to zero because we're about to drop a block,
+                    basically we reset it.
+                
+                    2nd, we create a random number from 0 - 19, because there's
+                    19 columns. the int 'ax' is what we assigned the result of the RNG to.
+
+                    3rd, We start a Coroutine called kill, it takes the block that we
+                    drop from the UI.
+
+                    4th we call the drop function of the column object which creates
+                    an entirely new block, and we pass the same color of the UI block 
+                    we just called 'kill' on.
+                    
+                    
+                 */
+
                 drp_tm = 0;
                 System.Random r = new System.Random();
                 int ax = r.Next(0, 19);
@@ -163,8 +185,9 @@ public class block_queue : MonoBehaviour
                 color.Dequeue();
                 c_b = q.Peek();
             }
+            var bar = c_b.transform.Find("bar").gameObject;
 
-           bar.GetComponent<RectTransform>().localScale = new Vector2(drp_tm, .1f);
+            bar.GetComponent<RectTransform>().localScale = new Vector2(drp_tm, .1f);
         }
     }
 
@@ -201,22 +224,27 @@ public class block_queue : MonoBehaviour
             float sx = Math.Abs(((dist - a_x) * 0.05f));
             a_x += sx;
             x -= sx;
-            if (x <= act_dist + 2)
+            if (obj != null)
             {
-                x = act_dist;
-                a_x = dist;
-                rect.anchoredPosition = new Vector2(x, -50f);
-                
-                if(act_dist == -2350)
+                if (x <= act_dist + 2)
                 {
-                    end_of_list = true;
-                    bts = 0.55f;
+                    x = act_dist;
+                    a_x = dist;
+                    rect.anchoredPosition = new Vector2(x, -50f);
+                
+                    if(act_dist == -2350)
+                    {
+                        end_of_list = true;
+                        bts = 0.55f;
+                    }
+                    yield return 0;
+                    break;
                 }
-                yield return 0;
-                break;
+            
+                rect.anchoredPosition = new Vector2(x, -50f);
+                x = rect.anchoredPosition.x;
             }
-            rect.anchoredPosition = new Vector2(x, -50f);
-            x = rect.anchoredPosition.x;
+            
             yield return 0;
            // break;
         }
@@ -226,6 +254,7 @@ public class block_queue : MonoBehaviour
         float al = 119;
         var s_r = obj.GetComponent<Image>();
         var rect = obj.GetComponent<RectTransform>();
+        obj.transform.Find("bar").gameObject.SetActive(false);
         while (al > 0)
         {
             al -= 3f;
@@ -239,7 +268,7 @@ public class block_queue : MonoBehaviour
         {
             UP_List();
         }
-        Destroy(obj);  
+        Destroy(obj, .1f);  
     }
 
 }

@@ -96,13 +96,11 @@ public class block : MonoBehaviour
             }
         }
         //        touching.Clear();
-
     }
 
     public void swap(int mode=0)
     {
-        Debug.Log("js");
- 
+        
         if (mode == 0 && h_blk != null)
         {
             Vector2 a = gameObject.transform.position;
@@ -178,7 +176,6 @@ public class block : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         //StartCoroutine(move());
 
 
@@ -237,6 +234,10 @@ public class block : MonoBehaviour
     {
         //Check();
         //pickup();
+        foreach(GameObject n in touching)
+        {
+            n.GetComponent<block>().die = 1;
+        }
         colm.GetComponent<column>().Takeoff(gameObject);
 
         spr.color = new Color(1, 1, 1);
@@ -321,7 +322,7 @@ public class block : MonoBehaviour
     {
         if (collision.gameObject.layer == 9)
         {
-            touching.Clear();
+            touching.Remove(collision.gameObject);
         }
     }
 }

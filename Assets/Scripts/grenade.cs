@@ -8,6 +8,7 @@ public class grenade : MonoBehaviour
     private Animator ani;
     private Rigidbody2D rgb;
     public GameObject bl;
+    int radius = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,13 +23,29 @@ public class grenade : MonoBehaviour
 
             ani.Play("explode");
             rgb.constraints = RigidbodyConstraints2D.FreezeAll;
-             var b = collision.gameObject;
-            bl = collision.gameObject;
-            b.GetComponent<block>().Check();
-            if (b.GetComponent<block>().touching.ToArray().Length < 3)
+            if (radius == 0) 
+            { 
+                var b = collision.gameObject;
+                b.GetComponent<block>().Check();
+                if (b.GetComponent<block>().touching.ToArray().Length < 3)
+                {
+                    b.GetComponent<block>().die = 2;
+                    b.GetComponent<block>().explode();
+                }
+            }
+            else
             {
-                b.GetComponent<block>().die = 2;
-                b.GetComponent<block>().explode();
+                var r = Physics2D.OverlapCircleAll(transform.position, radius, LayerMask.GetMask("blocks"));
+                for(int i = 0; i < r.Length; i++)
+                {
+                    var b = r[i].gameObject;
+                    b.GetComponent<block>().Check();
+                    if (b.GetComponent<block>().touching.ToArray().Length < 3)
+                    {
+                        b.GetComponent<block>().die = 2;
+                        b.GetComponent<block>().explode();
+                    }
+                }
             }
             Destroy(gameObject, 2f);
             GetComponent<BoxCollider2D>().enabled = false;

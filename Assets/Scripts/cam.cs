@@ -5,17 +5,33 @@ using UnityEngine;
 public class cam : MonoBehaviour
 {
     public float duration, magnitude;
+    public GameObject Target;
+    Vector3 velocity = Vector3.zero;
+    Camera camm;
     // Start is called before the first frame update
     void Start()
     {
+        camm = Camera.main;
         duration = 0.1f;
         magnitude = 0.3f;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+
+
+    }
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        /*
+         * DO NOT DELETE, FUNCTIONALITY IS FOR LOSS SCREEN AND SIMON + JOE PUZZLE MODE
+         
+        Time.timeScale = Mathf.Lerp(1.0f, 0.25f, 0.8f);
+        camm.orthographicSize = Mathf.Lerp(camm.orthographicSize, 3, 0.0145f);
+        transform.position = Vector3.Lerp(transform.position, 
+            new Vector3(Target.transform.position.x, Target.transform.position.y, -5),
+            0.1f);*/
     }
     public IEnumerator Shake()
     {
