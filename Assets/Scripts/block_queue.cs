@@ -28,6 +28,7 @@ public class block_queue : MonoBehaviour
         for(int i = 0; i < 10; i++)
         {
             mins[i] = mins[i] * 60f;
+
         }
         var a = Instantiate(g, gameObject.transform);
         q.Enqueue(a.gameObject);
@@ -132,12 +133,10 @@ public class block_queue : MonoBehaviour
 
         time_passed += Time.deltaTime;
         time_passed = Math.Round(time_passed, 2);
-        
         for(int i = 0; i< 10; i++)
-        {
+        {        
             if(time_passed == mins[i])
             {
-                Debug.Log("eq");
                 bts += 0.055f;
             }
         }
@@ -222,7 +221,6 @@ public class block_queue : MonoBehaviour
 
         while (rect.anchoredPosition.x > act_dist + 1)
         {
-            moving = true;
             rect.anchoredPosition = Vector3.Lerp(rect.anchoredPosition,
             new Vector3(-1280f, -50f, obj.transform.position.z),
             0.1f);
@@ -230,7 +228,6 @@ public class block_queue : MonoBehaviour
             yield return 0;
            // break;
         }
-        moving = false;
     }
     public IEnumerator kill(GameObject obj)
     {

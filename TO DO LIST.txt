@@ -18,6 +18,14 @@ o Implement RayGun that
 blows up any blocks a straight
 line.
 
+o implement mini indicator for what
+block you have in your possession. - CURRENTLY
+
+o Imp. combo counter on top of dude's
+head.
+
+o Add the animations
+
 o Have the objective of the game be to 
 get the highest block chain. There are
 2 main conditions in this game:
@@ -41,8 +49,7 @@ get the highest block chain. There are
 		(16 * .25)^5 = 1024;
 
 
-o Play a beeping sound when the player is in the 
-column a block is about to fall in.
+o Implement power ups coming out after block explosion.
 
 o Make meteors fall within a 5 column vacinity.
 meaning, 2 left colms from the player, 2 right

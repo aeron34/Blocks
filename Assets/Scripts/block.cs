@@ -10,7 +10,7 @@ public class block : MonoBehaviour
     private SpriteRenderer spr;
     private Rigidbody2D rgb;
     private Animator ani;
-    public bool follow;
+    public bool follow, runable=true;
     public List<GameObject> touching;
     public GameObject colm, v_blk, h_blk;
     public int die = 0;
@@ -20,6 +20,7 @@ public class block : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        runable = true;
         touching = new List<GameObject>();
         p = GameObject.Find("pic");
         ani = GetComponent<Animator>();
@@ -60,7 +61,7 @@ public class block : MonoBehaviour
         }
     }
      
-    public void Check()
+    public void Check(int mode=0)
     {
         
         if(color == "none")
@@ -86,8 +87,6 @@ public class block : MonoBehaviour
            // yield return null;
         }
 
-        //Debug.Log(touching.ToArray().Length);
-
         if(touching.ToArray().Length >= 3)
         {
             foreach (GameObject n in touching)
@@ -96,6 +95,44 @@ public class block : MonoBehaviour
             }
         }
         //        touching.Clear();
+    }
+
+    public IEnumerator flash()
+    {
+        if(!runable)
+        {
+            Debug.Log("doop");
+           yield break;
+        }
+        if (runable)
+        {
+            
+            float b = 1, by = 0.01f;
+            runable = false;
+            while (b > 0)
+            {
+                b -= by;
+                if(b < 0)
+                {
+                    b = 0f;
+                }
+                spr.color = new Color(spr.color.r, spr.color.g, spr.color.b, b);
+                yield return null;
+            }
+            while (b < 1)
+            {
+                b += by;
+                if (b > 1)
+                {
+                    b = 1f;
+                }
+                spr.color = new Color(spr.color.r, spr.color.g, spr.color.b, b);
+                yield return 0;
+            }
+        }
+        spr.color = new Color(spr.color.r, spr.color.g, spr.color.b, 1f);
+        yield return new WaitForSeconds(.25f);
+        runable = true;
     }
 
     public void swap(int mode=0)

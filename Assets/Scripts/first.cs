@@ -158,6 +158,7 @@ public class first : MonoBehaviour
         if (hit2.collider != null)
         {
             v_blk = hit2.collider.gameObject;
+          
         }
 
         var np = transform.GetChild(0).transform.position;
@@ -186,8 +187,8 @@ public class first : MonoBehaviour
                 StartCoroutine(hurt());
             }
         }
-
     }
+
     public IEnumerator hurt()
     {
         if (!hurt_b)
