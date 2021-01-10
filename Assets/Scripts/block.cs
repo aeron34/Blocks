@@ -173,6 +173,9 @@ public class block : MonoBehaviour
                 
             v_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX |
             RigidbodyConstraints2D.FreezeRotation;
+
+            v_blk.GetComponent<block>().v_blk = null;
+            v_blk.GetComponent<block>().h_blk = null;
         }
 
         touching.Clear();

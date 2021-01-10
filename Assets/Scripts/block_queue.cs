@@ -21,7 +21,7 @@ public class block_queue : MonoBehaviour
     float[] mins = { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f };
     float[] pos = new float[19];
     Queue<string> color = new Queue<string>();
-    List<GameObject> colms = new List<GameObject>();
+    public List<GameObject> colms = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
     {

@@ -15,7 +15,7 @@ public class Gizmo : MonoBehaviour
     // your pwr up runs out.
     public bool ground = false, top_hit, hurt_b = false;
     GameObject h_blk = null, v_blk = null, dist_blk;
-    public GameObject gren;
+    public GameObject gren, colm;
     Camera camm;
     private float thr_i = 0, drag;
     Queue<string> colors;
@@ -70,7 +70,7 @@ public class Gizmo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
         Movement();
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -83,7 +83,7 @@ public class Gizmo : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.U) && !(Input.GetKey(KeyCode.M)))
         {
-            if(colors.ToArray().Length >= 1)
+            if (colors.ToArray().Length >= 1)
             {
                 PowerUP(colors.Dequeue(), 1);
             }
@@ -95,6 +95,14 @@ public class Gizmo : MonoBehaviour
             {
                 v_blk.GetComponent<block>().swap(1);
             }
+        }
+        
+        if(Input.GetKeyDown(KeyCode.H) && dist_blk != null
+        && v_blk == null)
+        {
+           /* dist_blk.GetComponent<Rigidbody2D>().MovePosition(new Vector2());
+            dist_blk = null;
+            transform.GetChild(2).gameObject.SetActive(false);*/
         }
 
         if (Input.GetKeyDown(KeyCode.I))
@@ -155,6 +163,8 @@ public class Gizmo : MonoBehaviour
 
             dist_blk.GetComponent<block>().v_blk = v_blk;
             dist_blk.GetComponent<block>().swap(1);
+            dist_blk.GetComponent<block>().v_blk = null;
+            dist_blk.GetComponent<block>().h_blk = null;
             dist_blk = null;
             transform.GetChild(2).gameObject.SetActive(false);
             return;
@@ -277,9 +287,17 @@ public class Gizmo : MonoBehaviour
             {
                 StartCoroutine(hurt());
             }
-        }       
-        
-  
+        }
+
+        float least = 100;
+        foreach (GameObject n in FindObjectOfType<block_queue>().colms)
+        {
+            if(Math.Abs(n.transform.position.x - transform.position.x) < least)
+            {
+                least = Math.Abs(n.transform.position.x - transform.position.x);
+                colm = n;
+            }
+        }
     }
 
     public IEnumerator hurt()
@@ -298,4 +316,5 @@ public class Gizmo : MonoBehaviour
             hurt_b = false;
         }
     }
+
 }
