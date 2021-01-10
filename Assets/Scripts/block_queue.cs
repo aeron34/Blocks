@@ -27,7 +27,7 @@ public class block_queue : MonoBehaviour
     {
         for(int i = 0; i < 10; i++)
         {
-            mins[i] = mins[i] * 60f;
+            mins[i] *= 60f;
 
         }
         var a = Instantiate(g, gameObject.transform);
@@ -134,10 +134,11 @@ public class block_queue : MonoBehaviour
         time_passed += Time.deltaTime;
         time_passed = Math.Round(time_passed, 2);
         for(int i = 0; i< 10; i++)
-        {        
+        {
+            
             if(time_passed == mins[i])
-            {
-                bts += 0.055f;
+            {Debug.Log("pass" + mins[i]);
+                bts += 0.025f;
             }
         }
     }

@@ -18,9 +18,6 @@ o Implement RayGun that
 blows up any blocks a straight
 line.
 
-o implement mini indicator for what
-block you have in your possession. - CURRENTLY
-
 o Imp. combo counter on top of dude's
 head.
 
@@ -49,7 +46,7 @@ get the highest block chain. There are
 		(16 * .25)^5 = 1024;
 
 
-o Implement power ups coming out after block explosion.
+o Implement power ups coming out after block explosion. - CURRENTLY
 
 o Make meteors fall within a 5 column vacinity.
 meaning, 2 left colms from the player, 2 right
@@ -57,7 +54,12 @@ colms from the player, and the colm the
 player is in.
 
 Make meterors destroy blocks, potentially 
-fucking up combos.
+fucking up combos. - NEXT (1)
+
+o Implement UI, the hearts, the picture
+of the Character next to the hearts, 
+score in the top right - NEXT (2)
+
 
 o Make it so you can only
 use one assist at a time,

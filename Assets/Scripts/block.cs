@@ -6,7 +6,7 @@ using System.Linq;
 
 public class block : MonoBehaviour
 {
-    private GameObject p;
+    [SerializeField] private GameObject pwr_up;
     private SpriteRenderer spr;
     private Rigidbody2D rgb;
     private Animator ani;
@@ -22,7 +22,7 @@ public class block : MonoBehaviour
     {
         runable = true;
         touching = new List<GameObject>();
-        p = GameObject.Find("pic");
+        //p = GameObject.Find("pic");
         ani = GetComponent<Animator>();
         rgb = GetComponent<Rigidbody2D>();
         spr = GetComponent<SpriteRenderer>();
@@ -61,12 +61,12 @@ public class block : MonoBehaviour
         }
     }
      
-    public void Check(int mode=0)
+    public int Check()
     {
-        
+      
         if(color == "none")
         {
-            return;
+            return -1;
         }
 
         int coll_objs = 1, last_len = 0, i = 0;
@@ -87,49 +87,53 @@ public class block : MonoBehaviour
            // yield return null;
         }
 
+        /*
+         Fix the Check function with this:
+
+            o Keep the checking routine the exact same but 
+            use raycasts instead
+
+         */
+
         if(touching.ToArray().Length >= 3)
         {
             foreach (GameObject n in touching)
             {
                 n.GetComponent<block>().die = 1;
             }
+            FindObjectOfType<scorer>().UpdateScore(touching.ToArray().Length * 50);
+            return 1;
         }
-        //        touching.Clear();
+
+        return 0;
     }
 
     public IEnumerator flash()
     {
-        if(!runable)
-        {
-            Debug.Log("doop");
-           yield break;
-        }
-        if (runable)
-        {
             
-            float b = 1, by = 0.01f;
-            runable = false;
-            while (b > 0)
+        float b = 1, by = 0.01f;
+        runable = false;
+        while (b > 0)
+        {
+            b -= by;
+            if(b < 0)
             {
-                b -= by;
-                if(b < 0)
-                {
-                    b = 0f;
-                }
-                spr.color = new Color(spr.color.r, spr.color.g, spr.color.b, b);
-                yield return null;
+                b = 0f;
             }
-            while (b < 1)
-            {
-                b += by;
-                if (b > 1)
-                {
-                    b = 1f;
-                }
-                spr.color = new Color(spr.color.r, spr.color.g, spr.color.b, b);
-                yield return 0;
-            }
+            spr.color = new Color(spr.color.r, spr.color.g, spr.color.b, b);
+            yield return null;
         }
+        while (b < 1)
+        {
+            b += by;
+            if (b > 1)
+            {
+                b = 1f;
+            }
+            spr.color = new Color(spr.color.r, spr.color.g, spr.color.b, b);
+            yield return 0;
+        }
+
         spr.color = new Color(spr.color.r, spr.color.g, spr.color.b, 1f);
         yield return new WaitForSeconds(.25f);
         runable = true;
@@ -179,6 +183,7 @@ public class block : MonoBehaviour
     private void FixedUpdate()
     {
         // Debug.Log();
+        touching.Clear();
 
         var hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
         Vector2.right * -1, 2f, LayerMask.GetMask("blocks"));
@@ -195,6 +200,30 @@ public class block : MonoBehaviour
         {
             v_blk = hit2.collider.gameObject;
         }
+
+        //DIRECTIONAL RAYCASTS
+        RaycastHit2D[] rays = { Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y + 1.025f),
+            Vector2.up, 1f, LayerMask.GetMask("blocks")),
+            Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 1.025f),
+            Vector2.down, 1f, LayerMask.GetMask("blocks")), 
+            Physics2D.Raycast(new Vector2(transform.position.x - 1.025f, transform.position.y),
+            Vector2.left, 1f, LayerMask.GetMask("blocks")),
+            Physics2D.Raycast(new Vector2(transform.position.x + 1.025f, transform.position.y),
+            Vector2.right, 1f, LayerMask.GetMask("blocks"))
+        };
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (rays[i].collider != null)
+            {
+                if (!touching.Contains(rays[i].collider.gameObject)
+                    && rays[i].collider.gameObject.GetComponent<block>().color == color)
+                {
+                    touching.Add(rays[i].collider.gameObject);
+                }
+            }
+        }
+
     }
 
     public void pickup()
@@ -218,7 +247,7 @@ public class block : MonoBehaviour
 
         if (die == 0)
         {
-            if (follow)
+            /*if (follow)
             {
                 transform.position = new Vector3(
                     p.transform.position.x,
@@ -248,7 +277,7 @@ public class block : MonoBehaviour
 
                 }
                 rgb.simulated = false;
-            }
+            }*/
             if(sChk && nt <= 40.0)
             {
                 nt += 0.2f;
@@ -271,7 +300,18 @@ public class block : MonoBehaviour
     {
         //Check();
         //pickup();
-        foreach(GameObject n in touching)
+
+        System.Random random = new System.Random();
+        GetComponent<BoxCollider2D>().enabled = false;
+
+        if (random.Next(1, 6) == 2)
+        {
+            var g = Instantiate(pwr_up, transform.position, transform.rotation);
+            g.GetComponent<SpriteRenderer>().color = spr.color;
+            g.GetComponent<PowerUp>().color = color;
+        }
+
+        foreach (GameObject n in touching)
         {
             n.GetComponent<block>().die = 1;
         }
@@ -287,7 +327,11 @@ public class block : MonoBehaviour
 
     }
 
-
+    /* Make a raycast on the player so when an
+     * object is detected too close to him
+     * his throw speed will slow down to
+     * somethign that won't break the physics.
+     */
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (collision.gameObject.layer == 9
@@ -301,65 +345,6 @@ public class block : MonoBehaviour
                     Check();
                 }
             }
-            // touching.Add(GameObject.Find("block (11)");
-        }   
-    }
-
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (collision.gameObject.layer == 9
-        && collision.gameObject.GetComponent<block>().color == color)
-        {
-
-            if (!touching.Contains(collision.gameObject))
-            {
-                touching.Add(collision.gameObject);
-                if (sChk)
-                {
-                    Check();
-                }
-            }
-            // touching.Add(GameObject.Find("block (11)");
-        }
-
-        if (collision.gameObject.layer == 8 || collision.gameObject.layer == 9)
-        {
-            grounded = true;
-        }
-
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.layer == 8||collision.gameObject.layer == 9)
-        {
-            grounded = true;
-        }
-    }
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if(collision.gameObject.layer == 8 ||
-        collision.gameObject.layer == 9)
-        {
-            grounded = false;
-        }
-        if (collision.gameObject.layer == 9)
-        {
-            touching.Clear();
-        }
-
-    }
-    /* Make a raycast on the player so when an
-     * object is detected too close to him
-     * his throw speed will slow down to
-     * somethign that won't break the physics.
-     */
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.gameObject.layer == 9)
-        {
-            touching.Remove(collision.gameObject);
         }
     }
 }
