@@ -69,6 +69,7 @@ public class block : MonoBehaviour
             return -1;
         }
 
+        Debug.Log("call");
         int coll_objs = 1, last_len = 0, i = 0;
         touching.Add(gameObject);
         touching = touching.GroupBy(a => a.gameObject).Select(a => a.First()).ToList();
@@ -101,7 +102,13 @@ public class block : MonoBehaviour
             {
                 n.GetComponent<block>().die = 1;
             }
-            FindObjectOfType<scorer>().UpdateScore(touching.ToArray().Length * 50);
+            if (touching.ToArray().Length >= 4)
+            {
+                FindObjectOfType<scorer>().UpdateScore((int)Math.Pow(touching.ToArray().Length * .5, 5));
+            }
+            else {
+                FindObjectOfType<scorer>().UpdateScore(touching.ToArray().Length * 100);
+            }
             return 1;
         }
 
@@ -153,11 +160,23 @@ public class block : MonoBehaviour
                 
             transform.position = new Vector3(b.x, b.y, 0);
             h_blk.transform.position = new Vector3(a.x, a.y, 0);
+            
+            pc.GetComponent<column>().blocks.Remove(gameObject);
+            pc.GetComponent<column>().blocks.Add(h_blk);
+            
             colm = h_blk.GetComponent<block>().colm;
+
+            colm.GetComponent<column>().blocks.Remove(h_blk);
+            colm.GetComponent<column>().blocks.Add(gameObject);
+            
             h_blk.GetComponent<block>().colm = pc;
 
             h_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX |
             RigidbodyConstraints2D.FreezeRotation;
+
+            h_blk.GetComponent<block>().v_blk = null;
+            h_blk.GetComponent<block>().h_blk = null;
+ 
         }
 
         if(mode==1 && v_blk != null)
@@ -173,11 +192,14 @@ public class block : MonoBehaviour
                 
             v_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX |
             RigidbodyConstraints2D.FreezeRotation;
+            
 
             v_blk.GetComponent<block>().v_blk = null;
             v_blk.GetComponent<block>().h_blk = null;
+          
         }
-
+      v_blk = null;
+                h_blk = null;
         touching.Clear();
         rgb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
 
@@ -281,14 +303,21 @@ public class block : MonoBehaviour
                 }
                 rgb.simulated = false;
             }*/
-            if(sChk && nt <= 40.0)
+            if (sChk)
             {
-                nt += 0.2f;
-            }
-            if(sChk && nt > 40)
-            {
-                sChk = false;
-                nt = 0;
+                if (nt <= 80.0)
+                {
+                    nt += 2f;
+                }
+                if(nt % 10 == 0)
+                {
+                    Check();
+                }
+                if (sChk && nt > 80)
+                {
+                    sChk = false;
+                    nt = 0;
+                }
             }
         }
         if (die == 1)
@@ -303,30 +332,32 @@ public class block : MonoBehaviour
     {
         //Check();
         //pickup();
-
-        System.Random random = new System.Random();
-        GetComponent<BoxCollider2D>().enabled = false;
-
-        if (random.Next(1, 6) == 2)
+        if (die < 2)
         {
-            var g = Instantiate(pwr_up, transform.position, transform.rotation);
-            g.GetComponent<SpriteRenderer>().color = spr.color;
-            g.GetComponent<PowerUp>().color = color;
-        }
+            System.Random random = new System.Random();
+            GetComponent<BoxCollider2D>().enabled = false;
 
-        foreach (GameObject n in touching)
-        {
-            n.GetComponent<block>().die = 1;
-        }
-        colm.GetComponent<column>().Takeoff(gameObject);
+            if (random.Next(1, 6) == 2)
+            {
+                var g = Instantiate(pwr_up, transform.position, transform.rotation);
+                g.GetComponent<SpriteRenderer>().color = spr.color;
+                g.GetComponent<PowerUp>().color = color;
+            }
 
-        spr.color = new Color(1, 1, 1);
-        //StopAllCoroutines();
-        ani.Play("explode");
-        GetComponent<BoxCollider2D>().enabled = false;
-        rgb.simulated = false;
-        StartCoroutine(Camera.main.GetComponent<cam>().Shake());
-        Destroy(gameObject, 1f);
+            foreach (GameObject n in touching)
+            {
+                n.GetComponent<block>().die = 1;
+            }
+            colm.GetComponent<column>().Takeoff(gameObject);
+
+            spr.color = new Color(1, 1, 1);
+            //StopAllCoroutines();
+            ani.Play("explode");
+            GetComponent<BoxCollider2D>().enabled = false;
+            rgb.simulated = false;
+            StartCoroutine(Camera.main.GetComponent<cam>().Shake());
+            Destroy(gameObject, 1f);
+        }
 
     }
 

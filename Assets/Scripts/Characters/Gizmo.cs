@@ -13,9 +13,10 @@ public class Gizmo : MonoBehaviour
     public float cxS = 0, xS, xY = 35, di = 1, hearts = 3, pwr_dur = 0,
         pwr_drn; //pwr_drn variable, the higher it is the faster
     // your pwr up runs out.
-    public bool ground = false, top_hit, hurt_b = false;
+    public bool ground = false, good_space, top_hit, hurt_b = false;
     GameObject h_blk = null, v_blk = null, dist_blk;
-    public GameObject gren, colm;
+    public GameObject gren, colm, n_colm; //n_colm means whatever colm is after the 
+    //colm the player is in, it accounts for whether he's turned around or not.
     Camera camm;
     private float thr_i = 0, drag;
     Queue<string> colors;
@@ -23,6 +24,7 @@ public class Gizmo : MonoBehaviour
     {
         camm = Camera.main;
         Default();
+        di = 1;
         colors = new Queue<string>();
         pwr_drn = (0.01f)*0.1f;
         //Instantiate(n, transform.position, transform.rotation);
@@ -96,13 +98,32 @@ public class Gizmo : MonoBehaviour
                 v_blk.GetComponent<block>().swap(1);
             }
         }
-        
-        if(Input.GetKeyDown(KeyCode.H) && dist_blk != null
-        && v_blk == null)
+
+        if (Input.GetKeyDown(KeyCode.H) && dist_blk != null
+        && good_space && n_colm != null)
         {
-           /* dist_blk.GetComponent<Rigidbody2D>().MovePosition(new Vector2());
+            var blk_col = dist_blk.GetComponent<block>().colm;
+            dist_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+            
+            dist_blk.transform.position = new Vector2(n_colm.transform.position.x,
+                transform.position.y - .25f);
+            
+            transform.position = new Vector2(colm.transform.position.x, transform.position.y);
+
+            blk_col.GetComponent<column>().blocks.Remove(dist_blk);
+
+            n_colm.GetComponent<column>().blocks.Add(dist_blk);
+            dist_blk.GetComponent<block>().colm = n_colm;
+
+            dist_blk.GetComponent<block>().v_blk = null;
+            dist_blk.GetComponent<block>().h_blk = null;
+            
+            dist_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX |
+            RigidbodyConstraints2D.FreezeRotation;
+            
             dist_blk = null;
-            transform.GetChild(2).gameObject.SetActive(false);*/
+
+            transform.GetChild(2).gameObject.SetActive(false);
         }
 
         if (Input.GetKeyDown(KeyCode.I))
@@ -160,11 +181,24 @@ public class Gizmo : MonoBehaviour
     {
         if (dist_blk != null)
         {
+            GameObject pc = dist_blk.GetComponent<block>().colm;
+
+            pc.GetComponent<column>().blocks.Remove(dist_blk);
+            pc.GetComponent<column>().blocks.Add(v_blk);
+
+            colm = v_blk.GetComponent<block>().colm;
+
+            colm.GetComponent<column>().blocks.Remove(v_blk);
+            colm.GetComponent<column>().blocks.Add(gameObject);
+
+            dist_blk.GetComponent<block>().colm = colm;
+            v_blk.GetComponent<block>().colm = pc;
 
             dist_blk.GetComponent<block>().v_blk = v_blk;
             dist_blk.GetComponent<block>().swap(1);
             dist_blk.GetComponent<block>().v_blk = null;
             dist_blk.GetComponent<block>().h_blk = null;
+
             dist_blk = null;
             transform.GetChild(2).gameObject.SetActive(false);
             return;
@@ -237,6 +271,8 @@ public class Gizmo : MonoBehaviour
     {
         h_blk = null;
         ground = false;
+        good_space = false;
+
         RaycastHit2D hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
         Vector2.down, 1f, LayerMask.GetMask("blocks"));
 
@@ -288,14 +324,28 @@ public class Gizmo : MonoBehaviour
                 StartCoroutine(hurt());
             }
         }
+        
+        RaycastHit2D gd_spc = Physics2D.Raycast(transform.GetChild(0).transform.position,
+        Vector2.right*di, 3f, LayerMask.GetMask("blocks"));
+
+        if(gd_spc.collider == null)
+        {
+            good_space = true;
+        }
 
         float least = 100;
-        foreach (GameObject n in FindObjectOfType<block_queue>().colms)
+        var n = FindObjectOfType<block_queue>();
+        n_colm = null;
+        for (int i = 0; i < n.colms.ToArray().Length; i++)
         {
-            if(Math.Abs(n.transform.position.x - transform.position.x) < least)
+            if(Math.Abs(n.colms[i].transform.position.x - transform.position.x) < least)
             {
-                least = Math.Abs(n.transform.position.x - transform.position.x);
-                colm = n;
+                least = Math.Abs(n.colms[i].transform.position.x - transform.position.x);
+                colm = n.colms[i];
+                if (i != 0 && i != 19)
+                {
+                    n_colm = n.colms[(i + (1 * (int)di))];
+                }
             }
         }
     }
@@ -315,6 +365,11 @@ public class Gizmo : MonoBehaviour
             yield return new WaitForSeconds(3);
             hurt_b = false;
         }
+    }
+
+    private void OnTriggerEnter2D(Collision2D collision)
+    {
+
     }
 
 }

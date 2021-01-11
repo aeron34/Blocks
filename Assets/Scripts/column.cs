@@ -64,7 +64,7 @@ public class column : MonoBehaviour
     {
         foreach (GameObject n in blocks)
         {
-            if (n != null)
+            if (n != null && n.transform.position.y > a.transform.position.y)
             {
                 n.GetComponent<block>().sChk = true;
             }

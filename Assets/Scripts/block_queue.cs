@@ -82,6 +82,7 @@ public class block_queue : MonoBehaviour
                     blk.transform.position = new Vector3(pos[b], st_y, 0);
                     blk.GetComponent<block>().color = cols[col_i];
                     blk.GetComponent<block>().colm = colms[b];
+                    //colms[b].GetComponent<column>().
                     col_i++;
                 }
             } 
