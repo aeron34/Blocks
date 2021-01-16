@@ -353,42 +353,43 @@ public class Gizmo : MonoBehaviour
             {
                 v_blk = null;
             }
+        }
+        var np = transform.GetChild(0).transform.position;
 
-            var np = transform.GetChild(0).transform.position;
+        RaycastHit2D gc = Physics2D.Raycast(transform.GetChild(0).transform.position,
+        Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
 
-            RaycastHit2D gc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-            Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
+        RaycastHit2D gc2 = Physics2D.Raycast(new Vector2(np.x + .8f, np.y),
+        Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
 
-            RaycastHit2D gc2 = Physics2D.Raycast(new Vector2(np.x + .8f, np.y),
-            Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
+        if (gc.collider != null || gc2.collider != null)
+        {
+            ground = true;
+        }
+        
 
-            if (gc.collider != null || gc2.collider != null)
+        RaycastHit2D uc = Physics2D.Raycast(transform.GetChild(0).transform.position,
+        Vector2.up, 2.75f, LayerMask.GetMask("blocks"));
+
+        RaycastHit2D uc2 = Physics2D.Raycast(new Vector2(np.x + .65f, np.y),
+        Vector2.up, 2.75f, LayerMask.GetMask("blocks"));
+
+        if (uc.collider != null || uc2.collider != null)
+        {
+            if (ground && !hurt_b)
             {
-                ground = true;
-            }
-
-            RaycastHit2D uc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-            Vector2.up, 2.75f, LayerMask.GetMask("blocks"));
-
-            RaycastHit2D uc2 = Physics2D.Raycast(new Vector2(np.x + .65f, np.y),
-            Vector2.up, 2.75f, LayerMask.GetMask("blocks"));
-
-            if (uc.collider != null || uc2.collider != null)
-            {
-                if (ground && !hurt_b)
-                {
-                    StartCoroutine(hurt(20f));
-                }
-            }
-
-            RaycastHit2D gd_spc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-            Vector2.right * di, 3f, LayerMask.GetMask("blocks"));
-
-            if (gd_spc.collider == null)
-            {
-                good_space = true;
+                StartCoroutine(hurt(20f));
             }
         }
+
+        RaycastHit2D gd_spc = Physics2D.Raycast(transform.GetChild(0).transform.position,
+        Vector2.right * di, 3f, LayerMask.GetMask("blocks"));
+
+        if (gd_spc.collider == null)
+        {
+            good_space = true;
+        }
+        
 
         float least = 100;
         var n = FindObjectOfType<block_queue>();
@@ -414,10 +415,12 @@ public class Gizmo : MonoBehaviour
         {
             hurt_b = true;
             rgb.simulated = false;
-            StartCoroutine(LowerHealth(by));
+            StartCoroutine(LowerHealth(by));  
+            pwr_dur = 0;
             GetComponent<BoxCollider2D>().enabled = false;
             yield return new WaitForSeconds(2);
             rgb.simulated = true;
+            on = 0;
             rgb.velocity = new Vector2(0, 0);
             GetComponent<BoxCollider2D>().enabled = true;
             transform.position = new Vector3(0, 16f, 0);
