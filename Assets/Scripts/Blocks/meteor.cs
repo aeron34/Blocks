@@ -37,7 +37,7 @@ public class meteor : MonoBehaviour
         }
         if(g.layer == 12)
         {
-            StartCoroutine(g.GetComponent<Gizmo>().hurt(50f, 1));
+            g.GetComponent<Gizmo>().call_hurt(50f);
 
             Destroy(gameObject);
 

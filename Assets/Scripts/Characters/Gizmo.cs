@@ -16,24 +16,25 @@ public class Gizmo : MonoBehaviour
     // your pwr up runs out.
     private float n_hel = 1f;
     public bool ground = false, good_space, top_hit, hurt_b = false;
-    GameObject h_blk = null, v_blk = null; 
+    public GameObject h_blk = null, v_blk = null;
     public int[] weapons;
-    Gizmon gn;
+    public int on = 0;
+
     public GameObject gren, colm, health, n_colm, dist_blk; //n_colm means whatever colm is after the 
-    //colm the player is in, it accounts for whether he's turned around or not.
-  
+                                                            //colm the player is in, it accounts for whether he's turned around or not.
+
     // Camera camm;
-    
+
     private float drag;
     Queue<string> colors;
     void Start()
     {
         //camm = Camera.main;
         Default();
-        gn = new Gizmon();
+        //gn = new Gizmon();
         di = 1;
         colors = new Queue<string>();
-        pwr_drn = (0.01f)*0.1f;
+        pwr_drn = (0.01f) * 0.05f;
         //Instantiate(n, transform.position, transform.rotation);
         //m_c = transform.Find("spawn_pos").gameObject.GetComponent<BoxCollider2D>();
         rgb = GetComponent<Rigidbody2D>();
@@ -44,7 +45,7 @@ public class Gizmo : MonoBehaviour
         //StartCoroutine(LowerHealth());
 
 
-        weapons = new int[4]{0,0,0,0};
+        weapons = new int[4] { 0, 0, 0, 0 };
     }
 
 
@@ -67,7 +68,7 @@ public class Gizmo : MonoBehaviour
         if (Input.GetKey(KeyCode.D))
         {
             cxS = xS;
-            di = 1; 
+            di = 1;
             spr.flipX = false;
 
             //transform.position += m * Time.deltaTime;
@@ -110,7 +111,11 @@ public class Gizmo : MonoBehaviour
                 v_blk.GetComponent<block>().swap(1);
             }
         }
-
+        if (Input.GetKeyDown(KeyCode.M) && on == 0)
+        {
+            on = 1;
+            StartCoroutine(PowerBar());
+        }
         if (Input.GetKeyDown(KeyCode.H) && dist_blk != null
         && good_space && n_colm != null)
         {
@@ -146,9 +151,9 @@ public class Gizmo : MonoBehaviour
             }
         }
 
-        if(h_blk != null)
+        if (h_blk != null)
         {
-            gn.Controller(GameObject.Find("cursor"), colm);
+            //gn.Controller(GameObject.Find("cursor"), colm);
         }
 
         if (Input.GetKeyDown(KeyCode.K))
@@ -198,8 +203,8 @@ public class Gizmo : MonoBehaviour
 
         transform.GetChild(2).gameObject.SetActive(false);
     }
-    
-    private void GetDist()
+
+    public void GetDist()
     {
         if (dist_blk != null)
         {
@@ -224,6 +229,7 @@ public class Gizmo : MonoBehaviour
             dist_blk.GetComponent<block>().h_blk = null;
 
             dist_blk = null;
+            v_blk = null;
             transform.GetChild(2).gameObject.SetActive(false);
             return;
         }
@@ -250,7 +256,7 @@ public class Gizmo : MonoBehaviour
 
     private Dictionary<string, float> Default(int mode = 0)
     {
-        if(mode == 1)
+        if (mode == 1)
         {
             return new Dictionary<string, float>() {
                 {"xS", 10},
@@ -265,9 +271,9 @@ public class Gizmo : MonoBehaviour
         drag = 0.35f;
         return new Dictionary<string, float>() { };
     }
-    public IEnumerator LowerHealth(float by=0)
+    public IEnumerator LowerHealth(float by = 0)
     {
-        n_hel -= (by*0.01f);
+        n_hel -= (by * 0.01f);
 
         while (health.transform.localScale.x > n_hel)
         {
@@ -287,13 +293,14 @@ public class Gizmo : MonoBehaviour
             transform.Find("pwr_bar").transform.localScale = new Vector3(pwr_dur, 0.25f, 1f);
             yield return 0;
         }
+        on = 0;
         transform.Find("pwr_bar").gameObject.SetActive(false);
         Default();
     }
 
-    public void PowerUP(string color, int mode=0)
+    public void PowerUP(string color, int mode = 0)
     {
-        if(Input.GetKey(KeyCode.M))
+        if (Input.GetKey(KeyCode.M))
         {
             colors.Enqueue(color);
             return;
@@ -316,68 +323,71 @@ public class Gizmo : MonoBehaviour
 
     private void FixedUpdate()
     {
-        h_blk = null;
-        ground = false;
-        good_space = false;
-
-        RaycastHit2D hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.down, 1f, LayerMask.GetMask("blocks"));
-
-        if (hit.collider != null)
+        if (on == 0)
         {
-            h_blk = hit.collider.gameObject;
-        }
+            h_blk = null;
+            ground = false;
+            good_space = false;
 
-        RaycastHit2D hit2 = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.right * di, 2f, LayerMask.GetMask("blocks"));
+            RaycastHit2D hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
+            Vector2.down, 1f, LayerMask.GetMask("blocks"));
 
-
-        if (hit2.collider != null)
-        {
-            /*if(hit2.collider.gameObject != v_blk)
+            if (hit.collider != null)
             {
-                hit2.collider.gameObject.GetComponent<block>().Check(1);
-            }*/
-            v_blk = hit2.collider.gameObject;
-        }
-        else
-        {
-            v_blk = null;
-        }
-
-        var np = transform.GetChild(0).transform.position;
-
-        RaycastHit2D gc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
-
-        RaycastHit2D gc2 = Physics2D.Raycast(new Vector2(np.x + .8f, np.y),
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
-
-        if (gc.collider != null || gc2.collider != null)
-        {
-            ground = true;
-        }      
-        
-        RaycastHit2D uc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.up, 2.75f, LayerMask.GetMask("blocks"));
-
-        RaycastHit2D uc2 = Physics2D.Raycast(new Vector2(np.x + .5f, np.y),
-        Vector2.up, 2.75f, LayerMask.GetMask("blocks"));
-
-        if (uc.collider != null || uc2.collider != null)
-        {
-            if (ground && !hurt_b)
-            {
-                StartCoroutine(hurt());
+                h_blk = hit.collider.gameObject;
             }
-        }
-        
-        RaycastHit2D gd_spc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.right*di, 3f, LayerMask.GetMask("blocks"));
 
-        if(gd_spc.collider == null)
-        {
-            good_space = true;
+            RaycastHit2D hit2 = Physics2D.Raycast(transform.GetChild(0).transform.position,
+            Vector2.right * di, 2f, LayerMask.GetMask("blocks"));
+
+
+            if (hit2.collider != null)
+            {
+                /*if(hit2.collider.gameObject != v_blk)
+                {
+                    hit2.collider.gameObject.GetComponent<block>().Check(1);
+                }*/
+                v_blk = hit2.collider.gameObject;
+            }
+            else
+            {
+                v_blk = null;
+            }
+
+            var np = transform.GetChild(0).transform.position;
+
+            RaycastHit2D gc = Physics2D.Raycast(transform.GetChild(0).transform.position,
+            Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
+
+            RaycastHit2D gc2 = Physics2D.Raycast(new Vector2(np.x + .8f, np.y),
+            Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
+
+            if (gc.collider != null || gc2.collider != null)
+            {
+                ground = true;
+            }
+
+            RaycastHit2D uc = Physics2D.Raycast(transform.GetChild(0).transform.position,
+            Vector2.up, 2.75f, LayerMask.GetMask("blocks"));
+
+            RaycastHit2D uc2 = Physics2D.Raycast(new Vector2(np.x + .65f, np.y),
+            Vector2.up, 2.75f, LayerMask.GetMask("blocks"));
+
+            if (uc.collider != null || uc2.collider != null)
+            {
+                if (ground && !hurt_b)
+                {
+                    StartCoroutine(hurt(20f));
+                }
+            }
+
+            RaycastHit2D gd_spc = Physics2D.Raycast(transform.GetChild(0).transform.position,
+            Vector2.right * di, 3f, LayerMask.GetMask("blocks"));
+
+            if (gd_spc.collider == null)
+            {
+                good_space = true;
+            }
         }
 
         float least = 100;
@@ -385,7 +395,7 @@ public class Gizmo : MonoBehaviour
         n_colm = null;
         for (int i = 0; i < n.colms.ToArray().Length; i++)
         {
-            if(Math.Abs(n.colms[i].transform.position.x - transform.position.x) < least)
+            if (Math.Abs(n.colms[i].transform.position.x - transform.position.x) < least)
             {
                 least = Math.Abs(n.colms[i].transform.position.x - transform.position.x);
                 colm = n.colms[i];
@@ -397,26 +407,28 @@ public class Gizmo : MonoBehaviour
         }
     }
 
-    public IEnumerator hurt(float by = 0, int mode = 0)
+    public IEnumerator hurt(float by = 0)
     {
-        if (mode == 1)
-        {
-            StartCoroutine(LowerHealth(by));
-        }
-        if (!hurt_b && mode == 0)
+
+        if (!hurt_b)
         {
             hurt_b = true;
             rgb.simulated = false;
+            StartCoroutine(LowerHealth(by));
             GetComponent<BoxCollider2D>().enabled = false;
             yield return new WaitForSeconds(2);
             rgb.simulated = true;
             rgb.velocity = new Vector2(0, 0);
             GetComponent<BoxCollider2D>().enabled = true;
             transform.position = new Vector3(0, 16f, 0);
-           // StartCoroutine(LowerHealth(50));
+            // StartCoroutine(LowerHealth(50));
             yield return new WaitForSeconds(3);
             hurt_b = false;
         }
     }
 
+    public void call_hurt(float by=0)
+    {
+        StartCoroutine(hurt(by));
+    }
 }

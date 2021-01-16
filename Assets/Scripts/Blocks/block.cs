@@ -329,6 +329,7 @@ public class block : MonoBehaviour
                     nt = 0;
                 }
             }
+
         }
         if (die == 1 && !ex)
         {
@@ -359,7 +360,7 @@ public class block : MonoBehaviour
 
             System.Random random = new System.Random();
             GetComponent<BoxCollider2D>().enabled = false;
-            int rn = random.Next(1, 6);
+            int rn = random.Next(1, 14);
 
 
             if (rn == 2)
@@ -407,5 +408,40 @@ public class block : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void OnMouseEnter()
+    {
+        spr.color = new Color(135f,0,150f, 1);
+    }
+
+    private void OnMouseOver()
+    {
+        var ply = GameObject.Find("pic");
+        
+        if (Input.GetMouseButtonDown(0) && ply.GetComponent<Gizmo>().on == 2
+        && ply.GetComponent<Gizmo>().v_blk != null)
+        {
+            Debug.Log("Ogh");
+            ply.GetComponent<Gizmo>().dist_blk = gameObject;
+            ply.GetComponent<Gizmo>().on = 1;
+            ply.GetComponent<Gizmo>().GetDist();
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(0) && ply.GetComponent<Gizmo>().on == 1)
+        {
+            ply.GetComponent<Gizmo>().on = 2;
+            ply.GetComponent<Gizmo>().v_blk = gameObject;
+            return;
+        }
+
+
+
+    }
+
+    private void OnMouseExit()
+    {
+        MyColor();
     }
 }
