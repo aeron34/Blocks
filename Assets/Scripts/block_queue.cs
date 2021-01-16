@@ -13,7 +13,7 @@ public class block_queue : MonoBehaviour
     double time_passed = 0;
     bool moving;
     Queue<GameObject> q = new Queue<GameObject>();
-    public GameObject colm, n_block, block;
+    public GameObject colm, n_block, block, mete;
     GameObject c_b = null;
     float t_m = 0.05f, bts = 0.055f;
     System.Random random = new System.Random();
@@ -55,7 +55,8 @@ public class block_queue : MonoBehaviour
 
         string[] cols = { "green", "blue", "red", "purple", "white", "yellow" };
 
-        int col_i = -1, c_c=0;
+        int col_i = -1;
+
 
         int[,] orien = new int[2, 4]{ { 0, 1, 2, 3},{ 2, 3, 0, 1} };
         
@@ -89,11 +90,16 @@ public class block_queue : MonoBehaviour
 
             st_y += 2;
         }
-        //rect.anchoredPosition = new Vector2(-41f);
 
+        StartCoroutine(MeteorTime());
     }
 
-
+    public IEnumerator MeteorTime()
+    {
+        DropMeteor();
+        yield return new WaitForSeconds(6f);
+        StartCoroutine(MeteorTime());
+    }
     public void setColor(GameObject a)
     {
         c_n = random.Next(6) + 1;
@@ -141,6 +147,38 @@ public class block_queue : MonoBehaviour
             {Debug.Log("pass" + mins[i]);
                 bts += 0.025f;
             }
+        }
+    }
+
+    private void DropMeteor()
+    {
+        if (FindObjectOfType<Gizmo>() != null)
+        {
+            int indx = colms.FindIndex(c => c == FindObjectOfType<Gizmo>().colm);
+            if (indx == -1)
+            {
+                return;
+            }
+            List<GameObject> cs = new List<GameObject>();
+            cs.Add(FindObjectOfType<Gizmo>().colm);
+
+            int end = indx + 5;
+
+            if (end > 18)
+            {
+                end = 18;
+            }
+
+            for (int i = indx; i < end + 1; i++)
+            {
+                cs.Add(colms[i]);
+            }
+
+
+            System.Random r = new System.Random();
+            int rn = r.Next(0, cs.ToArray().Length - 1);
+            Debug.Log(rn);
+            StartCoroutine(colms[0].GetComponent<column>().Meteor(mete));
         }
     }
 

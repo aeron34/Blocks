@@ -16,7 +16,8 @@ public class block : MonoBehaviour
     public int die = 0;
     public float nt = 0;
     public string color;
-    public bool grounded, sChk;
+    private bool ex;
+    public bool grounded, sChk, dud;
     // Start is called before the first frame update
     void Start()
     {
@@ -69,7 +70,6 @@ public class block : MonoBehaviour
             return -1;
         }
 
-        Debug.Log("call");
         int coll_objs = 1, last_len = 0, i = 0;
         touching.Add(gameObject);
         touching = touching.GroupBy(a => a.gameObject).Select(a => a.First()).ToList();
@@ -80,7 +80,7 @@ public class block : MonoBehaviour
             touching.AddRange(touching.ElementAt(i).GetComponent<block>().touching);
             touching = touching.GroupBy(a => a.gameObject).Select(a => a.First()).ToList();
             i++;
-            if(i >= touching.ToArray().Length || touching.ToArray().Length >= 3)
+            if(i >= touching.ToArray().Length)
             {
                 break;
             }
@@ -96,6 +96,7 @@ public class block : MonoBehaviour
 
          */
 
+
         if(touching.ToArray().Length >= 3)
         {
             foreach (GameObject n in touching)
@@ -104,11 +105,12 @@ public class block : MonoBehaviour
             }
             if (touching.ToArray().Length >= 4)
             {
-                FindObjectOfType<scorer>().UpdateScore((int)Math.Pow(touching.ToArray().Length * .5, 5));
+                FindObjectOfType<scorer>().UpdateScore((int)Math.Pow(touching.ToArray().Length * .75, 5));
+                return 1;
             }
-            else {
-                FindObjectOfType<scorer>().UpdateScore(touching.ToArray().Length * 100);
-            }
+            
+            FindObjectOfType<scorer>().UpdateScore(touching.ToArray().Length * 50);
+            
             return 1;
         }
 
@@ -192,14 +194,22 @@ public class block : MonoBehaviour
                 
             v_blk.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX |
             RigidbodyConstraints2D.FreezeRotation;
-            
 
-            v_blk.GetComponent<block>().v_blk = null;
-            v_blk.GetComponent<block>().h_blk = null;
+
+            try
+            {
+                v_blk.GetComponent<block>().v_blk = null;
+                v_blk.GetComponent<block>().h_blk = null;
+            }catch(NullReferenceException e)
+            {
+
+            }
           
         }
-      v_blk = null;
-                h_blk = null;
+         
+        v_blk = null;
+        h_blk = null;
+
         touching.Clear();
         rgb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
 
@@ -305,7 +315,7 @@ public class block : MonoBehaviour
             }*/
             if (sChk)
             {
-                if (nt <= 80.0)
+                if (nt <= 120.0)
                 {
                     nt += 2f;
                 }
@@ -313,16 +323,17 @@ public class block : MonoBehaviour
                 {
                     Check();
                 }
-                if (sChk && nt > 80)
+                if (sChk && nt > 120)
                 {
                     sChk = false;
                     nt = 0;
                 }
             }
         }
-        if (die == 1)
+        if (die == 1 && !ex)
         {
             explode();
+            ex = true;
             die = 2;
         }
     }
@@ -334,15 +345,31 @@ public class block : MonoBehaviour
         //pickup();
         if (die < 2)
         {
+
+            if (FindObjectOfType<Gizmo>().dist_blk == gameObject)
+            {
+                FindObjectOfType<Gizmo>().dist_blk = null;
+                FindObjectOfType<Gizmo>().transform.GetChild(2).gameObject.SetActive(false);
+            }
+
+            if (dud)
+            {
+                FindObjectOfType<scorer>().UpdateScore(-100);
+            }
+
             System.Random random = new System.Random();
             GetComponent<BoxCollider2D>().enabled = false;
+            int rn = random.Next(1, 6);
 
-            if (random.Next(1, 6) == 2)
+
+            if (rn == 2)
             {
                 var g = Instantiate(pwr_up, transform.position, transform.rotation);
                 g.GetComponent<SpriteRenderer>().color = spr.color;
                 g.GetComponent<PowerUp>().color = color;
             }
+            
+            
 
             foreach (GameObject n in touching)
             {

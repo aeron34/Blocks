@@ -29,8 +29,7 @@ public class grenade : MonoBehaviour
                 b.GetComponent<block>().Check();
                 if (b.GetComponent<block>().touching.ToArray().Length < 3)
                 {
-                    b.GetComponent<block>().die = 2;
-                    b.GetComponent<block>().explode();
+                    b.GetComponent<block>().die = 1;
                 }
             }
             else
@@ -42,8 +41,7 @@ public class grenade : MonoBehaviour
                     b.GetComponent<block>().Check();
                     if (b.GetComponent<block>().touching.ToArray().Length < 3)
                     {
-                        b.GetComponent<block>().die = 2;
-                        b.GetComponent<block>().explode();
+                        b.GetComponent<block>().die = 1;
                     }
                 }
             }
@@ -52,11 +50,7 @@ public class grenade : MonoBehaviour
           
         }
     }
-    private void FixedUpdate()
-    {   
-        
-        
-    }
+
     // Update is called once per frame
     void Update()
     {

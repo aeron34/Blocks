@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System;
 
 public class column : MonoBehaviour
 {
@@ -13,47 +14,47 @@ public class column : MonoBehaviour
     {
        // blocks = new List<GameObject>();
         block = Resources.Load<GameObject>("block");
-        up_indi = GameObject.Find("up_indi");
+        up_indi = transform.GetChild(0).gameObject;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(b_drp && ply != null && !up_indi.GetComponent<AudioSource>().isPlaying)
+        if(b_drp && ply != null && !GameObject.Find("up_indi").GetComponent<AudioSource>().isPlaying)
         {
-            up_indi.GetComponent<AudioSource>().PlayOneShot(up_indi.GetComponent<AudioSource>().clip);
-            up_indi.transform.position = new Vector3(transform.position.x, transform.position.y + 4f,
-                 transform.position.z);
-
+            GameObject.Find("up_indi").GetComponent<AudioSource>().PlayOneShot(GameObject.Find("up_indi").GetComponent<AudioSource>().clip);
+            up_indi.GetComponent<SpriteRenderer>().enabled = true;
         }
-    }
-
-    private IEnumerator indi()
-    {
-        up_indi.GetComponent<SpriteRenderer>().enabled = true;
-        yield return new WaitForSeconds(2f); 
-        up_indi.GetComponent<SpriteRenderer>().enabled = false;
     }
 
     private IEnumerator realDrop(string col = "")
     {
-        if (ply != null)
-        {
-            up_indi.transform.position = new Vector3(transform.position.x, transform.position.y + 4f,
-            transform.position.z);
-        }
+
         yield return new WaitForSeconds(1f);
         var n_b = Instantiate(block, transform.position, transform.rotation);
         n_b.transform.position = new Vector3(transform.position.x, 12.75f, 0);
         n_b.GetComponent<Rigidbody2D>().simulated = true;
         n_b.GetComponent<block>().color = col;
         n_b.GetComponent<block>().colm = gameObject;
-        up_indi.transform.position = new Vector3(40f, transform.position.y + 4f,
-        transform.position.z);
+        up_indi.GetComponent<SpriteRenderer>().enabled = false;
         
         b_drp = false;
     }
 
+    public IEnumerator Meteor(GameObject a)
+    {
+        b_drp = true;
+        //Add an anim that makes the column 
+        //red regardless of if ply is in or not.
+        up_indi.GetComponent<SpriteRenderer>().enabled = true;
+
+        yield return new WaitForSeconds(1f);
+        var n_b = Instantiate(a, transform.position, transform.rotation);
+        n_b.transform.position = new Vector3(transform.position.x, 25, 0);
+        up_indi.GetComponent<SpriteRenderer>().enabled = false;
+
+        b_drp = false;
+    }
     public void drop(string col="")
     {
         b_drp = true;
@@ -66,9 +67,16 @@ public class column : MonoBehaviour
         {
             if (n != null && n.transform.position.y > a.transform.position.y)
             {
-                n.GetComponent<block>().sChk = true;
+                try
+                {
+                    n.GetComponent<block>().sChk = true;
+                }catch(NullReferenceException e)
+                {
+                    continue;
+                }
             }
         }
+
         blocks.Remove(a);
         //blocks.Clear();
     }
@@ -85,9 +93,9 @@ public class column : MonoBehaviour
         {
             ply = null;
 
-            if (b_drp && up_indi.GetComponent<AudioSource>().isPlaying)
+            if (b_drp && GameObject.Find("up_indi").GetComponent<AudioSource>().isPlaying)
             {
-                up_indi.GetComponent<AudioSource>().Stop();
+                GameObject.Find("up_indi").GetComponent<AudioSource>().Stop();
             }
         }
     }

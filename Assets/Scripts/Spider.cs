@@ -11,7 +11,7 @@ public class Spider : MonoBehaviour
     public bool move = true, swap = true;
     int di = 1, n = 0, mode=1;
     Vector2[] vs;
-    GameObject[] b3;
+    public GameObject[] b3;
     GameObject c_b;
     // Start is called before the first frame update
     void Start()
@@ -102,14 +102,26 @@ public class Spider : MonoBehaviour
             {
                 b3[i] = null;
             }
-            var down = Physics2D.RaycastAll(transform.position,
-            Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
+
+            var down = Physics2D.RaycastAll(new Vector2(transform.position.x,
+                transform.position.y - 1f),
+                Vector2.down, 2f, LayerMask.GetMask("blocks"));
+            
+            var up = Physics2D.Raycast(new Vector2(transform.position.x, 
+                transform.position.y + 1f),
+            Vector2.up, 1.25f, LayerMask.GetMask("blocks"));
           
 
             for(int i = 0; i < down.Length; i++)
             {
-               b3[i] = down[i].collider.gameObject;
+               b3[i+1] = down[i].collider.gameObject;
             }  
+            
+            if(up.collider != null)
+            {
+                b3[0] = up.collider.gameObject;
+            }
+
             if(b3[0] != null && b3[1] != null)
             { 
                 if(b3[0].GetComponent<block>().color
@@ -119,16 +131,15 @@ public class Spider : MonoBehaviour
                 }
             }
             
-            if(down.Length == 2)
+            if(b3.Length >= 3 && b3[0] != null && b3[2] != null)
             {
-                b3[2] = Physics2D.RaycastAll(b3[1].transform.position,
-                Vector2.right, 2f, LayerMask.GetMask("blocks"))[1].collider.gameObject;
-
-                if(b3[0].GetComponent<block>().color == b3[2].GetComponent<block>().color)
+                if(b3[0].GetComponent<block>().color
+                == b3[2].GetComponent<block>().color)
                 {
-                    b3[2].GetComponent<block>().swap(0);
-                }
-
+                    Debug.Log("swap");
+                    b3[2].GetComponent<block>().swap(1);
+                } 
+                
                 return;
             }
         }

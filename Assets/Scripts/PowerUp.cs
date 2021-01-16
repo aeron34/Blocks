@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class PowerUp : MonoBehaviour
 {
@@ -59,9 +60,23 @@ public class PowerUp : MonoBehaviour
         
             if(g.layer == 12)
             {
-                g.GetComponent<Gizmo>().PowerUP(color);
-                gameObject.SetActive(false);
-                Destroy(gameObject);
+                try
+                {
+                    switch(color)
+                    {
+                        case "blue":
+                            g.GetComponent<Gizmo>().weapons[1]++;
+                            gameObject.SetActive(false);
+                            Destroy(gameObject);
+                            return;
+                    }
+
+                    //g.GetComponent<Gizmo>().PowerUP(color);;
+                }
+                catch (NullReferenceException e)
+                {
+                    return;
+                }
             }
         }
     }
