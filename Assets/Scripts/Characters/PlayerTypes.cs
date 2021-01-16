@@ -49,17 +49,36 @@ namespace Giz
                             return;
                         }
 
-                        if (c.GetComponent<column>().blocks.ToArray().Length <
-                        c_colm.GetComponent<column>().blocks.ToArray().Length)
+                        if (mx == 1)
                         {
-                            con_Y = c.GetComponent<column>().blocks.ToArray().Length-1;
-                            Debug.Log("Less: " + con_Y);
-                            crs.transform.position =
-                                c.GetComponent<column>().blocks[con_Y].transform.position;
+                            if (c_colm.GetComponent<column>().blocks.ToArray().Length <
+                            c.GetComponent<column>().blocks.ToArray().Length)
+                            {
+                                con_Y = c.GetComponent<column>().blocks.ToArray().Length - 1;
+                                Debug.Log("Less: " + con_Y);
+                                crs.transform.position =
+                                    c.GetComponent<column>().blocks[con_Y].transform.position;
 
-                            c_colm = c;
-                            con_X += mx;
-                            moved += mx;
+                                c_colm = c;
+                                con_X += mx;
+                                moved += mx;
+                            }
+                        }
+
+                        if(mx == -1)
+                        {
+                            if (c.GetComponent<column>().blocks.ToArray().Length <
+                            c_colm.GetComponent<column>().blocks.ToArray().Length)
+                            {
+                                con_Y = c.GetComponent<column>().blocks.ToArray().Length - 1;
+                                Debug.Log("Less: " + con_Y);
+                                crs.transform.position =
+                                    c.GetComponent<column>().blocks[con_Y].transform.position;
+
+                                c_colm = c;
+                                con_X += mx;
+                                moved += mx;
+                            }
                         }
                     }
                 }
