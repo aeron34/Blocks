@@ -46,13 +46,20 @@ get the highest block chain. There are
 		(16 * .25)^5 = 1024;
 
 
-o Make meteors into Power UPs you
-could obtain.
+o TELL PEOPLE HOW THEY CAN DO
+DIFFERENT THINGS WITH THE PAINTER (FORMELY
+CALLED SPIDER), such as, exploding one ajancent
+block (left or right), then deploying which
+will give a wierd effect.
 
-o Make it so you can only
-use one assist at a time,
-(btw assists are the spiders, 
-ray guns, and all that)
+o Make meteors into Power UPs you
+could obtain. - NEXT(2)
+
+o Implement weapon selector. - currently
+
+o Make it so player can't
+move and he's stuck when
+you engage in ultimate weap.) - NEXT
 
 o Make it so that the more 
 points you earn, the less

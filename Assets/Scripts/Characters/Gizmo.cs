@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System;
 using Giz;
 
@@ -17,10 +18,11 @@ public class Gizmo : MonoBehaviour
     private float n_hel = 1f;
     public bool ground = false, good_space, top_hit, hurt_b = false;
     public GameObject h_blk = null, v_blk = null;
+    public GameObject gren, spider;
     public int[] weapons;
-    public int on = 0;
+    public int on = 0, wep_i=0;
 
-    public GameObject gren, colm, health, n_colm, dist_blk; //n_colm means whatever colm is after the 
+    public GameObject colm, health, n_colm, dist_blk; //n_colm means whatever colm is after the 
                                                             //colm the player is in, it accounts for whether he's turned around or not.
 
     // Camera camm;
@@ -45,7 +47,9 @@ public class Gizmo : MonoBehaviour
         //StartCoroutine(LowerHealth());
 
 
-        weapons = new int[4] { 0, 0, 0, 0 };
+        weapons = new int[3] { 5, 5, 5 };
+       
+        GameObject.Find("weap_box").transform.Find("1").GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 1);
     }
 
 
@@ -84,7 +88,15 @@ public class Gizmo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        for(int i = 0; i< 3; i++)
+        {
+            if(weapons[i] > 5)
+            {
+                weapons[i] = 5;
+            }
+            GameObject.Find("weap_box").transform.GetChild(i).
+                transform.GetChild(0).GetComponent<Text>().text = weapons[i].ToString();
+        }
         Movement();
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -93,14 +105,6 @@ public class Gizmo : MonoBehaviour
             if (h_blk != null)
             {
                 h_blk.GetComponent<block>().swap();
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.U) && !(Input.GetKey(KeyCode.M)))
-        {
-            if (colors.ToArray().Length >= 1)
-            {
-                PowerUP(colors.Dequeue(), 1);
             }
         }
 
@@ -119,10 +123,7 @@ public class Gizmo : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H) && dist_blk != null
         && good_space && n_colm != null)
         {
-            if (weapons[0] > 0)
-            {
-                DropBlock();
-            }
+            DropBlock();
         }
 
         if (Input.GetKeyDown(KeyCode.I))
@@ -161,6 +162,27 @@ public class Gizmo : MonoBehaviour
             GetDist();
         }
 
+        if(on == 0)
+        {
+            if(Input.GetKeyDown(KeyCode.U))
+            {
+                wep_i++;
+                if(wep_i > 2)
+                {
+                    wep_i = 0;
+                }
+                for(int i = 0; i < 3; i++)
+                {
+                    GameObject.Find("weap_box").transform.GetChild(i).
+                    GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, .5f);
+
+                }
+                GameObject.Find("weap_box").transform.GetChild(wep_i).
+                    GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 1);
+
+            }
+        }
+        
         if (Input.GetKeyDown(KeyCode.O))
         {
             Weapon();
@@ -244,13 +266,32 @@ public class Gizmo : MonoBehaviour
 
     private void Weapon()
     {
-        if (weapons[1] != 0)
+        if (on == 0)
         {
-            var g = Instantiate(gren, transform.position, transform.rotation);
-            g.GetComponent<grenade>().di = di;
-            g.GetComponent<Rigidbody2D>().velocity = new Vector2((32 * di), 10);
-            weapons[1] -= 1;
+            if (weapons[wep_i] != 0)
+            {                    
+                GameObject g;
+
+                switch (wep_i)
+                {
+                    case 0:
+                        g = Instantiate(gren, transform.position, transform.rotation);
+                        g.GetComponent<grenade>().di = di;
+                        g.GetComponent<Rigidbody2D>().velocity = new Vector2((32 * di), 10);
+                        weapons[wep_i] -= 1;
+                        break;
+
+                    case 1:
+                        int len = colm.GetComponent<column>().blocks.ToArray().Length;
+                        g = Instantiate(spider,
+                            colm.GetComponent<column>().blocks[len-1].transform.position, 
+                            transform.rotation);
+                        weapons[wep_i] -= 1;
+                        break;
+                }
+            }
         }
+
         return;
     }
 

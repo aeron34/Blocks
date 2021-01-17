@@ -62,13 +62,26 @@ public class PowerUp : MonoBehaviour
             {
                 try
                 {
-                    switch(color)
-                    {
-                        case "blue":
-                            g.GetComponent<Gizmo>().weapons[1]++;
-                            gameObject.SetActive(false);
-                            Destroy(gameObject);
-                            return;
+                    if (color == "blue" || color == "red")
+                    { 
+                        g.GetComponent<Gizmo>().weapons[1]++;
+                        gameObject.SetActive(false);
+                        Destroy(gameObject);
+                        return;
+                    }   
+                    if (color == "yellow" || color == "green")
+                    { 
+                        g.GetComponent<Gizmo>().weapons[0]++;
+                        gameObject.SetActive(false);
+                        Destroy(gameObject);
+                        return;
+                    }  
+                    if (color == "purple" || color == "white")
+                    { 
+                        g.GetComponent<Gizmo>().weapons[2]++;
+                        gameObject.SetActive(false);
+                        Destroy(gameObject);
+                        return;
                     }
 
                     //g.GetComponent<Gizmo>().PowerUP(color);;

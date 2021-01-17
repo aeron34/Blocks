@@ -357,17 +357,19 @@ public class block : MonoBehaviour
             {
                 FindObjectOfType<scorer>().UpdateScore(-100);
             }
-
-            System.Random random = new System.Random();
-            GetComponent<BoxCollider2D>().enabled = false;
-            int rn = random.Next(1, 14);
-
-
-            if (rn == 2)
+            else
             {
-                var g = Instantiate(pwr_up, transform.position, transform.rotation);
-                g.GetComponent<SpriteRenderer>().color = spr.color;
-                g.GetComponent<PowerUp>().color = color;
+                System.Random random = new System.Random();
+                GetComponent<BoxCollider2D>().enabled = false;
+                int rn = random.Next(1, 14);
+
+
+                if (rn == 2)
+                {
+                    var g = Instantiate(pwr_up, transform.position, transform.rotation);
+                    g.GetComponent<SpriteRenderer>().color = spr.color;
+                    g.GetComponent<PowerUp>().color = color;
+                }
             }
             
             
