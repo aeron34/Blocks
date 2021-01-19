@@ -85,12 +85,11 @@ public class Gizmo : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void UP_Logic()
     {
-        for(int i = 0; i< 3; i++)
+        for (int i = 0; i < 3; i++)
         {
-            if(weapons[i] > 5)
+            if (weapons[i] > 5)
             {
                 weapons[i] = 5;
             }
@@ -162,16 +161,16 @@ public class Gizmo : MonoBehaviour
             GetDist();
         }
 
-        if(on == 0)
+        if (on == 0)
         {
-            if(Input.GetKeyDown(KeyCode.U))
+            if (Input.GetKeyDown(KeyCode.U))
             {
                 wep_i++;
-                if(wep_i > 2)
+                if (wep_i > 2)
                 {
                     wep_i = 0;
                 }
-                for(int i = 0; i < 3; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     GameObject.Find("weap_box").transform.GetChild(i).
                     GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, .5f);
@@ -182,7 +181,7 @@ public class Gizmo : MonoBehaviour
 
             }
         }
-        
+
         if (Input.GetKeyDown(KeyCode.O))
         {
             Weapon();
@@ -197,6 +196,15 @@ public class Gizmo : MonoBehaviour
                 rgb.velocity = new Vector2(rgb.velocity.x, xY);
                 ground = false;
             }
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if(!hurt_b)
+        { 
+            UP_Logic();
         }
     }
 
@@ -455,7 +463,7 @@ public class Gizmo : MonoBehaviour
         if (!hurt_b)
         {
             hurt_b = true;
-            rgb.simulated = false;
+            //rgb.simulated = false;
             StartCoroutine(LowerHealth(by));  
             pwr_dur = 0;
             GetComponent<BoxCollider2D>().enabled = false;
@@ -465,9 +473,9 @@ public class Gizmo : MonoBehaviour
             rgb.velocity = new Vector2(0, 0);
             GetComponent<BoxCollider2D>().enabled = true;
             transform.position = new Vector3(0, 16f, 0);
-            // StartCoroutine(LowerHealth(50));
+            hurt_b = false; // StartCoroutine(LowerHealth(50));
             yield return new WaitForSeconds(3);
-            hurt_b = false;
+           
         }
     }
 

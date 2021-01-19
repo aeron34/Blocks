@@ -177,8 +177,7 @@ public class block_queue : MonoBehaviour
 
             System.Random r = new System.Random();
             int rn = r.Next(0, cs.ToArray().Length - 1);
-            Debug.Log(rn);
-            StartCoroutine(colms[0].GetComponent<column>().Meteor(mete));
+            StartCoroutine(colms[rn].GetComponent<column>().Meteor(mete));
         }
     }
 

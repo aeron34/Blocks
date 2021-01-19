@@ -220,6 +220,9 @@ public class block : MonoBehaviour
         // Debug.Log();
         touching.Clear();
 
+        v_blk = null;
+        h_blk = null;
+        
         var hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
         Vector2.right * -1, 2f, LayerMask.GetMask("blocks"));
 
@@ -315,7 +318,7 @@ public class block : MonoBehaviour
             }*/
             if (sChk)
             {
-                if (nt <= 120.0)
+                if (nt <= 1000.0)
                 {
                     nt += 2f;
                 }
@@ -323,7 +326,7 @@ public class block : MonoBehaviour
                 {
                     Check();
                 }
-                if (sChk && nt > 120)
+                if (sChk && nt > 1000.0f)
                 {
                     sChk = false;
                     nt = 0;
@@ -372,12 +375,11 @@ public class block : MonoBehaviour
                 }
             }
             
-            
-
             foreach (GameObject n in touching)
             {
                 n.GetComponent<block>().die = 1;
             }
+
             colm.GetComponent<column>().Takeoff(gameObject);
 
             spr.color = new Color(1, 1, 1);
