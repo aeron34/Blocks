@@ -45,10 +45,11 @@ public class Boxer : MonoBehaviour
 
     }
 
-
-    public void none()
-    {
+    public void revertBack()
+    {        
         ani.Play("idle");
+        movable = true;
+        Debug.Log("called");
     }
 
     private void Movement()
@@ -83,6 +84,7 @@ public class Boxer : MonoBehaviour
         if(v_blk != null)
         {
             StartCoroutine(v_blk.GetComponent<block>().slide(di));
+            ani.Play("punch");
         }
     }
     private void UP_Logic()
@@ -141,14 +143,29 @@ public class Boxer : MonoBehaviour
         }
     }
 
+
     private void ComboKeys()
     {
-        if(Input.GetKey(KeyCode.O) && Input.GetKey(KeyCode.S))
+         
+        if(Input.GetKey(KeyCode.S))
         {
-            Debug.Log("DOWN");
-            movable = false;
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                movable = false;
+                ani.Play("d_punch");
+                cxS = 0;
+                return;
+            }
         }
-    }
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            movable = false;
+            ani.Play("punch");
+            cxS = 0;
+        }
+       // Debug.Log("called");
+     }
+
     // Update is called once per frame
     void Update()
     {
