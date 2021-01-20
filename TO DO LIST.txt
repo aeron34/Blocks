@@ -14,6 +14,9 @@ o Implement heart/lives system:
 
 o Create the main menu.
 
+o Add a megaman style explode animation
+to the character when something fell on him.
+
 o Implement RayGun that
 blows up any blocks a straight
 line.

@@ -219,6 +219,7 @@ MonoBehaviour:
   color: 
   grounded: 0
   sChk: 0
+  dud: 0
 --- !u!95 &2474155211500712622
 Animator:
   serializedVersion: 3

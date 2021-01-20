@@ -150,17 +150,30 @@ public class block_queue : MonoBehaviour
         }
     }
 
+
     private void DropMeteor()
     {
-        if (FindObjectOfType<Gizmo>() != null)
+        var ply = GameObject.Find("pic");
+        GameObject dm_colm = null;
+
+        if (ply.GetComponent<Gizmo>() != null)
         {
-            int indx = colms.FindIndex(c => c == FindObjectOfType<Gizmo>().colm);
+            dm_colm = ply.GetComponent<Gizmo>().colm;
+        }
+        if (ply.GetComponent<Boxer>() != null)
+        {
+            dm_colm = ply.GetComponent<Boxer>().colm;
+        }
+
+        if (dm_colm != null)
+        {
+            int indx = colms.FindIndex(c => c == dm_colm);
             if (indx == -1)
             {
                 return;
             }
             List<GameObject> cs = new List<GameObject>();
-            cs.Add(FindObjectOfType<Gizmo>().colm);
+            cs.Add(dm_colm);
 
             int end = indx + 5;
 

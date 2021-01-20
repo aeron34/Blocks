@@ -35,10 +35,16 @@ public class meteor : MonoBehaviour
                 return;
             }
         }
-        if(g.layer == 12)
+        if (g.layer == 12)
         {
-            g.GetComponent<Gizmo>().call_hurt(50f);
-
+            if (g.GetComponent<Gizmo>() != null)
+            {
+               g.GetComponent<Gizmo>().call_hurt(50f);
+            }   
+            if (g.GetComponent<Boxer>() != null)
+            {
+               g.GetComponent<Boxer>().call_hurt(50f);
+            }
             Destroy(gameObject);
 
 

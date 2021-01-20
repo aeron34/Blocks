@@ -349,11 +349,14 @@ public class block : MonoBehaviour
         //pickup();
         if (die < 2)
         {
-
-            if (FindObjectOfType<Gizmo>().dist_blk == gameObject)
+            var p = GameObject.Find("pic");
+            if (p.GetComponent<Gizmo>() != null)
             {
-                FindObjectOfType<Gizmo>().dist_blk = null;
-                FindObjectOfType<Gizmo>().transform.GetChild(2).gameObject.SetActive(false);
+                if (p.GetComponent<Gizmo>().dist_blk == gameObject)
+                {
+                    p.GetComponent<Gizmo>().dist_blk = null;
+                    p.GetComponent<Gizmo>().transform.GetChild(2).gameObject.SetActive(false);
+                }
             }
 
             if (dud)
@@ -414,6 +417,91 @@ public class block : MonoBehaviour
         }
     }
 
+    public IEnumerator slide(float di)
+    {
+        var c = FindObjectOfType<block_queue>().colms;
+        int inx = c.FindIndex(a => a == colm), by = 3;
+        bool fail = false;
+        
+        if(inx - 3 < 0 && di == -1)
+        {
+            by = inx;
+        }
+
+        if (inx + 3 > 18 && di == 1)
+        {
+            by = 18 - inx;
+        }
+
+        var b = FindObjectOfType<block_queue>().colms[inx+(int)(di*by)];
+        rgb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+        if (di == -1)
+        {
+            while (transform.position.x > b.transform.position.x)
+            {
+                if (h_blk != null)
+                {
+                    int i = c.FindIndex(a => a == h_blk.GetComponent<block>().colm);
+                    colm = c[i + 1];
+                    transform.position = new Vector2(colm.transform.position.x, transform.position.y);
+                    rgb.constraints = RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
+                    fail = true;
+                    break;
+                }
+
+                if (transform.position.x < b.transform.position.x + .2f)
+                {
+                    break;
+                }
+                transform.position = (Vector3.Lerp(new Vector3(transform.position.x, rgb.position.y, 0),
+                new Vector3(b.transform.position.x, rgb.position.y, 0), .08f));
+                yield return 0;
+            }
+        }
+        /*This code is for player facing right, then terminate while loop
+          when player is greater than the left side.
+         */
+        if(di == 1)
+        {
+            while (transform.position.x < b.transform.position.x)
+            {
+                var r = Physics2D.Raycast(new Vector2(transform.position.x + 1.025f, transform.position.y),
+                Vector2.right, .25f, LayerMask.GetMask("blocks"));
+
+                if(r.collider != null)
+                {
+                    int i = c.FindIndex(a => a == r.collider.gameObject.GetComponent<block>().colm);
+                    colm = c[i - 1];
+                    transform.position = new Vector2(colm.transform.position.x, transform.position.y);
+                    rgb.constraints = RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
+                    fail = true;
+                    break;
+                }
+
+                if (transform.position.x > b.transform.position.x - .2f)
+                {
+                    break;
+                }
+                
+                //This is the code that actually moves the block in a smooth fashion
+                 
+                transform.position = (Vector3.Lerp(new Vector3(transform.position.x, rgb.position.y, 0),
+                new Vector3(b.transform.position.x, rgb.position.y, 0), .08f));
+
+                yield return 0;
+            }
+        }
+
+        if (!fail)
+        {
+            colm = b;
+            transform.position = new Vector2(colm.transform.position.x, transform.position.y);
+            rgb.constraints = RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
+        }
+
+    }
+
     private void OnMouseEnter()
     {
         spr.color = new Color(135f,0,150f, 1);
@@ -422,26 +510,29 @@ public class block : MonoBehaviour
     private void OnMouseOver()
     {
         var ply = GameObject.Find("pic");
-        
-        if (Input.GetMouseButtonDown(0) && ply.GetComponent<Gizmo>().on == 2
-        && ply.GetComponent<Gizmo>().v_blk != null)
+
+        /* Code that only applies to Gizmo,
+        If he is chosen.
+        */
+        if (ply.GetComponent<Gizmo>() != null)
         {
-            Debug.Log("Ogh");
-            ply.GetComponent<Gizmo>().dist_blk = gameObject;
-            ply.GetComponent<Gizmo>().on = 1;
-            ply.GetComponent<Gizmo>().GetDist();
-            return;
+            if (Input.GetMouseButtonDown(0) && ply.GetComponent<Gizmo>().on == 2
+            && ply.GetComponent<Gizmo>().v_blk != null)
+            {
+                Debug.Log("Ogh");
+                ply.GetComponent<Gizmo>().dist_blk = gameObject;
+                ply.GetComponent<Gizmo>().on = 1;
+                ply.GetComponent<Gizmo>().GetDist();
+                return;
+            }
+
+            if (Input.GetMouseButtonDown(0) && ply.GetComponent<Gizmo>().on == 1)
+            {
+                ply.GetComponent<Gizmo>().on = 2;
+                ply.GetComponent<Gizmo>().v_blk = gameObject;
+                return;
+            }
         }
-
-        if (Input.GetMouseButtonDown(0) && ply.GetComponent<Gizmo>().on == 1)
-        {
-            ply.GetComponent<Gizmo>().on = 2;
-            ply.GetComponent<Gizmo>().v_blk = gameObject;
-            return;
-        }
-
-
-
     }
 
     private void OnMouseExit()

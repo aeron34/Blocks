@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using Giz;
 
 public class Gizmo : MonoBehaviour
 {
@@ -12,8 +11,8 @@ public class Gizmo : MonoBehaviour
     Rigidbody2D rgb;
     public Animator ani;
     private SpriteRenderer spr;
-    public float cxS = 0, xS, xY = 35, di = 1, hearts = 3, pwr_dur = 0,
-        pwr_drn; //pwr_drn variable, the higher it is the faster
+    public float cxS = 0, xS, xY = 35, di = 1, 
+    pwr_dur = 0, pwr_drn; //pwr_drn variable, the higher it is the faster
     // your pwr up runs out.
     private float n_hel = 1f;
     public bool ground = false, good_space, top_hit, hurt_b = false;
@@ -31,25 +30,23 @@ public class Gizmo : MonoBehaviour
     Queue<string> colors;
     void Start()
     {
-        //camm = Camera.main;
-        Default();
-        //gn = new Gizmon();
+   
         di = 1;
         colors = new Queue<string>();
         pwr_drn = (0.01f) * 0.05f;
-        //Instantiate(n, transform.position, transform.rotation);
-        //m_c = transform.Find("spawn_pos").gameObject.GetComponent<BoxCollider2D>();
+       
         rgb = GetComponent<Rigidbody2D>();
         ani = GetComponent<Animator>();
         spr = GetComponent<SpriteRenderer>();
-        // transform.position = cam.ViewportToWorldPoint(new Vector3(2 / (cam.orthographicSize * 4 * cam.aspect), 0.5f, 1));
-        // transform.position = cam.ViewportToWorldPoint(new Vector3(2 / (cam.orthographicSize * 4 * cam.aspect), 0.5f, 1));
-        //StartCoroutine(LowerHealth());
-
 
         weapons = new int[3] { 5, 5, 5 };
-       
-        GameObject.Find("weap_box").transform.Find("1").GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 1);
+        health = GameObject.Find("health_bar");
+        GameObject.Find("weap_box").transform.Find("1").
+        GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 1);
+        
+        xS = 10;
+        xY = 30;
+        drag = 0.35f;
     }
 
 
@@ -114,11 +111,7 @@ public class Gizmo : MonoBehaviour
                 v_blk.GetComponent<block>().swap(1);
             }
         }
-        if (Input.GetKeyDown(KeyCode.M) && on == 0)
-        {
-            on = 1;
-            StartCoroutine(PowerBar());
-        }
+
         if (Input.GetKeyDown(KeyCode.H) && dist_blk != null
         && good_space && n_colm != null)
         {
@@ -274,6 +267,12 @@ public class Gizmo : MonoBehaviour
 
     private void Weapon()
     {
+        if (wep_i == 2 && on == 0)
+        {
+            on = 1;
+            StartCoroutine(PowerBar());
+        }
+        
         if (on == 0)
         {
             if (weapons[wep_i] != 0)
@@ -303,23 +302,6 @@ public class Gizmo : MonoBehaviour
         return;
     }
 
-    private Dictionary<string, float> Default(int mode = 0)
-    {
-        if (mode == 1)
-        {
-            return new Dictionary<string, float>() {
-                {"xS", 10},
-                {"xY", 30},
-                {"drag", 0.35f}
-            };
-        }
-
-
-        xS = 10;
-        xY = 30;
-        drag = 0.35f;
-        return new Dictionary<string, float>() { };
-    }
     public IEnumerator LowerHealth(float by = 0)
     {
         n_hel -= (by * 0.01f);
@@ -344,32 +326,8 @@ public class Gizmo : MonoBehaviour
         }
         on = 0;
         transform.Find("pwr_bar").gameObject.SetActive(false);
-        Default();
+
     }
-
-    public void PowerUP(string color, int mode = 0)
-    {
-        if (Input.GetKey(KeyCode.M))
-        {
-            colors.Enqueue(color);
-            return;
-        }
-
-        switch (color)
-        {
-            case "blue":
-                var dict = Default(1);
-                xS = dict["xS"] * 2;
-                drag = dict["drag"] * 2;
-                break;
-            case "green":
-                var d = Default(1);
-                xY = d["xY"] * 1.5f;
-                break;
-        }
-        StartCoroutine(PowerBar());
-    }
-
     private void FixedUpdate()
     {
         if (on == 0)
@@ -463,7 +421,7 @@ public class Gizmo : MonoBehaviour
         if (!hurt_b)
         {
             hurt_b = true;
-            //rgb.simulated = false;
+            rgb.simulated = false;
             StartCoroutine(LowerHealth(by));  
             pwr_dur = 0;
             GetComponent<BoxCollider2D>().enabled = false;
