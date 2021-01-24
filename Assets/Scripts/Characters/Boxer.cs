@@ -11,6 +11,7 @@ public class Boxer : MonoBehaviour
     Rigidbody2D rgb;
     public Animator ani;
     private SpriteRenderer spr;
+    public List<string> inps = new List<string>();
     public float cxS = 0, xS, xY = 35, di = 1,
     pwr_dur = 0, pwr_drn; //pwr_drn variable, the higher it is the faster
     // your pwr up runs out.
@@ -21,12 +22,12 @@ public class Boxer : MonoBehaviour
     public int on = 0;
     public GameObject colm, health, n_colm; //n_colm means whatever colm is after the 
     //colm the player is in, it accounts for whether he's turned around or not.
-
     // Camera camm;
-
+    private string[][] Combos;
+    private int frame_C = 0;
     private float drag;
     Queue<string> colors;
-
+    Action[] moves;
     void Start()
     {
 
@@ -39,16 +40,29 @@ public class Boxer : MonoBehaviour
         spr = GetComponent<SpriteRenderer>();
         health = GameObject.Find("health_bar");
 
+        moves = new Action[1] { Go };//, Go };
         xS = 15;
         xY = 40;
-        drag = 0.6f;
+        drag = 1.2f;
+
+        Combos = new string[][]{
+            new string[]{"s","d","s","d","j"}, // 
+            new string[]{ },
+            new string[]{ }};
 
     }
 
+    private void Go()
+    {
+        Debug.Log("josd");
+        ani.Play("upper");
+        //return 0;
+    }
     public void revertBack()
     {        
         ani.Play("idle");
         movable = true;
+        frame_C = 60;
         Debug.Log("called");
     }
 
@@ -62,20 +76,31 @@ public class Boxer : MonoBehaviour
                 cxS = 0;
             }
         }
-
-        if (Input.GetKey(KeyCode.D))
+        if(Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.A))
+        {
+            cxS = 0;
+            return;
+        }
+        if (Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A))
         {
             cxS = xS;
             di = 1;
             spr.flipX = false;
-
+            Combos = new string[][]{
+            new string[]{"s","d","s","d","j"}, // 
+            new string[]{ },
+            new string[]{ }};
             //transform.position += m * Time.deltaTime;
         }
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
         {
             cxS = xS;
             di = -1;
             spr.flipX = true;
+            Combos = new string[][]{
+            new string[]{"s","a","s","a","j"}, // 
+            new string[]{ },
+            new string[]{ }};
         }
     }
 
@@ -86,6 +111,47 @@ public class Boxer : MonoBehaviour
             StartCoroutine(v_blk.GetComponent<block>().slide(di));
             ani.Play("punch");
         }
+    }
+
+    private void process_inp()
+    {
+        if (Input.inputString != "")
+        {
+            inps.Add(Input.inputString);
+            frame_C = 45;
+            Debug.Log(frame_C);
+            return;
+        }
+
+        frame_C -= 1;
+
+        if(frame_C == 0)
+        {
+            inps.Clear();
+        }
+
+        string n = string.Join("", inps.ToArray());
+        
+        if (n == "" || n.Length > 15)
+        {
+            inps.Clear();
+            return;
+        }
+        
+        for (int i = 0; i < 3; i++)
+        {
+            string a = string.Join("", Combos[i]);
+            if (n.Contains(a) && a != "")
+            {
+                moves[i]();
+                cxS = 0;
+                movable = false;
+
+                inps.Clear();
+                break;
+            }
+        }
+
     }
     private void UP_Logic()
     {
@@ -129,6 +195,7 @@ public class Boxer : MonoBehaviour
             Punch();
         }
 
+        process_inp();
         ComboKeys();
 
         rgb.velocity = new Vector2(cxS * di, rgb.velocity.y);
@@ -157,12 +224,15 @@ public class Boxer : MonoBehaviour
                 return;
             }
         }
+
         if (Input.GetKeyDown(KeyCode.O))
         {
             movable = false;
             ani.Play("punch");
             cxS = 0;
         }
+
+
        // Debug.Log("called");
      }
 
