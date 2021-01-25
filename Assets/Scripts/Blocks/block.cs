@@ -111,6 +111,7 @@ public class block : MonoBehaviour
             
             FindObjectOfType<scorer>().UpdateScore(touching.ToArray().Length * 50);
             
+
             return 1;
         }
 
@@ -377,11 +378,7 @@ public class block : MonoBehaviour
                     g.GetComponent<PowerUp>().color = color;
                 }
             }
-            
-            foreach (GameObject n in touching)
-            {
-                n.GetComponent<block>().die = 1;
-            }
+          
 
             colm.GetComponent<column>().Takeoff(gameObject);
 

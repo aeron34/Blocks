@@ -1,17 +1,4 @@
 
-o Implement block falling
-system:
-
-	- Make it so if block
-	falls on head of player,
-	heart is lost.
-
-o Implement heart/lives system:
-
-	- Get an Image for the hearts
-
-	- Anchor in top left with canvas.
-
 o Create the main menu.
 
 o Add a megaman style explode animation
@@ -25,6 +12,15 @@ o Imp. combo counter on top of dude's
 head.
 
 o Add the animations
+
+o Imp. Jab, this destroys blocks - CURRENTLY.
+
+o Make the column straight punch 
+delete the color punched for 3 rows
+up and foward, switch the upper-end
+of the column adn - NEXT (1)
+
+o Imp. column upper - NEXT (2).
 
 o Have the objective of the game be to 
 get the highest block chain. There are
@@ -58,20 +54,8 @@ will give a wierd effect.
 o Make meteors into Power UPs you
 could obtain. - NEXT(2)
 
-o Implement weapon selector. - currently
-
-o Make it so player can't
-move and he's stuck when
-you engage in ultimate weap.) - NEXT
-
-o Make it so that the more 
-points you earn, the less
-real money you must spend.
-let's say for the sake 
-of simp., for every 1000 points
-10 cents is taken off.
-
-
 o HAVE 3 CHARS in the beginning,
 only increase the amount after 
 viewership increases.
+
+

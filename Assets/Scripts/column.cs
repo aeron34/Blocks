@@ -61,21 +61,25 @@ public class column : MonoBehaviour
         StartCoroutine(realDrop(col));
         // blocks.Add(n_b);
     }
-    public void Takeoff(GameObject a)
+    public void Takeoff(GameObject a, bool casc = true)
     {
-        foreach (GameObject n in blocks)
-        {
-            if (n != null && n.transform.position.y > a.transform.position.y)
+        if (casc) 
+        { 
+            foreach (GameObject n in blocks)
             {
-                try
+                if (n != null && n.transform.position.y > a.transform.position.y)
                 {
-                    n.GetComponent<block>().sChk = true;
-                }catch(NullReferenceException e)
-                {
-                    continue;
+                    try
+                    {
+                        n.GetComponent<block>().sChk = true;
+                    } catch (NullReferenceException e)
+                    {
+                        continue;
+                    }
                 }
-            }
+            } 
         }
+
 
         blocks.Remove(a);
         //blocks.Clear();

@@ -19,8 +19,10 @@ public class Boxer : MonoBehaviour
     private bool movable = true;
     public bool ground = false, good_space, top_hit, hurt_b = false;
     public GameObject h_blk = null, v_blk = null;
+    public GameObject ult_bar;
+    private GameObject health;
     public int on = 0;
-    public GameObject colm, health, n_colm; //n_colm means whatever colm is after the 
+    public GameObject colm, n_colm; //n_colm means whatever colm is after the 
     //colm the player is in, it accounts for whether he's turned around or not.
     // Camera camm;
     private string[][] Combos;
@@ -28,6 +30,7 @@ public class Boxer : MonoBehaviour
     private float drag;
     Queue<string> colors;
     Action[] moves;
+
     void Start()
     {
 
@@ -38,23 +41,77 @@ public class Boxer : MonoBehaviour
         rgb = GetComponent<Rigidbody2D>();
         ani = GetComponent<Animator>();
         spr = GetComponent<SpriteRenderer>();
-        health = GameObject.Find("health_bar");
 
-        moves = new Action[1] { Go };//, Go };
+        health = GameObject.Find("health_bar");
+        ult_bar = GameObject.Find("ult_bar");
+
+        moves = new Action[2] { Straight, ULTIMATE };//, Go };
         xS = 15;
         xY = 40;
         drag = 1.2f;
-
-        Combos = new string[][]{
-            new string[]{"s","d","s","d","j"}, // 
-            new string[]{ },
-            new string[]{ }};
+        StartCoroutine(AddBar());
 
     }
 
-    private void Go()
+    private void Straight()
     {
-        Debug.Log("josd");
+        var ori = transform.GetChild(0).transform.position;
+        
+        /*
+         * This "distance" var makes it so that you can't just 
+         * throw this move out without being close to the actual
+         * blocks.
+         */
+
+        var distance = Physics2D.Raycast(new Vector2((ori.x + (0.5f*di)), ori.y),
+        Vector2.right * di, .5f, LayerMask.GetMask("blocks"));
+
+        List<RaycastHit2D[]> blocks_for_del = new List<RaycastHit2D[]>
+        {
+            Physics2D.RaycastAll(new Vector2((ori.x + (0.5f * di)), ori.y),
+            Vector2.right * di, 5f, LayerMask.GetMask("blocks")),
+            Physics2D.RaycastAll(new Vector2((ori.x + (0.5f * di)), ori.y + 1.5f),
+            Vector2.right * di, 5f, LayerMask.GetMask("blocks")),
+            Physics2D.RaycastAll(new Vector2((ori.x + (0.5f * di)), ori.y + 3.5f),
+            Vector2.right * di, 5f, LayerMask.GetMask("blocks"))
+        };
+
+
+        if(distance.collider != null)
+        {
+            StartCoroutine(LowerBar(30f, ult_bar));
+            for(int i = 0; i < blocks_for_del.ToArray().Length; i++)
+            {
+                for (int a = 0; a < blocks_for_del[i].Length; a++)
+                {
+                    var g = blocks_for_del[i][a].collider.gameObject;
+
+                    if (g.GetComponent<block>().color ==
+                    distance.collider.gameObject.GetComponent<block>().color)
+                    {
+                        QuickEXP(blocks_for_del[i][a].collider.gameObject);
+                    }
+                }
+            }
+        }
+        else
+        {
+            revertBack();
+            return;
+        }
+        ani.Play("upper");
+        //return 0;
+    }
+
+    private void ULTIMATE()
+    {
+        Debug.Log("Ultimate");
+        ani.Play("upper");
+    }
+
+    private void Upper()
+    {
+        Debug.Log("Upper");
         ani.Play("upper");
         //return 0;
     }
@@ -87,9 +144,8 @@ public class Boxer : MonoBehaviour
             di = 1;
             spr.flipX = false;
             Combos = new string[][]{
-            new string[]{"s","d","s","d","j"}, // 
-            new string[]{ },
-            new string[]{ }};
+            new string[]{"s","d","s","d","u"}, // 
+            new string[]{"s", "s", "s", "o"}};
             //transform.position += m * Time.deltaTime;
         }
         if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
@@ -98,9 +154,8 @@ public class Boxer : MonoBehaviour
             di = -1;
             spr.flipX = true;
             Combos = new string[][]{
-            new string[]{"s","a","s","a","j"}, // 
-            new string[]{ },
-            new string[]{ }};
+            new string[]{"s","a","s","a","u"}, // 
+            new string[]{"s", "s", "s", "o"} };
         }
     }
 
@@ -119,7 +174,6 @@ public class Boxer : MonoBehaviour
         {
             inps.Add(Input.inputString);
             frame_C = 45;
-            Debug.Log(frame_C);
             return;
         }
 
@@ -138,21 +192,67 @@ public class Boxer : MonoBehaviour
             return;
         }
         
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 2; i++)
         {
             string a = string.Join("", Combos[i]);
             if (n.Contains(a) && a != "")
             {
-                moves[i]();
                 cxS = 0;
                 movable = false;
-
+                moves[i]();
                 inps.Clear();
                 break;
             }
         }
-
     }
+    
+    private void QuickEXP(GameObject g)
+    {
+        FindObjectOfType<scorer>().UpdateScore(50);
+        g.GetComponent<block>().explode();
+    }
+
+    public void regStrt()
+    {
+        if(v_blk != null)
+        {
+            QuickEXP(v_blk);
+        }
+    }
+
+    public void downStrt()
+    {
+        ani.Play("d_punch");
+        
+        transform.position = new Vector2(colm.transform.position.x, 
+        transform.position.y);
+
+        Vector2 np = transform.GetChild(0).transform.position;
+
+        var d = Physics2D.RaycastAll(new Vector2(np.x - 0.25f, np.y - 2f),
+        Vector2.right * di, .75f, LayerMask.GetMask("blocks"));
+        
+        for (int i = 0; i < d.Length; i++)
+        {
+            QuickEXP(d[i].collider.gameObject);
+        }
+    }
+
+    private IEnumerator AddBar()
+    {
+        if(ult_bar.transform.localScale.x + 0.01f < 1f)
+        {
+            ult_bar.transform.localScale = new Vector2(
+            ult_bar.transform.localScale.x + 0.01f, 1f);
+        }
+        else
+        {
+            ult_bar.transform.localScale = new Vector2(1, 1);
+        }
+        yield return new WaitForSeconds(.5f);
+        StartCoroutine(AddBar());
+    }
+
     private void UP_Logic()
     {
 
@@ -213,13 +313,13 @@ public class Boxer : MonoBehaviour
 
     private void ComboKeys()
     {
-         
+        
         if(Input.GetKey(KeyCode.S))
         {
             if (Input.GetKeyDown(KeyCode.O))
             {
                 movable = false;
-                ani.Play("d_punch");
+                downStrt();
                 cxS = 0;
                 return;
             }
@@ -228,12 +328,10 @@ public class Boxer : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.O))
         {
             movable = false;
+            regStrt();
             ani.Play("punch");
             cxS = 0;
         }
-
-
-       // Debug.Log("called");
      }
 
     // Update is called once per frame
@@ -245,16 +343,37 @@ public class Boxer : MonoBehaviour
         }
     }
 
-    public IEnumerator LowerHealth(float by = 0)
+    public IEnumerator LowerBar(float by = 0, GameObject g = null)
     {
-        n_hel -= (by * 0.01f);
-
-        while (health.transform.localScale.x > n_hel)
+        if(g == null)
         {
-            health.transform.localScale = Vector2.Lerp(new Vector2(health.transform.localScale.x, 1),
-            new Vector2(n_hel, 1), .1f);
-            yield return 0;
+            g = health;
         }
+
+       float n_hel = g.transform.localScale.x - (by * 0.01f);
+
+        //Remember if by < 0 then that means 
+        //g(the bar) will go UP, not down.
+        //n_hel will be add to a POSITIVE number
+        //if by < 0;
+
+        if (by > 0)
+        {
+            while (g.transform.localScale.x > n_hel + .025f)
+            {
+                g.transform.localScale = Vector2.Lerp(new Vector2(g.transform.localScale.x, 1),
+                new Vector2(n_hel, 1), .1f);
+                if (g.transform.localScale.x < 0f)
+                {
+                    n_hel = 0;
+                    break;
+                }
+                yield return 0;
+            }
+            g.transform.localScale = new Vector2(n_hel, 1);
+        }
+
+
     }
 
     private IEnumerator PowerBar()
@@ -366,7 +485,7 @@ public class Boxer : MonoBehaviour
         {
             hurt_b = true;
             rgb.simulated = false;
-            StartCoroutine(LowerHealth(by));
+            StartCoroutine(LowerBar(by));
             pwr_dur = 0;
             GetComponent<BoxCollider2D>().enabled = false;
             yield return new WaitForSeconds(2);
@@ -375,7 +494,7 @@ public class Boxer : MonoBehaviour
             rgb.velocity = new Vector2(0, 0);
             GetComponent<BoxCollider2D>().enabled = true;
             transform.position = new Vector3(0, 16f, 0);
-            hurt_b = false; // StartCoroutine(LowerHealth(50));
+            hurt_b = false; // StartCoroutine(LowerBar(50));
             yield return new WaitForSeconds(3);
 
         }

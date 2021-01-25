@@ -60,7 +60,7 @@ public class block_queue : MonoBehaviour
 
         int[,] orien = new int[2, 4]{ { 0, 1, 2, 3},{ 2, 3, 0, 1} };
         
-        for(int i = 0; i < 6; i++)
+        for(int i = 0; i < 7; i++)
         {
 
             col_i++;
@@ -144,7 +144,7 @@ public class block_queue : MonoBehaviour
         {
             
             if(time_passed == mins[i])
-            {Debug.Log("pass" + mins[i]);
+            { 
                 bts += 0.025f;
             }
         }
