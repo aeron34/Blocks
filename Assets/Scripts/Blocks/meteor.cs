@@ -26,6 +26,7 @@ public class meteor : MonoBehaviour
             try
             {
                 g.GetComponent<block>().dud = true;
+                g.GetComponent<block>().colm.GetComponent<column>().casc = false;
                 g.GetComponent<block>().touching.Clear();
                 g.GetComponent<block>().die = 1;
                 Destroy(gameObject);

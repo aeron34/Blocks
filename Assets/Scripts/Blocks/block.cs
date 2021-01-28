@@ -99,10 +99,25 @@ public class block : MonoBehaviour
 
         if(touching.ToArray().Length >= 3)
         {
+            colm.GetComponent<column>().casc = true;
             foreach (GameObject n in touching)
             {
                 n.GetComponent<block>().die = 1;
+                n.GetComponent<block>().colm.GetComponent<column>().casc = true;
+
             }
+            var p = GameObject.Find("pic");
+            if(p.GetComponent<Gizmo>() != null)
+            {
+                p.GetComponent<Gizmo>().c_c = 30f;
+                p.GetComponent<Gizmo>().com += 1;
+            }
+            if(p.GetComponent<Boxer>() != null)
+            {
+                p.GetComponent<Boxer>().c_c = 30f;
+                Debug.Log(p.GetComponent<Boxer>().com);
+                p.GetComponent<Boxer>().com += 1;
+            }            
             if (touching.ToArray().Length >= 4)
             {
                 FindObjectOfType<scorer>().UpdateScore((int)Math.Pow(touching.ToArray().Length * .75, 5));
@@ -110,7 +125,7 @@ public class block : MonoBehaviour
             }
             
             FindObjectOfType<scorer>().UpdateScore(touching.ToArray().Length * 50);
-            
+
 
             return 1;
         }
@@ -223,15 +238,15 @@ public class block : MonoBehaviour
 
         v_blk = null;
         h_blk = null;
-        
+
         var hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
         Vector2.right * -1, 2f, LayerMask.GetMask("blocks"));
 
         if (hit.collider != null)
         {
             h_blk = hit.collider.gameObject;
-        }     
-        
+        }
+
         var hit2 = Physics2D.Raycast(transform.GetChild(1).transform.position,
         Vector2.up, 2f, LayerMask.GetMask("blocks"));
 
@@ -244,7 +259,7 @@ public class block : MonoBehaviour
         RaycastHit2D[] rays = { Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y + 1.025f),
             Vector2.up, 1f, LayerMask.GetMask("blocks")),
             Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 1.025f),
-            Vector2.down, 1f, LayerMask.GetMask("blocks")), 
+            Vector2.down, 1f, LayerMask.GetMask("blocks")),
             Physics2D.Raycast(new Vector2(transform.position.x - 1.025f, transform.position.y),
             Vector2.left, 1f, LayerMask.GetMask("blocks")),
             Physics2D.Raycast(new Vector2(transform.position.x + 1.025f, transform.position.y),
@@ -265,58 +280,11 @@ public class block : MonoBehaviour
 
     }
 
-    public void pickup()
-    {
-       
-        if (colm != null)
-        {
-             colm.GetComponent<column>().Takeoff(gameObject);
-        }
-
-        //columns.Clear();
-        touching.Clear();
-
-    }
-
     // Update is called once per frame
     void Update()
     {
-        //StartCoroutine(move());
-
-
         if (die == 0)
         {
-            /*if (follow)
-            {
-                transform.position = new Vector3(
-                    p.transform.position.x,
-                    p.transform.position.y + 1.5f,
-                    0f);
-
-                grounded = false;
-                spr.flipX = p.GetComponent<SpriteRenderer>().flipX;
-
-
-                if (rgb.simulated)
-                {
-                    float[] a = { 90, 180, 270, 360 };
-                    for (int i = 0; i < 4; i++)
-                    {
-                        a[i] = (int)rgb.rotation - a[i];
-                        // Debug.Log(a[i]);
-                    }
-                    float l = a.Min();
-
-                    int ind = Array.IndexOf(a, l);
-                    var n = new Quaternion();
-
-                    n.Set(0f, 0f, (int)((ind + 1) * 90), 0f);
-                    transform.rotation = n;
-                    rgb.SetRotation((ind + 1) * 90);
-
-                }
-                rgb.simulated = false;
-            }*/
             if (sChk)
             {
                 if (nt <= 1000.0)
@@ -351,6 +319,7 @@ public class block : MonoBehaviour
         if (die < 2)
         {
             var p = GameObject.Find("pic");
+
             if (p.GetComponent<Gizmo>() != null)
             {
                 if (p.GetComponent<Gizmo>().dist_blk == gameObject)
@@ -366,16 +335,19 @@ public class block : MonoBehaviour
             }
             else
             {
-                System.Random random = new System.Random();
-                GetComponent<BoxCollider2D>().enabled = false;
-                int rn = random.Next(1, 14);
-
-
-                if (rn == 2)
+                if (p.GetComponent<Gizmo>() != null)
                 {
-                    var g = Instantiate(pwr_up, transform.position, transform.rotation);
-                    g.GetComponent<SpriteRenderer>().color = spr.color;
-                    g.GetComponent<PowerUp>().color = color;
+                    System.Random random = new System.Random();
+                    GetComponent<BoxCollider2D>().enabled = false;
+                    int rn = random.Next(1, 14);
+
+
+                    if (rn == 2)
+                    {
+                        var g = Instantiate(pwr_up, transform.position, transform.rotation);
+                        g.GetComponent<SpriteRenderer>().color = spr.color;
+                        g.GetComponent<PowerUp>().color = color;
+                    }
                 }
             }
           
@@ -414,10 +386,10 @@ public class block : MonoBehaviour
         }
     }
 
-    public IEnumerator slide(float di)
+    public IEnumerator slide(float di, int by=3)
     {
         var c = FindObjectOfType<block_queue>().colms;
-        int inx = c.FindIndex(a => a == colm), by = 3;
+        int inx = c.FindIndex(a => a == colm);
         bool fail = false;
         
         if(inx - 3 < 0 && di == -1)
@@ -433,6 +405,8 @@ public class block : MonoBehaviour
         var b = FindObjectOfType<block_queue>().colms[inx+(int)(di*by)];
         rgb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
+        colm.GetComponent<column>().blocks.Remove(gameObject);
+
         if (di == -1)
         {
             while (transform.position.x > b.transform.position.x)
@@ -441,6 +415,7 @@ public class block : MonoBehaviour
                 {
                     int i = c.FindIndex(a => a == h_blk.GetComponent<block>().colm);
                     colm = c[i + 1];
+
                     transform.position = new Vector2(colm.transform.position.x, transform.position.y);
                     rgb.constraints = RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
                     fail = true;
@@ -470,6 +445,7 @@ public class block : MonoBehaviour
                 {
                     int i = c.FindIndex(a => a == r.collider.gameObject.GetComponent<block>().colm);
                     colm = c[i - 1];
+
                     transform.position = new Vector2(colm.transform.position.x, transform.position.y);
                     rgb.constraints = RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
                     fail = true;
@@ -497,6 +473,10 @@ public class block : MonoBehaviour
             rgb.constraints = RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
         }
 
+        if (!colm.GetComponent<column>().blocks.Contains(gameObject))
+        {
+            colm.GetComponent<column>().blocks.Add(gameObject);
+        }
     }
 
     private void OnMouseEnter()

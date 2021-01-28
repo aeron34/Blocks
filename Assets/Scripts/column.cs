@@ -9,6 +9,7 @@ public class column : MonoBehaviour
     public List<GameObject> blocks;
     public GameObject block, spawn, up_indi, ply=null;
     bool b_drp;
+    public bool casc = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -61,7 +62,7 @@ public class column : MonoBehaviour
         StartCoroutine(realDrop(col));
         // blocks.Add(n_b);
     }
-    public void Takeoff(GameObject a, bool casc = true)
+    public void Takeoff(GameObject a)
     {
         if (casc) 
         { 
@@ -82,6 +83,7 @@ public class column : MonoBehaviour
 
 
         blocks.Remove(a);
+        casc = true;
         //blocks.Clear();
     }
     private void OnTriggerEnter2D(Collider2D collision)

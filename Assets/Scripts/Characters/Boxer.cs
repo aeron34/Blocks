@@ -20,8 +20,9 @@ public class Boxer : MonoBehaviour
     public bool ground = false, good_space, top_hit, hurt_b = false;
     public GameObject h_blk = null, v_blk = null;
     public GameObject ult_bar;
-    private GameObject health;
-    public int on = 0;
+    private GameObject health, com_c;
+    public int on = 0, com = 0;
+    public float c_c = 0;
     public GameObject colm, n_colm; //n_colm means whatever colm is after the 
     //colm the player is in, it accounts for whether he's turned around or not.
     // Camera camm;
@@ -49,12 +50,38 @@ public class Boxer : MonoBehaviour
         xS = 15;
         xY = 40;
         drag = 1.2f;
+
+        com_c = GameObject.Find("Com_Cnt");
+
         StartCoroutine(AddBar());
 
     }
 
+ 
+    public void ComboCounter()
+    {
+        
+        if(c_c < 0)
+        {
+            com = 0;
+            com_c.SetActive(false);
+        }
+        c_c -= 0.08f;
+        if (c_c > 0 && com >= 2)
+        {
+            com_c.SetActive(true);
+
+            com_c.GetComponent<Text>().text = com + "x combo"; 
+        }
+    }
+
     private void Straight()
     {
+        if(ult_bar.transform.localScale.x < .4f)
+        {
+            revertBack();
+            return;
+        }
         var ori = transform.GetChild(0).transform.position;
         
         /*
@@ -84,13 +111,9 @@ public class Boxer : MonoBehaviour
             {
                 for (int a = 0; a < blocks_for_del[i].Length; a++)
                 {
-                    var g = blocks_for_del[i][a].collider.gameObject;
-
-                    if (g.GetComponent<block>().color ==
-                    distance.collider.gameObject.GetComponent<block>().color)
-                    {
-                        QuickEXP(blocks_for_del[i][a].collider.gameObject);
-                    }
+                    var g = blocks_for_del[i][a].collider.gameObject;                    
+                    QuickEXP(blocks_for_del[i][a].collider.gameObject);
+                    
                 }
             }
         }
@@ -159,11 +182,11 @@ public class Boxer : MonoBehaviour
         }
     }
 
-    private void Punch()
+    private void Punch(int b)
     {
         if(v_blk != null)
         {
-            StartCoroutine(v_blk.GetComponent<block>().slide(di));
+            StartCoroutine(v_blk.GetComponent<block>().slide(di, b));
             ani.Play("punch");
         }
     }
@@ -209,6 +232,7 @@ public class Boxer : MonoBehaviour
     private void QuickEXP(GameObject g)
     {
         FindObjectOfType<scorer>().UpdateScore(50);
+        g.GetComponent<block>().colm.GetComponent<column>().casc = false;
         g.GetComponent<block>().explode();
     }
 
@@ -290,11 +314,6 @@ public class Boxer : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            Punch();
-        }
-
         process_inp();
         ComboKeys();
 
@@ -313,8 +332,18 @@ public class Boxer : MonoBehaviour
 
     private void ComboKeys()
     {
-        
-        if(Input.GetKey(KeyCode.S))
+
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            Punch(1);
+        }  
+        if ((Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A)) && Input.GetKeyDown(KeyCode.K))
+        {
+            Punch(3);
+        }
+
+        if (Input.GetKey(KeyCode.S))
         {
             if (Input.GetKeyDown(KeyCode.O))
             {
@@ -340,6 +369,7 @@ public class Boxer : MonoBehaviour
         if (!hurt_b && movable)
         {
             UP_Logic();
+            ComboCounter();
         }
     }
 
@@ -394,6 +424,7 @@ public class Boxer : MonoBehaviour
     {
         
         h_blk = null;
+        v_blk = null;
         ground = false;
         good_space = false;
 
@@ -425,10 +456,10 @@ public class Boxer : MonoBehaviour
         var np = transform.GetChild(0).transform.position;
 
         RaycastHit2D gc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
+        Vector2.down, 1.25f, LayerMask.GetMask("blocks","ground"));
 
         RaycastHit2D gc2 = Physics2D.Raycast(new Vector2(np.x + .8f, np.y),
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
+        Vector2.down, 1.25f, LayerMask.GetMask("blocks", "ground"));
 
         if (gc.collider != null || gc2.collider != null)
         {
@@ -483,6 +514,7 @@ public class Boxer : MonoBehaviour
 
         if (!hurt_b)
         {
+            
             hurt_b = true;
             rgb.simulated = false;
             StartCoroutine(LowerBar(by));

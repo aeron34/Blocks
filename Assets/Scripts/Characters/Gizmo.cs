@@ -19,8 +19,8 @@ public class Gizmo : MonoBehaviour
     public GameObject h_blk = null, v_blk = null;
     public GameObject gren, spider;
     public int[] weapons;
-    public int on = 0, wep_i=0;
-
+    public int on = 0, wep_i=0, com = 0;
+    public float c_c = 0;
     public GameObject colm, health, n_colm, dist_blk; //n_colm means whatever colm is after the 
                                                             //colm the player is in, it accounts for whether he's turned around or not.
 
@@ -362,12 +362,12 @@ public class Gizmo : MonoBehaviour
             }
         }
         var np = transform.GetChild(0).transform.position;
-
+      
         RaycastHit2D gc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
+        Vector2.down, 1.25f, LayerMask.GetMask("blocks", "ground"));
 
         RaycastHit2D gc2 = Physics2D.Raycast(new Vector2(np.x + .8f, np.y),
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks"));
+        Vector2.down, 1.25f, LayerMask.GetMask("blocks", "ground"));
 
         if (gc.collider != null || gc2.collider != null)
         {
