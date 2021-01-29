@@ -29,6 +29,7 @@ public class Boxer : MonoBehaviour
     private string[][] Combos;
     private int frame_C = 0;
     private float drag;
+    public bool able;
     Queue<string> colors;
     Action[] moves;
 
@@ -46,7 +47,7 @@ public class Boxer : MonoBehaviour
         health = GameObject.Find("health_bar");
         ult_bar = GameObject.Find("ult_bar");
 
-        moves = new Action[2] { Straight, ULTIMATE };//, Go };
+        moves = new Action[3] { Straight, ULTIMATE, Upper };//, Go };
         xS = 15;
         xY = 40;
         drag = 1.2f;
@@ -135,7 +136,11 @@ public class Boxer : MonoBehaviour
     private void Upper()
     {
         Debug.Log("Upper");
-        ani.Play("upper");
+        if (v_blk != null)
+        {
+            v_blk.GetComponent<block>().Launch();
+        }
+        revertBack();
         //return 0;
     }
     public void revertBack()
@@ -168,7 +173,8 @@ public class Boxer : MonoBehaviour
             spr.flipX = false;
             Combos = new string[][]{
             new string[]{"s","d","s","d","u"}, // 
-            new string[]{"s", "s", "s", "o"}};
+            new string[]{"s", "s", "s", "o"},
+            new string[]{"s", "d", "u"}};
             //transform.position += m * Time.deltaTime;
         }
         if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
@@ -178,17 +184,23 @@ public class Boxer : MonoBehaviour
             spr.flipX = true;
             Combos = new string[][]{
             new string[]{"s","a","s","a","u"}, // 
-            new string[]{"s", "s", "s", "o"} };
+            new string[]{"s", "s", "s", "o"},
+            new string[]{"s", "a", "u"}};
+
         }
     }
 
     private void Punch(int b)
     {
-        if(v_blk != null)
+        if (ground)
         {
-            StartCoroutine(v_blk.GetComponent<block>().slide(di, b));
-            ani.Play("punch");
+            if (v_blk != null)
+            {
+                StartCoroutine(v_blk.GetComponent<block>().slide(di, b));
+                ani.Play("punch");
+            }
         }
+        
     }
 
     private void process_inp()
@@ -215,7 +227,7 @@ public class Boxer : MonoBehaviour
             return;
         }
         
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < moves.Length; i++)
         {
             string a = string.Join("", Combos[i]);
             if (n.Contains(a) && a != "")
@@ -422,7 +434,6 @@ public class Boxer : MonoBehaviour
 
     private void FixedUpdate()
     {
-        
         h_blk = null;
         v_blk = null;
         ground = false;
@@ -529,6 +540,31 @@ public class Boxer : MonoBehaviour
             hurt_b = false; // StartCoroutine(LowerBar(50));
             yield return new WaitForSeconds(3);
 
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        var g = collision.gameObject;
+        if(g.layer == 9 && !ground)
+        {
+            
+            if(Input.GetKey(KeyCode.K) && ((transform.position.y - .4f) >
+            (g.transform.position.y - 1f)) && g.GetComponent<block>().v_blk == null)
+            {
+                int f_di = 1;
+                if(g.transform.position.x > transform.position.x)
+                {
+                    f_di = 1;
+                }
+                else
+                {
+                    f_di = -1;
+
+                }
+                StartCoroutine(collision.gameObject.GetComponent<block>().slide(f_di, 3));
+                
+            }
         }
     }
 

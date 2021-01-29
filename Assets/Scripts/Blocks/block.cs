@@ -62,6 +62,13 @@ public class block : MonoBehaviour
         }
     }
      
+    public void Launch()
+    {
+        if(v_blk == null)
+        {
+            rgb.velocity = new Vector2(0, 30);
+        }
+    }
     public int Check()
     {
       

@@ -4,20 +4,7 @@ o Create the main menu.
 o Add a megaman style explode animation
 to the character when something fell on him.
 
-o Implement RayGun that
-blows up any blocks a straight
-line.
-
-o Imp. combo counter on top of dude's
-head.
-
 o Add the animations
-
-
-o Make the column straight punch 
-delete the color punched for 3 rows
-up and foward, switch the upper-end
-of the column adn - CURRENTLY
 
 o Imp. column upper - NEXT (1).
 

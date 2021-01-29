@@ -91,7 +91,7 @@ public class block_queue : MonoBehaviour
             st_y += 2;
         }
 
-        StartCoroutine(MeteorTime());
+       // StartCoroutine(MeteorTime());
     }
 
     public IEnumerator MeteorTime()
