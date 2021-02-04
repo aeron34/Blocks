@@ -84,8 +84,12 @@ o ONLINE:
 	took is 16 create a new room, if not assign
 	the user the number.
 
-	
-	-
+	- When your in the waiting room, have it 
+	send more requests than it would when it's
+	playing.
+
+	- Update online status if user is logged in.
+
 
 o TELL PEOPLE HOW THEY CAN DO
 DIFFERENT THINGS WITH THE PAINTER (FORMELY

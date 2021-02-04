@@ -11,9 +11,21 @@ public class Online : MonoBehaviour
     static readonly HttpClient h = new HttpClient();
     private static Dictionary<string, string> na;
 
+    void Awake()
+    {
+        if(FindObjectsOfType(GetType()).Length > 1)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+    }
     // Start is called before the first frame update
     void Start()
     {
+
     }
 
     public void Get()
@@ -32,11 +44,12 @@ public class Online : MonoBehaviour
 
         
         Debug.Log(content);
+
         if(content != "nope")
         {
-            na = new Dictionary<string, string> {
-                { "username", content }
-            };
+            na = new Dictionary<string, string> { };
+            na.Add("username", content);
+            
         }
     }
     // Update is called once per frame
@@ -45,6 +58,18 @@ public class Online : MonoBehaviour
         if(Input.GetKey(KeyCode.A))
         {
             Debug.Log(na["username"]);
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        try
+        {    
+            Debug.Log(na["username"]);
+        }
+        catch(NullReferenceException e)
+        {
+            Debug.Log("no");
         }
     }
 }
