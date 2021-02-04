@@ -30,6 +30,62 @@ get the highest block chain. There are
 		//16 blocks
 		(16 * .25)^5 = 1024;
 
+o Tables the DB will have:
+
+	- Simon_LB
+
+	- Solo_LB (this is the game mode we have
+	now)
+
+o The DB user table will have:
+	
+	- room address. This is the current 
+	room you're in, this will be used for:
+		
+		o determining how many people
+		are in a room (helps with limit).
+
+		o help other players pool the 
+		players in a room and randomly
+		pick someone to send to.
+	
+	
+	- username 
+
+	- password
+
+	- How many meteors you have
+	coming at you.
+
+	- online state, string that
+	has states like "running", 
+	"waiting", "offline", etc.
+
+	- How many games you've won.
+
+o ONLINE:
+
+	- Use the master OBJ we have and make
+	it persist, have it keep the username
+	inside it.
+
+	- make it so the only way the game will
+	accept your username is if:
+
+		1. Your not auth. already.
+		2. You type in the right password.
+		(use bcrypt)
+
+	- In order to create new rooms return
+	an array of online users, go down to
+	the last one, take the room number of the 
+	last user, try to splice 20 users
+	back in the array, and if the number you
+	took is 16 create a new room, if not assign
+	the user the number.
+
+	
+	-
 
 o TELL PEOPLE HOW THEY CAN DO
 DIFFERENT THINGS WITH THE PAINTER (FORMELY

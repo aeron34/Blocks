@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class cam : MonoBehaviour
 {
     public float duration, magnitude;
-    public GameObject Target;
+    public Vector3 Target;
     Vector3 velocity = Vector3.zero;
     Camera camm;
+    public bool zoom;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,16 +24,19 @@ public class cam : MonoBehaviour
 
     }
     // Update is called once per frame
-    void FixedUpdate()
+ 
+    private void FixedUpdate()
     {
-        /*
-         * DO NOT DELETE, FUNCTIONALITY IS FOR LOSS SCREEN AND SIMON + JOE PUZZLE MODE
-         
-        Time.timeScale = Mathf.Lerp(1.0f, 0.25f, 0.8f);
-        camm.orthographicSize = Mathf.Lerp(camm.orthographicSize, 3, 0.0145f);
-        transform.position = Vector3.Lerp(transform.position, 
-            new Vector3(Target.transform.position.x, Target.transform.position.y, -5),
-            0.1f);*/
+        if(zoom)
+        {
+            Target = GameObject.Find("pic").transform.position;
+            //Time.timeScale = Mathf.Lerp(1.0f, 0.25f, 0.8f);
+            camm.orthographicSize = Mathf.Lerp(camm.orthographicSize, 3, 0.2f);
+            transform.position = Vector3.Lerp(transform.position,
+            new Vector3(Target.x, Target.y, -5),
+            0.2f);
+        }
+
     }
     public IEnumerator Shake()
     {

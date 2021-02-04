@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 public class Boxer : MonoBehaviour
 {
@@ -32,10 +34,10 @@ public class Boxer : MonoBehaviour
     public bool able;
     Queue<string> colors;
     Action[] moves;
+    static readonly HttpClient h= new HttpClient();
 
     void Start()
     {
-
         di = 1;
         colors = new Queue<string>();
         pwr_drn = (0.01f) * 0.05f;
@@ -55,7 +57,7 @@ public class Boxer : MonoBehaviour
         com_c = GameObject.Find("Com_Cnt");
 
         StartCoroutine(AddBar());
-
+        Get();
     }
 
  
@@ -74,6 +76,25 @@ public class Boxer : MonoBehaviour
 
             com_c.GetComponent<Text>().text = com + "x combo"; 
         }
+    }
+
+    private static async Task Get()
+    {
+        /*var values = new Dictionary<string, string>
+        {
+            { "blocks", "2" }
+        };
+        var cnt = new FormUrlEncodedContent(values);
+        var response = await h.PostAsync("http://localhost:3000/", cnt);
+        var responseString = await response.Content.ReadAsStringAsync();
+        */
+
+        string user = "noasm";
+        string a = $"http://localhost:3000/get/{user}";
+
+        var content = await h.GetStringAsync("http://localhost:3000/get/");
+
+        Debug.Log(a);
     }
 
     private void Straight()
@@ -112,9 +133,7 @@ public class Boxer : MonoBehaviour
             {
                 for (int a = 0; a < blocks_for_del[i].Length; a++)
                 {
-                    var g = blocks_for_del[i][a].collider.gameObject;                    
-                    QuickEXP(blocks_for_del[i][a].collider.gameObject);
-                    
+                    QuickEXP(blocks_for_del[i][a].collider.gameObject);                    
                 }
             }
         }
@@ -129,7 +148,8 @@ public class Boxer : MonoBehaviour
 
     private void ULTIMATE()
     {
-        Debug.Log("Ultimate");
+        Camera.main.GetComponent<cam>().zoom = true;
+        Camera.main.GetComponent<cam>().Target = transform.position;
         ani.Play("upper");
     }
 
@@ -560,10 +580,9 @@ public class Boxer : MonoBehaviour
                 else
                 {
                     f_di = -1;
-
                 }
-                StartCoroutine(collision.gameObject.GetComponent<block>().slide(f_di, 3));
-                
+
+                StartCoroutine(collision.gameObject.GetComponent<block>().slide(f_di, 3));                
             }
         }
     }
