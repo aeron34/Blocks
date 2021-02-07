@@ -3,7 +3,8 @@ const urls = require('./URL_METHODS');
 const methods = require('./methods');
 const express = require('express');
 const path = require('path');
-
+const moment_tz = require('moment-timezone');
+const moment = require('moment');
 
 const knx = require('knex')({
   client: 'pg',
@@ -37,20 +38,103 @@ knx('users').where('username', 'sonny').
 then(a => res.send(a[0].username));
 
 */
+var now = moment("2021-02-06T10:05:29");
+var a = moment_tz.utc(now).tz("Asia/Taipei");
+b = now.utc().format();
+
+//console.log(a.diff(b, 'minutes'));
+
+
+app.post('/logout', (req, res) => {
+    let u = req.body;
+
+    knx('users').where('username', u.username).
+    then(a => {
+      if(a[0].password == u.password)
+      {
+        knx('users').where('username', u.username).
+        update({
+          online_status: "offline",
+          room: -1
+          }).then(a => {
+          res.send('logged out');
+        })
+      }else {
+        res.send('wrong pass');
+      }
+  });
+
+})
+
+app.get('/check_rooms/:rn', (req, res) => {
+  res.send(req.params.rn);
+});
+
+app.post('/check_in', (req, res) => {
+    const u = req.body;
+    res.send('done');
+});
+
+app.get('/update', (req, res) => {
+  let n = [
+  'Son',
+  'lemons',
+  'Boton',
+  'wutang',
+  'gucci'];
+
+  let arr = [];
+
+  for(let i = 0; i < 5; i++)
+  {
+    arr.push(knx('users').where('username', n[i]).
+    update({
+      room: 3,
+      online_status: "running"
+    }));
+  }
+
+  Promise.all(arr).then(a => {
+      res.send('oh');
+  });
+})
 
 app.get('/rooms', (req, res) => {
-  knx('users').orderBy('room','desc').select('*')
-  .then(a => {
-    let n = a;
+  let user = {};
+  let u = req.query;
 
-    n = n.slice(0, ROOM_SIZE+4);
-    methods.GetRoom(n, ROOM_SIZE);
+  knx.transaction(trx => {
+    trx('users').where('username', u.username).
+    then(a => {
+        user = a[0];
+        trx('users').orderBy('room','desc').select('*')
+        .then(a => {
 
-    console.log(n[0]);
-    res.send('here');
+        let n = a;
+        n = n.slice(0, ROOM_SIZE+1);
+        let b = methods.GetRoom(n, ROOM_SIZE, user);
 
-  });
-});
+        switch(b[0])
+        {
+          case 1:
+            methods.AssignRoom(trx, b[1]+1, user.username, res);
+            break;
+          case 0:
+            methods.AssignAndRunRoom(trx, b[1], n, res);
+            break;
+          case -1:
+              methods.AssignRoom(trx, b[1], user.username, res);
+            break;
+          default:
+            break;
+        }
+      });
+    })
+  }).catch(e => {
+    res.send(e);
+  })
+})
+
 
 app.get('/login', (req, res) => {
   const u = req.query;

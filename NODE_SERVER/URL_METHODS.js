@@ -11,8 +11,16 @@ const createUser = (req, res, u, knx) => {
 const login = (req, res, u, knx) => {
 
   let good = false;
+  b = {};
+
   knx('users').where('username', u.username).
   then(a => {
+    b = a[0];
+    if(b.online_status != "offline")
+    {
+      res.send('nope');
+      return;
+    }
     if(a[0].password != u.pass)
     {
       res.send('nope');
@@ -20,11 +28,14 @@ const login = (req, res, u, knx) => {
     }else {
       knx('users').where('username', u.username).
       update({
-        online_status: "online"
-      }).returning('username').then(a => {
-        res.send(a[0]);
+        online_status: "online",
+        room: -1
+      }).then(a => {
+        res.send('done');
       });
     }
+  }).catch(e => {
+    res.send('nope');
   });
 }
 
