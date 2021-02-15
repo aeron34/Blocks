@@ -1,0 +1,14 @@
+Packages/
+obj/
+Temp/
+ProjectSettings/
+Logs/
+Library/
+.vs/
+2D.sln
+Assembly-CSharp.csproj
+Assembly-CSharp-Editor.csproj
+pic.png
+build/
+NODE_SERVER/node_modules
+Assets/TextMesh Pro
