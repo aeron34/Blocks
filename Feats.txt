@@ -1,0 +1,164 @@
+- Use gyroscopic features of 
+phones for the sniper feat.
+think of the switch or 
+zombi U for using the gyro
+of a device to aim
+
+- You can use ground pound
+by mashing X, the more
+you mash the more damage.
+
+- The turrents that get
+created have limited
+range that can be upgraded.
+some fire in a straight
+line cutting off movement.
+Maybe someone could use
+a turrent to trick someone
+into moving into a more 
+sniper friendly range.
+
+- A wind turbine mod
+that can create huge 
+gusts of wind. You 
+hold the phone and 
+blow into the mic, 
+if the mic hears you 
+inhale then the furniture
+goes back, then you
+blow and it goes forward.
+
+- Team battle mode
+with multiple players
+fighting, maybe capture
+the flag
+
+- an underground mod, 
+or a scavenger that
+can find goodies during
+battle maybe.
+
+- An ether mode where
+battles are waged automatically.
+You can log back in and see
+your score, money, battle points
+etc. has increased, but also the 
+probabilty of learning a new skill
+is decreased.
+
+-  A tower defense mode where players
+are on teams of 5, and there are 
+intel divisions where that belongs
+to characters who can shape shift,
+soliders who do the obvious adn 
+other positions. You can retreat
+if double'd up on.
+
+- Be able to synthesize new moves
+from other mod types and make 
+your own unique mod (for ex:
+fire and water are mutually exclusive
+but you can have moves for both,
+you must use in game currency 
+to equip and mesh).
+
+o Use inheritence (C# OOP) to
+implement a weapon smith feat.
+in which you can fuse weapons
+together, and get funct. out 
+of it.
+
+BACK BURNER:
+
+- be able to scan 
+real life objs into 
+the game.
+
+
+----- PUZZLE:
+
+o NEWS: THE MAIN MODE
+IS NOW BASED ON HOW MANY
+BLOCKS YOU CAN EXPLODE AT
+ONCE, combos will still
+be counted but they will 
+no longer be the main obj.
+
+o Build up meteorites and 
+send them off.
+
+o Being able to play team
+battles and giving each 
+other lives and powerups.
+
+o People on your team can
+tell you thru voice chat
+what's going on, as 
+other players can turn the 
+lights off for example.
+
+Or maybe that there's a
+flash of a powerup inside
+a block that another player
+sees, and can tell that 
+player of which one it is.
+
+o (LATER) Add a 2d puzzle
+solving mode (multiplayer), 
+with side scrolling,
+Time limit to solve the puzzles.
+multiple teams, consisting
+of atleast 2 but not more than
+4, puzzles will custom to the
+amount of players in. For ex:
+if there's 3 players, then
+they will only encounter general
+(like word puzzles, logical riddles,
+etc.), or 3 player puzzles.
+
+o The boxer can destroy blocks
+in place, literally blow them up
+but will not gain full points
+for it, thus still incentivizing
+skillful play
+
+o Be able to send meteorites
+to another player of your choosing.
+
+o Add a Simon says mode instead
+of the falling blocks shit
+
+o Box can:
+
+	- slide blocks horiz.
+	- delete them by punching
+	them (minimal points).
+	- make columns slide 
+	to back. (column punch)
+
+o Boxer has a pound that leaves
+him with only a certain color
+after finish (ex: performed
+over blue block will leave him
+with only blues underneath).
+
+o (LATER) Add a blind-man mode, 
+essentially you have to
+guide your friend, you
+can see all the blocks
+but he can't, he can
+only see his player.
+
+This mode is in teams, 
+the one with the most
+combo's after a time 
+limit wins.
+
+If your homie gets 
+enough combos or
+something you get
+to drop blocks that
+would be favorable
+to his current block
+layout/situation.
+
