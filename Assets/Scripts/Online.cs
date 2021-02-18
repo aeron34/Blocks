@@ -13,7 +13,7 @@ public class Online : MonoBehaviour
     static readonly HttpClient h = new HttpClient();
     private static Dictionary<string, string> na;
     private static bool call;
-    public bool online;
+    public bool online = true;
     private static int room, metes = 0;
 
     void Awake()
@@ -48,12 +48,19 @@ public class Online : MonoBehaviour
     private static async Task SendMets(int x)
     {
         //string u = na["username"];
+        var dict = new Dictionary<string, string>
+        {
+            { "username", na["username"] }, 
+            { "room", na["room"] }, 
+            { "mets", x.ToString()}, 
+        };
 
-        string a = $"http://localhost:3000/send_mets?username=Son&meteors={x}";
+        //form "postable object" if that makes any sense
+        var content = new FormUrlEncodedContent(dict);
+        string a = $"http://localhost:3000/send_mets";
 
-        var content = await h.GetStringAsync(a);
-
-       // Debug.Log(content);
+        var response = await h.PostAsync(a, content);
+        var str = await response.Content.ReadAsStringAsync();
     }
 
     private static async Task Login()
@@ -76,7 +83,7 @@ public class Online : MonoBehaviour
         l.GetComponent<Button>().enabled = true;
 
 
-        if (content == "done" && na.Count == 0)
+        if (content == "logged in" && na.Count == 0)
         {
             na.Add("username", u);
             na.Add("password", p);
@@ -94,22 +101,18 @@ public class Online : MonoBehaviour
 
     }
 
-    /*  Online.cs, and this is an aysnc function that 
-        get calls every 1.5 seconds.
-        If the condition that updates the database 
-        is statisfied, NODE JS/the server returns
-        the text "run" and this funct. is no longer
-        called.
-    */
     private static async Task CheckRooms()
     {
         string b = na["username"];
         string a = $"http://localhost:3000/rooms?username={b}";
         var content = await h.GetStringAsync(a);
 
-
-        if(content == "run")
+        Debug.Log(content);
+        
+        if(Int32.Parse(content) > -1)
         {
+            room = Int32.Parse(content);
+            na.Add("room", room.ToString());
             SceneManager.LoadScene(1);
         }
     }
@@ -146,9 +149,12 @@ public class Online : MonoBehaviour
 
     public IEnumerator SendUP()
     {
-        yield return new WaitForSeconds(1f);
-        CheckRooms();
-        StartCoroutine(SendUP());
+        if (!na.ContainsKey("room"))
+        {
+            yield return new WaitForSeconds(1f);
+            CheckRooms();
+            StartCoroutine(SendUP());
+        }
     }
 
     // Update is called once per frame
@@ -160,7 +166,8 @@ public class Online : MonoBehaviour
             Debug.Log("aosjd");
             GameObject.Find("welcome").GetComponent<TextMeshProUGUI>().text = na["username"];
 
-            GameObject.Find("welcome").SetActive(false);  StartCoroutine(SendUP());
+            GameObject.Find("welcome").SetActive(false);
+            StartCoroutine(SendUP());
             call = false;
         }
     }

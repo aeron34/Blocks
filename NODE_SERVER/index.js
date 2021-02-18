@@ -75,8 +75,59 @@ app.post('/check_in', (req, res) => {
     res.send('done');
 });
 
-/* I do the same for the
-o */
+
+app.post('/send_mets', async (req, res) => {
+
+  let name = req.body.username;
+  let room = req.body.room;
+  let mets = req.body.mets;
+
+  console.log(`called by ${name}`);
+
+  let user_arr = [];
+
+  await knx('users').where('room', room).
+  then(users => {
+    user_arr = users.filter(a => {
+      if(a.username != name)
+      {
+        return a;
+      }
+    })
+  }).catch(e => {
+    res.json(e);
+  })
+
+  let user = user_arr[Math.floor(Math.random() * user_arr.length)]
+
+  await knx('users').where('username', user.username).
+  update({
+    meteors: parseInt(mets) + parseInt(user.meteors)
+  }).returning('*').then(a => {
+    res.send('meteors sent')
+  });
+
+})
+
+app.get('/get_mets', async (req, res) => {
+
+  let params = req.query;
+  let mets = 0;
+
+  const user = await knx('users').where('username', params.username).
+  then(user => {
+    mets = user[0].meteors;
+    return user[0];
+  }).catch(e => {
+    res.send(e);
+  });
+
+  await knx('users').where('username', params.username).
+  update({meteors: 0}).then(a => {
+      res.send(`${mets}`);
+  });
+
+});
 
 app.get('/rooms', async (req, res) => {
 
@@ -89,40 +140,46 @@ app.get('/rooms', async (req, res) => {
     res.send(e);
   })
 
+  if(user.online_status == 'running')
+  {
+    return res.send('no run')
+  }
+
   let mode = [];
 
-  const user_list = await knx('users').orderBy('room','desc').select('*')
-  .then(obj_arr => {
-      let temp_list = obj_arr;
-      obj_arr = obj_arr.slice(0, ROOM_SIZE+1);
-      mode = methods.GetRoom(obj_arr, ROOM_SIZE, user);
-      return obj_arr;
-  });
+  if(user.online_status != 'running')
+  {
 
-  console.log('MODE: ' + mode)
+    const user_list = await knx('users').orderBy('room','desc').select('*')
+    .then(obj_arr => {
+        let temp_list = obj_arr;
+        obj_arr = obj_arr.slice(0, ROOM_SIZE+1);
+        mode = methods.GetRoom(obj_arr, ROOM_SIZE, user);
+        return obj_arr;
+    });
 
-  /*
-  try {
-    switch(mode[0])
-    {
-      case 1:
-        methods.AssignRoom(knx, mode[1]+1, user.username, res);
-        break;
-      case 0:
-        await Promise.all(methods.AssignAndRunRoom(knx, mode[1], user_list)).then(
-        a => {return res.send('don')});
-        break;
-      case -1:
-          await methods.AssignRoom(knx, mode[1], user.username, res);
-        break;
-      default:
-        break;
-      }
+
+    try {
+      switch(mode[0])
+      {
+        case 1:
+          methods.AssignRoom(knx, mode[1]+1, user.username, res);
+          break;
+        case 0:
+          await Promise.all(methods.AssignAndRunRoom(knx, mode[1], user_list)).then(
+          a => {return res.send(`${mode[1]}`)});
+          break;
+        case -1:
+            await methods.AssignRoom(knx, mode[1], user.username, res);
+          break;
+        default:
+          break;
+        }
+    }
+    catch (e) {
+      res.send(e);
+    }
   }
-  catch (e) {
-    res.send(e);
-  }
-  */
 });
 
 

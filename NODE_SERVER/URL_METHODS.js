@@ -27,18 +27,10 @@ const login = (req, res, u, knx) => {
     {
       return res.send('nope');
     }
-    res.send('done');
+    res.send('logged in');
   }).catch(e => {
     res.send('nope');
   });
-
-  /*Promise.all(arr).then(a => {
-    res.send('goog');
-
-  }).catch(e => {
-    console.log('no');
-  });*/
-
 };
 
 module.exports = {

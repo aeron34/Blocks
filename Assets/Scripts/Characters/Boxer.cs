@@ -495,7 +495,7 @@ public class Boxer : MonoBehaviour
         var np = transform.GetChild(0).transform.position;
 
         RaycastHit2D gc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks","ground"));
+        Vector2.down, 1.25f, LayerMask.GetMask("blocks", "ground"));
 
         RaycastHit2D gc2 = Physics2D.Raycast(new Vector2(np.x + .8f, np.y),
         Vector2.down, 1.25f, LayerMask.GetMask("blocks", "ground"));

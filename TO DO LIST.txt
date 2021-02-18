@@ -1,0 +1,143 @@
+
+o Create the main menu.
+
+o Add a megaman style explode animation
+to the character when something fell on him.
+
+o Add the animations
+
+o Imp. column upper - NEXT (1).
+
+o Have the objective of the game be to 
+get the highest block chain. There are
+2 main conditions in this game:
+
+	- Getting the longest block
+	chain automatically puts you
+	in the lead.
+
+	- But, Ultimately the person
+	with the highest score
+	wins. You can increase
+	your score by getting matches
+	and combo's. As for chains,
+	they work on a multiplier, 
+	of which the formula is:
+
+	(how_many_blocks * .25)^5 = how many points you earn.
+
+	//so for example:
+		//16 blocks
+		(16 * .25)^5 = 1024;
+
+o Tables the DB will have:
+
+	- Simon_LB
+
+	- Solo_LB (this is the game mode we have
+	now)
+
+
+
+
+TEST LOGIN FUNCT.
+
+
+
+
+o The DB user table will have:
+	
+	- room address. This is the current 
+	room you're in, this will be used for:
+		
+		o determining how many people
+		are in a room (helps with limit).
+
+		o help other players pool the 
+		players in a room and randomly
+		pick someone to send to.
+	
+	
+	- username 
+
+	- password
+
+	- How many meteors you have
+	coming at you.
+
+	- online state, string that
+	has states like "running", 
+	"waiting", "offline", etc.
+
+	- How many games you've won.
+
+o ONLINE:
+
+	- When your in the waiting room, have it 
+	send more requests than it would when it's
+	playing. 
+
+	- Use Bcrypt for passwords.	
+
+	- Make a funct that removes a player who hasn't contacted
+	the server in the past 30 secs (create a function
+	in unity that reaches out to the server, and a method 
+	in Node that documents the time the request was
+	processed.) - CURRENTLY
+
+o Add the button mashing to the boxers
+ultimate - NEXT(1) 
+
+o Use the meteor row to document how many of them you have 
+coming at you. - NEXT(2)
+
+o Maybe after the Initial release, allow direct peer to 
+peer matches, this could be accomplised by creating
+a P2P table in the DB and using the string method
+that we scrapped eariler.
+
+o Sometime in the future update the site and add:
+
+	o Option to upload profile pic.
+
+	o Add news column
+
+	o Add a profile section that allows
+	you to see your wins/losses.
+
+
+o (LATER, AFTER RELEASE) create a dictionary object, initially
+set it as empty. this will be a dict that
+tracks how many blocks are touching each other, for ex:
+{red: 4, //this means 4 reds are touching in the column
+blue: 0,
+etc...}
+
+And only renew/update with new values this object when a 
+function (UP_Dict maybe) is called by a block that was destroyed
+in that column. The freshly updated version will now be 
+used as a pre-state of sorts, and make the blocks no longer
+have the time window float for touching after a detonation, 
+have the column handle it by setting self check on its blocks
+to true if the state has change from previous, so for example:
+after a blow up, the state has yellows touching as 0 ({yell: 0...})
+but after a few seconds, 2 yellows touch ({yell: 2}), now this
+will trigger the column to call check() on the designated blocks (think
+of the for loop that looks for blocks above the exploded one, this
+is an array of those above blocks)
+
+o Add puzzle creator mode.
+
+o TELL PEOPLE HOW THEY CAN DO
+DIFFERENT THINGS WITH THE PAINTER (FORMELY
+CALLED SPIDER), such as, exploding one ajancent
+block (left or right), then deploying which
+will give a wierd effect.
+
+
+
+o HAVE 3 CHARS in the beginning,
+only increase the amount after 
+viewership increases.
+
+

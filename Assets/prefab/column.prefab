@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1471498139339308823}
   - component: {fileID: 1471498139339308820}
   - component: {fileID: 1471498139339308822}
-  m_Layer: 13
+  m_Layer: 11
   m_Name: column
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -76,6 +76,7 @@ MonoBehaviour:
   spawn: {fileID: 0}
   up_indi: {fileID: 0}
   ply: {fileID: 0}
+  casc: 1
 --- !u!1 &8042489067379560774
 GameObject:
   m_ObjectHideFlags: 0

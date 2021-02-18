@@ -22,7 +22,8 @@ function GetRoom(obj, R_S, user)
   for(var i = 0; i < obj.length; i++)
   {
     if(obj[i].room == h_rn &&
-    obj[i].online_status != "running")
+    obj[i].online_status != "running"&&
+    obj[i].online_status != "offline")
     {
         cnt++;
     }
@@ -54,7 +55,6 @@ function AssignRoom(knx, rn, name, res)
     room: rn,
     online_status: "waiting"
   }).then(a => {
-    console.log(a);
     res.send('wait');
   });
 }

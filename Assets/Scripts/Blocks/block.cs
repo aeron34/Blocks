@@ -131,10 +131,11 @@ public class block : MonoBehaviour
                     FindObjectOfType<Online>().SendMeteors(x);
                 }
             }
+
             if (len >= 4)
             {
-                FindObjectOfType<scorer>().UpdateChain(len);
                 FindObjectOfType<scorer>().UpdateScore((int)Math.Pow(touching.ToArray().Length * .75, 5));
+                FindObjectOfType<scorer>().UpdateChain(len);
                 return 1;
             }
             

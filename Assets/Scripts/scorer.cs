@@ -35,6 +35,7 @@ public class scorer : MonoBehaviour
         {
             com = 0;
             last_chn = 0;
+            chain.text = "";
             combo.gameObject.SetActive(false);
             chain.gameObject.SetActive(false);
         }
