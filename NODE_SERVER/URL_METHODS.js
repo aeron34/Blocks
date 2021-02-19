@@ -21,7 +21,8 @@ const login = (req, res, u, knx) => {
     password: u.pass,
     online_status: 'offline'
   }).update({
-    online_status: "online"
+    online_status: "online",
+    meteors: 0
   }).then( a=> {
     if(a == 0)
     {

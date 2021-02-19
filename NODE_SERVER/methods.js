@@ -4,9 +4,14 @@ function GetRoom(obj, R_S, user)
   let cnt = 0, h_rn = obj[0].room;
 
 
-  user.room = h_rn;
+  if(h_rn > -1)
+  {
+    user.room = h_rn;
+  }else {
+    h_rn = 0;
+  }
 
-  for(let i = 0; i < R_S+1; i++)
+  for(let i = 0; i < obj.length; i++)
   {
       if(obj[i].username == user.username)
       {
@@ -18,7 +23,6 @@ function GetRoom(obj, R_S, user)
   obj.unshift(user);
 
   let ret_arr = [-1,h_rn];
-
   for(var i = 0; i < obj.length; i++)
   {
     if(obj[i].room == h_rn &&
@@ -56,6 +60,8 @@ function AssignRoom(knx, rn, name, res)
     online_status: "waiting"
   }).then(a => {
     res.send('wait');
+  }).catch(e => {
+    res.json(e);
   });
 }
 

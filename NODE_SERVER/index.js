@@ -55,7 +55,8 @@ app.post('/logout', (req, res) => {
         knx('users').where('username', u.username).
         update({
           online_status: "offline",
-          room: -1
+          room: -1,
+          meteors: 0
           }).then(a => {
           res.send('logged out');
         })
@@ -140,45 +141,41 @@ app.get('/rooms', async (req, res) => {
     res.send(e);
   })
 
-  if(user.online_status == 'running')
-  {
-    return res.send('no run')
-  }
-
   let mode = [];
 
-  if(user.online_status != 'running')
+  if(user.room <= -1)
   {
+    user.room = 0;
+  }
 
-    const user_list = await knx('users').orderBy('room','desc').select('*')
-    .then(obj_arr => {
-        let temp_list = obj_arr;
-        obj_arr = obj_arr.slice(0, ROOM_SIZE+1);
-        mode = methods.GetRoom(obj_arr, ROOM_SIZE, user);
-        return obj_arr;
-    });
+  const user_list = await knx('users').orderBy('room','desc').select('*')
+  .then(obj_arr => {
+      obj_arr = obj_arr.slice(0, ROOM_SIZE);
+      mode = methods.GetRoom(obj_arr, ROOM_SIZE, user);
+      return obj_arr;
+  });
 
+  console.log(`${user.username}: ${mode[0]}`)
+  try {
+    switch(mode[0])
+    {
+      case 1:
+        methods.AssignRoom(knx, mode[1]+1, user.username, res);
+        break;
+      case 0:
 
-    try {
-      switch(mode[0])
-      {
-        case 1:
-          methods.AssignRoom(knx, mode[1]+1, user.username, res);
-          break;
-        case 0:
-          await Promise.all(methods.AssignAndRunRoom(knx, mode[1], user_list)).then(
-          a => {return res.send(`${mode[1]}`)});
-          break;
-        case -1:
-            await methods.AssignRoom(knx, mode[1], user.username, res);
-          break;
-        default:
-          break;
-        }
-    }
-    catch (e) {
-      res.send(e);
-    }
+        await Promise.all(methods.AssignAndRunRoom(knx, mode[1], user_list)).then(
+        a => {return res.send(`${mode[1]}`)});
+        break;
+      case -1:
+          await methods.AssignRoom(knx, mode[1], user.username, res);
+        break;
+      default:
+        break;
+      }
+  }
+  catch (e) {
+    res.send(e);
   }
 });
 

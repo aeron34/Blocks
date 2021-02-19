@@ -105,6 +105,8 @@ o Sometime in the future update the site and add:
 	o Add a profile section that allows
 	you to see your wins/losses.
 
+o (KNEX and DB) Only take a list of the top rows, do
+not take the entire list. 
 
 o (LATER, AFTER RELEASE) create a dictionary object, initially
 set it as empty. this will be a dict that
