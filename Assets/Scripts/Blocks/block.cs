@@ -495,7 +495,7 @@ public class block : MonoBehaviour
 
     private void OnMouseEnter()
     {
-        spr.color = new Color(135f,0,150f, 1);
+        spr.color = new Color(135f, 0, 150f, 1);
     }
 
     private void OnMouseOver()
@@ -510,7 +510,6 @@ public class block : MonoBehaviour
             if (Input.GetMouseButtonDown(0) && ply.GetComponent<Gizmo>().on == 2
             && ply.GetComponent<Gizmo>().v_blk != null)
             {
-                Debug.Log("Ogh");
                 ply.GetComponent<Gizmo>().dist_blk = gameObject;
                 ply.GetComponent<Gizmo>().on = 1;
                 ply.GetComponent<Gizmo>().GetDist();

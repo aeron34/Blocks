@@ -16,11 +16,29 @@ const knx = require('knex')({
   },
 });
 
+/*
+class RoomAssigner
+{
+  constructor()
+  {
+    console.log('made');
+  }
 
+  /*Users_array is
+
+  users_array =
+  here = () => {
+    console.log('hurr');
+  }
+}
+
+let r = new RoomAssigner();
+*/
 const ROOM_SIZE = 3;
 
 
 const app = express();
+
 app.use(express.urlencoded({extended: false})); //Parses the request body
 app.use(express.json());
 app.use('/files', express.static('static'));
@@ -30,14 +48,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname+'/static/index.html'));
 });
 
-/*
-knx.select('*').from('users')
-.then(a => res.status(300).json(a));
 
-knx('users').where('username', 'sonny').
-then(a => res.send(a[0].username));
-
-*/
 var now = moment("2021-02-06T10:05:29");
 var a = moment_tz.utc(now).tz("Asia/Taipei");
 b = now.utc().format();
@@ -149,13 +160,13 @@ app.get('/rooms', async (req, res) => {
   }
 
   const user_list = await knx('users').orderBy('room','desc').select('*')
-  .then(obj_arr => {
+  .limit(5).then(obj_arr => {
+      console.log(obj_arr)
       obj_arr = obj_arr.slice(0, ROOM_SIZE);
       mode = methods.GetRoom(obj_arr, ROOM_SIZE, user);
       return obj_arr;
   });
 
-  console.log(`${user.username}: ${mode[0]}`)
   try {
     switch(mode[0])
     {

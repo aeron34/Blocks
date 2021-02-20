@@ -136,10 +136,20 @@ CALLED SPIDER), such as, exploding one ajancent
 block (left or right), then deploying which
 will give a wierd effect.
 
+o ADD CHAR Select (NOW)
 
+	BOX NEEDS:
 
-o HAVE 3 CHARS in the beginning,
-only increase the amount after 
-viewership increases.
+		- ultra_holder
+		- box prefab, renamed to "pic"
+
+	GIZ NEEDS:
+
+		- weap_box
+		- pic prefab
+
+o  Add pause.
+
+o Finish box's ultimate.
 
 

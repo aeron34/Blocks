@@ -7,7 +7,6 @@ public class grenade : MonoBehaviour
     public float di;
     private Animator ani;
     private Rigidbody2D rgb;
-    public GameObject bl;
     int radius = 0;
     // Start is called before the first frame update
     void Start()

@@ -50,8 +50,8 @@ public class Boxer : MonoBehaviour
         ult_bar = GameObject.Find("ult_bar");
 
         moves = new Action[3] { Straight, ULTIMATE, Upper };//, Go };
-        xS = 15;
-        xY = 40;
+        xS = 18;
+        xY = 35;
         drag = 1.2f;
 
         Combos = new string[][]{
@@ -62,7 +62,7 @@ public class Boxer : MonoBehaviour
         com_c = GameObject.Find("Com_Cnt");
 
         StartCoroutine(AddBar());
-        StartCoroutine(FindObjectOfType<Online>().GetMeteors());
+        //StartCoroutine(FindObjectOfType<Online>().GetMeteors());
         Get();
     }
 
@@ -161,7 +161,6 @@ public class Boxer : MonoBehaviour
 
     private void Upper()
     {
-        Debug.Log("Upper");
         if (v_blk != null)
         {
             v_blk.GetComponent<block>().Launch();
@@ -221,6 +220,8 @@ public class Boxer : MonoBehaviour
         {
             if (v_blk != null)
             {
+                movable = false;
+                cxS = 0;
                 StartCoroutine(v_blk.GetComponent<block>().slide(di, b));
                 ani.Play("punch");
             }

@@ -113,7 +113,7 @@ public class Online : MonoBehaviour
         {
             room = Int32.Parse(content);
             na.Add("room", room.ToString());
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene("Game");
         }
     }
 
@@ -135,8 +135,6 @@ public class Online : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
         CheckMeteors();
-
-        Debug.Log($"ON: {metes}");
 
         if (metes > 0)
         {

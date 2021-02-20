@@ -21,7 +21,7 @@ public class Gizmo : MonoBehaviour
     public int[] weapons;
     public int on = 0, wep_i=0, com = 0;
     public float c_c = 0;
-    public GameObject colm, health, n_colm, dist_blk; //n_colm means whatever colm is after the 
+    public GameObject colm, health, n_colm, dist_blk, block_controller; //n_colm means whatever colm is after the 
     //colm the player is in, it accounts for whether he's turned around or not.
 
     // Camera camm;
@@ -34,7 +34,8 @@ public class Gizmo : MonoBehaviour
         di = 1;
         colors = new Queue<string>();
         pwr_drn = (0.01f) * 0.05f;
-       
+
+        block_controller = FindObjectOfType<block_queue>().gameObject;
         rgb = GetComponent<Rigidbody2D>();
         ani = GetComponent<Animator>();
         spr = GetComponent<SpriteRenderer>();
@@ -44,7 +45,7 @@ public class Gizmo : MonoBehaviour
         GameObject.Find("weap_box").transform.Find("1").
         GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 1);
         
-        xS = 10;
+        xS = 12;
         xY = 30;
         drag = 0.35f;
     }
@@ -124,7 +125,6 @@ public class Gizmo : MonoBehaviour
             {
                 if (h_blk.GetComponent<block>().Check() == 1)
                 {
-
                     dist_blk = null;
                     transform.GetChild(2).gameObject.SetActive(false);
                 }
@@ -142,11 +142,6 @@ public class Gizmo : MonoBehaviour
                     transform.GetChild(2).gameObject.SetActive(false);
                 }
             }
-        }
-
-        if (h_blk != null)
-        {
-            //gn.Controller(GameObject.Find("cursor"), colm);
         }
 
         if (Input.GetKeyDown(KeyCode.K))
@@ -270,20 +265,22 @@ public class Gizmo : MonoBehaviour
         if (wep_i == 2 && on == 0)
         {
             on = 1;
+            block_controller.GetComponent<block_queue>().enabled = false;
             StartCoroutine(PowerBar());
+            weapons[wep_i] -= 1;
         }
-        
+
         if (on == 0)
         {
             if (weapons[wep_i] != 0)
             {                    
-                GameObject g;
+                GameObject g = null;
 
                 switch (wep_i)
                 {
                     case 0:
                         g = Instantiate(gren, transform.position, transform.rotation);
-                        g.GetComponent<grenade>().di = di;
+                        g.GetComponent<grenade>().di = 1;
                         g.GetComponent<Rigidbody2D>().velocity = new Vector2((32 * di), 10);
                         weapons[wep_i] -= 1;
                         break;
@@ -326,6 +323,7 @@ public class Gizmo : MonoBehaviour
         }
         on = 0;
         transform.Find("pwr_bar").gameObject.SetActive(false);
+        block_controller.GetComponent<block_queue>().enabled = true;
 
     }
     private void FixedUpdate()
@@ -350,10 +348,6 @@ public class Gizmo : MonoBehaviour
 
             if (hit2.collider != null)
             {
-                /*if(hit2.collider.gameObject != v_blk)
-                {
-                    hit2.collider.gameObject.GetComponent<block>().Check(1);
-                }*/
                 v_blk = hit2.collider.gameObject;
             }
             else
@@ -431,7 +425,7 @@ public class Gizmo : MonoBehaviour
             rgb.velocity = new Vector2(0, 0);
             GetComponent<BoxCollider2D>().enabled = true;
             transform.position = new Vector3(0, 16f, 0);
-            hurt_b = false; // StartCoroutine(LowerHealth(50));
+            hurt_b = false; 
             yield return new WaitForSeconds(3);
            
         }

@@ -381,7 +381,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0
   m_GravityScale: 8
-  m_Material: {fileID: 6200000, guid: 1f1a170b5d39566419820abfcb959174, type: 2}
+  m_Material: {fileID: 6200000, guid: 8d433f033bb1be4419388cbb00d128ff, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 0
   m_CollisionDetection: 1
@@ -444,6 +444,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ani: {fileID: 0}
+  inps: []
   cxS: 0
   xS: 0
   xY: 35
@@ -456,7 +457,10 @@ MonoBehaviour:
   hurt_b: 0
   h_blk: {fileID: 0}
   v_blk: {fileID: 0}
+  ult_bar: {fileID: 0}
   on: 0
+  com: 0
+  c_c: 0
   colm: {fileID: 0}
-  health: {fileID: 0}
   n_colm: {fileID: 0}
+  able: 0
