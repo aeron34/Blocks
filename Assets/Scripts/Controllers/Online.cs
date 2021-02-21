@@ -125,7 +125,7 @@ public class Online : MonoBehaviour
 
         if (content != "none")
         {
-            FindObjectOfType<block_queue>().metes += Int32.Parse(content);
+            FindObjectOfType<block_queue>().meteors += Int32.Parse(content);
             metes = Int32.Parse(content);
         }
     }

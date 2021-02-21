@@ -12,88 +12,98 @@ public class block_queue : MonoBehaviour
     float s = 0.5f, drp_tm;
     double time_passed = 0;
     bool moving;
-    Queue<GameObject> q = new Queue<GameObject>();
-    public GameObject colm, n_block, block, mete;
+    public float default_col_X = -20.3f;
+    Queue<GameObject> blk_queue = new Queue<GameObject>();
+    public GameObject colm, null_block, block, meteor;
     GameObject c_b = null;
     float t_m = 0.05f, bts = 0.055f;
     System.Random random = new System.Random();
-    public int c_n = 0, metes = 0;
-    float[] mins = { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f };
-    float[] pos = new float[19];
+    public int meteors = 0, default_col_number = 19;
+    float[] minutes_passed = { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f };
+    float[] column_positions = new float[19];
     Queue<string> color = new Queue<string>();
     public List<GameObject> colms = new List<GameObject>();
+
+    public string Game_Mode = "Game";
+    
     // Start is called before the first frame update
     void Start()
     {
-        for(int i = 0; i < 10; i++)
+
+        column_positions[0] = default_col_X;
+
+        for (int i = 1; i < default_col_number; i++)
         {
-            mins[i] *= 60f;
-
-        }
-        var a = Instantiate(g, gameObject.transform);
-        q.Enqueue(a.gameObject);
-        setColor(a.gameObject);
-
-        c_b = a.gameObject;
-        StartCoroutine(move(c_b));
-        pos[0] = -20.3f;
-
-        for(int i = 1; i < 19; i++)
-        {
-            double n = (pos[i - 1] + 2.2);
-            pos[i] = (float)(Math.Round(n, 2));
+            double n = (column_positions[i - 1] + 2.2);
+            column_positions[i] = (float)(Math.Round(n, 2));
         }
 
-        for(int i = 0; i < 19; i++)
+        for (int i = 0; i < default_col_number; i++)
         {
-            var blk = Instantiate(colm, 
-            new Vector3((pos[i]),5.14f,0), blk_spn.rotation);
-            colms.Add(blk);
+            var new_column = Instantiate(colm,
+            new Vector3((column_positions[i]), 5.14f, 0), colm.transform.rotation);
+            colms.Add(new_column);
         }
 
-        float st_y = -11;
-
-        string[] cols = { "green", "blue", "red", "yellow" };
-
-        int col_i = -1;
-
-
-        int[,] orien = new int[2, 4]{ { 0, 1, 2, 3},{ 2, 3, 0, 1} };
-        int oi = 0;
-        for(int i = 0; i < 7; i++)
+        if (Game_Mode == "Game")
         {
-
-            col_i++;
-            for (int b = 0; b < 19; b++)
+            for (int i = 0; i < 10; i++)
             {
-                if (col_i > 3)
-                {
-                    oi++;
-                    col_i = 0;
-                }
-                if(oi >= 2)
-                {
-                    oi = 0;
-                }
-                if (i < 2)
-                {
-                    //These are the white blocks
-                    var blk = Instantiate(n_block, blk_spn.position, blk_spn.rotation);
-                    blk.transform.position = new Vector3(pos[b], st_y, 0);
-                }
-                else
-                {
-                    //These are the actual blocks
-                    var blk = Instantiate(block, blk_spn.position, blk_spn.rotation);
-                    blk.transform.position = new Vector3(pos[b], st_y, 0);
-                    blk.GetComponent<block>().color = cols[orien[oi,col_i]];
-                    blk.GetComponent<block>().colm = colms[b];
-                    //colms[b].GetComponent<column>().
-                    col_i++;
-                }
-            } 
+                minutes_passed[i] *= 60f;
+            }
 
-            st_y += 2;
+            var first_block_hud = Instantiate(g, gameObject.transform);
+            blk_queue.Enqueue(first_block_hud.gameObject);
+            setColor(first_block_hud.gameObject);
+
+            c_b = first_block_hud.gameObject;
+            StartCoroutine(move(c_b));
+
+
+            float st_y = -11;
+
+            string[] colors = { "green", "blue", "red", "yellow" };
+
+            int col_i = -1;
+
+
+            int[,] orien = new int[2, 4] { { 0, 1, 2, 3 }, { 2, 3, 0, 1 } };
+            int oi = 0;
+            for (int i = 0; i < 7; i++)
+            {
+
+                col_i++;
+                for (int b = 0; b < default_col_number; b++)
+                {
+                    if (col_i > 3)
+                    {
+                        oi++;
+                        col_i = 0;
+                    }
+                    if (oi >= 2)
+                    {
+                        oi = 0;
+                    }
+                    if (i < 2)
+                    {
+                        //These are the null gray blocks
+                        var blk = Instantiate(null_block, blk_spn.position, blk_spn.rotation);
+                        blk.transform.position = new Vector3(column_positions[b], st_y, 0);
+                    }
+                    else
+                    {
+                        //These are the actual blocks
+                        var blk = Instantiate(block, blk_spn.position, blk_spn.rotation);
+                        blk.transform.position = new Vector3(column_positions[b], st_y, 0);
+                        blk.GetComponent<block>().color = colors[orien[oi, col_i]];
+                        blk.GetComponent<block>().colm = colms[b];
+                        //colms[b].GetComponent<column>().
+                        col_i++;
+                    }
+                }
+
+                st_y += 2;
+            }
         }
 
        // StartCoroutine(MeteorTime());
@@ -101,25 +111,25 @@ public class block_queue : MonoBehaviour
 
     public IEnumerator MeteorTime()
     {
-        Debug.Log("BQ: " + metes);
+        Debug.Log("BQ: " + meteors);
 
-        while (metes > 0) 
+        while (meteors > 0) 
         {
-            metes -= 1;
+            meteors -= 1;
             DropMeteor();
             yield return new WaitForSeconds(1f);
         }
 
-        Debug.Log("BQ: " + metes);
+        Debug.Log("BQ: " + meteors);
         /*DropMeteor();
         yield return new WaitForSeconds(1f);
         StartCoroutine(MeteorTime());*/
     }
     public void setColor(GameObject a)
     {
-        c_n = random.Next(4) + 1;
+        var color_number = random.Next(4) + 1;
 
-        switch (c_n)
+        switch (color_number)
         {
             case 1:
                 color.Enqueue("blue");
@@ -143,16 +153,19 @@ public class block_queue : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        drop();
-
-        time_passed += Time.deltaTime;
-        time_passed = Math.Round(time_passed, 2);
-        for(int i = 0; i< 10; i++)
+        if (Game_Mode == "Game")
         {
-            
-            if(time_passed == mins[i])
-            { 
-                bts += 0.025f;
+            drop();
+
+            time_passed += Time.deltaTime;
+            time_passed = Math.Round(time_passed, 2);
+            for (int i = 0; i < 10; i++)
+            {
+
+                if (time_passed == minutes_passed[i])
+                {
+                    bts += 0.025f;
+                }
             }
         }
     }
@@ -164,7 +177,7 @@ public class block_queue : MonoBehaviour
 
         System.Random r = new System.Random();
         int rn = r.Next(0, colms.ToArray().Length);
-        StartCoroutine(colms[rn].GetComponent<column>().Meteor(mete));
+        StartCoroutine(colms[rn].GetComponent<column>().Meteor(meteor));
     }
 
     public void drop()
@@ -202,12 +215,12 @@ public class block_queue : MonoBehaviour
                  */
                 drp_tm = 0;
                 System.Random r = new System.Random();
-                int ax = r.Next(0, 19);
-                StartCoroutine(kill(q.Dequeue()));
+                int ax = r.Next(0, default_col_number);
+                StartCoroutine(kill(blk_queue.Dequeue()));
                 colms.ElementAt(ax).GetComponent<column>().drop(color.Peek());
                 color.Dequeue();
                  UP_List();
-                c_b = q.Peek();
+                c_b = blk_queue.Peek();
                
             }
             var bar = c_b.transform.Find("bar").gameObject;
@@ -219,9 +232,9 @@ public class block_queue : MonoBehaviour
     public void UP_List()
     {  
         var a = Instantiate(g, gameObject.transform);
-        q.Enqueue(a.gameObject);
+        blk_queue.Enqueue(a.gameObject);
         setColor(a.gameObject);
-        var qn = q.ToArray();
+        var qn = blk_queue.ToArray();
         for (int i = 0; i < qn.Length; i++)
         {
             StartCoroutine(move(qn[i], 1));

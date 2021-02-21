@@ -495,7 +495,12 @@ public class block : MonoBehaviour
 
     private void OnMouseEnter()
     {
-        spr.color = new Color(135f, 0, 150f, 1);
+        var ply = GameObject.Find("pic");
+
+        if (ply.GetComponent<Gizmo>().on == 0)
+        {
+            spr.color = new Color(135f, 0, 150f, 1);
+        }
     }
 
     private void OnMouseOver()

@@ -130,26 +130,38 @@ is an array of those above blocks)
 
 o Add puzzle creator mode.
 
+o Implement quick jab for box. It's the one 
+that reshuffles the order of the blocks. 
+we can achieve this by setting up 2 raycasts
+on the block that was punched, have 1 that
+points all the way up for 3 blocks, and all
+the way left. So here's the algo:
+
+Set up left ray casts on ALL blocks, the
+upper blocks and the punched block, create
+an array **ON** the punched block and return 
+the results of teh left raycast to the 
+punched block, now we have a huge array
+of blocks. We can now shake them, find
+2 random blocks in the array, swap em, 
+remove em, keep repeating till it's
+empty.
+
 o TELL PEOPLE HOW THEY CAN DO
 DIFFERENT THINGS WITH THE PAINTER (FORMELY
 CALLED SPIDER), such as, exploding one ajancent
 block (left or right), then deploying which
 will give a wierd effect.
 
-o ADD CHAR Select (NOW)
-
-	BOX NEEDS:
-
-		- ultra_holder
-		- box prefab, renamed to "pic"
-
-	GIZ NEEDS:
-
-		- weap_box
-		- pic prefab
 
 o  Add pause.
 
-o Finish box's ultimate.
+o Create the trials of training mode (NOW).
+
+o Finish box's ultimate (NEXT).
 
 
+
+o Code a starting X pos for the column, 
+if it isn't set, then default to what 
+block_queue already does. 

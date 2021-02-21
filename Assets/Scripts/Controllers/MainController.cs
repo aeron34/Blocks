@@ -49,21 +49,21 @@ public class MainController : MonoBehaviour
     {
         if(scene.name == "Game")
         { 
-        if (char_name == "Gizmo")
-        {
-            var canvas = GameObject.Find("Canvas");
-            var g = Instantiate(Gizmo);
-            g.name = "pic";
-            Instantiate(weap_box, canvas.transform).name = "weap_box";
+            if (char_name == "Gizmo")
+            {
+                var canvas = GameObject.Find("Canvas");
+                var g = Instantiate(Gizmo);
+                g.name = "pic";
+                Instantiate(weap_box, canvas.transform).name = "weap_box";
+            }
+            if (char_name == "Boxer")
+            {
+                var canvas = GameObject.Find("Canvas");
+                var g = Instantiate(Boxer);
+                g.name = "pic";
+                Instantiate(ultra_bar, canvas.transform).name = "ultra_bar";
+            }
         }
-        if (char_name == "Boxer")
-        {
-            var canvas = GameObject.Find("Canvas");
-            var g = Instantiate(Boxer);
-            g.name = "pic";
-            Instantiate(ultra_bar, canvas.transform).name = "ultra_bar";
-        }
-    }
     }
 
     #region View and Scene Loaders

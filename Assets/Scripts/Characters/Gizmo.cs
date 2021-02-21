@@ -40,7 +40,7 @@ public class Gizmo : MonoBehaviour
         ani = GetComponent<Animator>();
         spr = GetComponent<SpriteRenderer>();
 
-        weapons = new int[3] { 5, 5, 5 };
+        weapons = new int[3] { 0,0,0 };
         health = GameObject.Find("health_bar");
         GameObject.Find("weap_box").transform.Find("1").
         GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 1);
@@ -262,7 +262,7 @@ public class Gizmo : MonoBehaviour
 
     private void Weapon()
     {
-        if (wep_i == 2 && on == 0)
+        if (wep_i == 2 && on == 0 && weapons[wep_i] > 0)
         {
             on = 1;
             block_controller.GetComponent<block_queue>().enabled = false;
@@ -272,7 +272,7 @@ public class Gizmo : MonoBehaviour
 
         if (on == 0)
         {
-            if (weapons[wep_i] != 0)
+            if (weapons[wep_i] > 0)
             {                    
                 GameObject g = null;
 
@@ -401,7 +401,7 @@ public class Gizmo : MonoBehaviour
             {
                 least = Math.Abs(n.colms[i].transform.position.x - transform.position.x);
                 colm = n.colms[i];
-                if (i != 0 && i != 18)
+                if (i != 0 && i != n.colms.ToArray().Length - 1)
                 {
                     n_colm = n.colms[(i + (1 * (int)di))];
                 }

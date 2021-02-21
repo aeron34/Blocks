@@ -14,7 +14,7 @@ public class Spider : MonoBehaviour
     {
         blks = new GameObject[3] { null, null, null };
         start = new List<string>();//[3] { null, null, null };
-
+        StartCoroutine(Timer());
     }
 
     private IEnumerator wait()
@@ -32,7 +32,7 @@ public class Spider : MonoBehaviour
             if (cast[0].collider != null)
             {
                 for (int i = 0; i < cast.Length; i++)
-                {                   
+                {
                     start.Add(cast[i].collider.gameObject.GetComponent<block>().color);
                 }
                 strt = false;
@@ -57,6 +57,18 @@ public class Spider : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    private IEnumerator Timer()
+    {
+        var seconds = 0;
+        while(seconds < 6)
+        {
+            seconds += 1;
+            yield return new WaitForSeconds(1f);
+        }
+
+        Destroy(gameObject);
+    }
+
     private void Update()
     {
       
@@ -79,7 +91,6 @@ public class Spider : MonoBehaviour
                     {
                         blks[i].GetComponent<block>().color = start[i];
                         blks[i].GetComponent<block>().MyColor();
-
                     }
                 }
             }
