@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Linq;
+using Extras;
 
 public class block_queue : MonoBehaviour
 {
@@ -23,12 +24,15 @@ public class block_queue : MonoBehaviour
     float[] column_positions = new float[19];
     Queue<string> color = new Queue<string>();
     public List<GameObject> colms = new List<GameObject>();
-
-    public string Game_Mode = "Game";
+    private Extras.Utilites util;
+    public string Game_Mode = "Game", block_arrangment;
     
     // Start is called before the first frame update
     void Start()
     {
+        util = new Extras.Utilites();
+        util.Meme();
+
 
         column_positions[0] = default_col_X;
 

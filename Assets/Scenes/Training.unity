@@ -752,7 +752,7 @@ MonoBehaviour:
   meteors: 0
   default_col_number: 13
   colms: []
-  Game_Mode: 
+  Game_Mode: Training
 --- !u!4 &2001631720
 Transform:
   m_ObjectHideFlags: 0

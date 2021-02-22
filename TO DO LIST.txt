@@ -145,7 +145,7 @@ punched block, now we have a huge array
 of blocks. We can now shake them, find
 2 random blocks in the array, swap em, 
 remove em, keep repeating till it's
-empty.
+empty. (NEXT [2])
 
 o TELL PEOPLE HOW THEY CAN DO
 DIFFERENT THINGS WITH THE PAINTER (FORMELY
@@ -161,7 +161,6 @@ o Create the trials of training mode (NOW).
 o Finish box's ultimate (NEXT).
 
 
+o create an algorithm that takes an array and 
+generates a puzzle
 
-o Code a starting X pos for the column, 
-if it isn't set, then default to what 
-block_queue already does. 
