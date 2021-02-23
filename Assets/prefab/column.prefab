@@ -72,7 +72,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blocks: []
-  block: {fileID: 0}
+  block: {fileID: 6639533882246998223, guid: c96df9a60f13af94a970dae57d807d7d, type: 3}
   spawn: {fileID: 0}
   up_indi: {fileID: 0}
   ply: {fileID: 0}

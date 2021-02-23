@@ -160,7 +160,3 @@ o Create the trials of training mode (NOW).
 
 o Finish box's ultimate (NEXT).
 
-
-o create an algorithm that takes an array and 
-generates a puzzle
-

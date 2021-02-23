@@ -14,7 +14,7 @@ public class column : MonoBehaviour
     void Start()
     {
        // blocks = new List<GameObject>();
-        block = Resources.Load<GameObject>("block");
+       // block = Resources.Load<GameObject>("block");
         up_indi = transform.GetChild(0).gameObject;
     }
 
@@ -55,6 +55,18 @@ public class column : MonoBehaviour
         up_indi.GetComponent<SpriteRenderer>().enabled = false;
 
         b_drp = false;
+    }
+    public void MakeTrainingBlock(string color="", int offset_y = 0)
+    {
+        float y = -4.15f + (2*offset_y) * .85f;
+        
+        var new_block = Instantiate(block, transform.position, transform.rotation);
+        new_block.transform.position = new Vector3(transform.position.x, y, 0);
+        new_block.GetComponent<Rigidbody2D>().simulated = true;
+        new_block.GetComponent<block>().color = color.Trim(' ');
+        new_block.GetComponent<block>().transform.localScale = new Vector3(.85f, .85f, 1);// = color;
+        new_block.GetComponent<block>().colm = gameObject;
+
     }
     public void drop(string col="")
     {

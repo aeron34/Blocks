@@ -9,15 +9,18 @@ namespace Extras
 {
     public class Utilites
     {
-        public void Meme()
+        public List<string[]> Meme()
         {
-            var h = File.ReadAllLines("Assets/Data/oh.txt");
-            var ab = h[0].Split(',').ToArray();
-
+            var trialDataText = File.ReadAllLines("Assets/Data/oh.txt");
             List<string[]> xy = new List<string[]>();
 
-            xy.Add(ab);
-            Debug.Log(xy[0][0]);
+            for (int i = 0; i < trialDataText.Length; i++)
+            {
+                var arr = trialDataText[i].Split(',').ToArray();
+                xy.Add(arr);
+            }
+
+            return xy;//[0][0]);
         }
     }
 }

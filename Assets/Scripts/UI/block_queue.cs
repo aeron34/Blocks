@@ -31,9 +31,6 @@ public class block_queue : MonoBehaviour
     void Start()
     {
         util = new Extras.Utilites();
-        util.Meme();
-
-
         column_positions[0] = default_col_X;
 
         for (int i = 1; i < default_col_number; i++)
@@ -47,6 +44,22 @@ public class block_queue : MonoBehaviour
             var new_column = Instantiate(colm,
             new Vector3((column_positions[i]), 5.14f, 0), colm.transform.rotation);
             colms.Add(new_column);
+        }
+
+        if(Game_Mode == "Training")
+        {
+            var list = util.Meme();
+            int c_n = 5;
+            foreach (string[] arr in list)
+            {
+                c_n++;
+                //Debug.Log(arr[0][i]);
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    Debug.Log(arr[i]);
+                    colms[c_n].GetComponent<column>().MakeTrainingBlock(arr[i], i);
+                }
+            }
         }
 
         if (Game_Mode == "Game")

@@ -120,15 +120,19 @@ public class block : MonoBehaviour
                 p.GetComponent<Boxer>().com += 1;
             }       */
 
+           
             FindObjectOfType<scorer>().c_c = 30f;
             FindObjectOfType<scorer>().com += 1;
-
-            if (FindObjectOfType<Online>().online)
+            
+            if (FindObjectOfType<Online>() != null)
             {
-                if (len / 4 > 0)
+                if (FindObjectOfType<Online>().online)
                 {
-                    int x = (int)(len / 4);
-                    FindObjectOfType<Online>().SendMeteors(x);
+                    if (len / 4 > 0)
+                    {
+                        int x = (int)(len / 4);
+                        FindObjectOfType<Online>().SendMeteors(x);
+                    }
                 }
             }
 
