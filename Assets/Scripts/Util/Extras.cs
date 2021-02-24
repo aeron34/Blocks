@@ -10,6 +10,14 @@ namespace Extras
 {
     public class Utilites
     {
+        public List<string[]> LoadTutText()
+        {
+            var textData = File.ReadAllText($"Assets/Data/Tut Text.txt");
+            List<string[]> xy = new List<string[]>();
+            var arr = textData.Split('|').ToArray();
+
+            return xy;
+        }
         public List<string[]> Load(int number)
         {
             var trialDataText = File.ReadAllLines($"Assets/Data/Gizmo{number}.txt");
@@ -32,6 +40,9 @@ namespace Extras
                 case "COMBO":
                     satisfied = CheckCombo(this_obj, Int32.Parse(condition[1]));
                     break;
+                case "SCORE":
+                    satisfied = CheckScore(this_obj, Int32.Parse(condition[1]));
+                    break;
                 default:
                     break;
             }
@@ -43,6 +54,16 @@ namespace Extras
             
             int combo = obj.GetComponent<block_queue>().scorer.GetComponent<scorer>().com;
             if (combo >= expected)
+            {
+                return true;
+            }
+            return false;
+        }
+        public bool CheckScore(GameObject obj, int expected)
+        {
+
+            int score = obj.GetComponent<block_queue>().scorer.GetComponent<scorer>().GetScore();
+            if (score >= expected)
             {
                 return true;
             }

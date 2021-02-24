@@ -17,7 +17,7 @@ public class block_queue : MonoBehaviour
     Queue<GameObject> blk_queue = new Queue<GameObject>();
     public GameObject colm, null_block, block, meteor, scorer = null;
     GameObject c_b = null;
-    int trialNumber = 0;
+    int trialNumber = 1;
     float t_m = 0.05f, bts = 0.055f;
     System.Random random = new System.Random();
     public int meteors = 0, default_col_number = 19;
@@ -210,12 +210,14 @@ public class block_queue : MonoBehaviour
 
     private IEnumerator LoadNewTrial()
     {
-        Debug.Log("called");
-        checking = false;
-        yield return new WaitForSeconds(2f);
+        Debug.Log("called");        
+        checking = false;        
+        yield return new WaitForSeconds(3f);
         GameObject.Find("pic").transform.position = new Vector3(-5f, -3.1f, 1);
+        trialNumber += 1;
+        GetTrial(trialNumber);       
+        scorer.GetComponent<scorer>().Reset(0);
 
-        GetTrial(2);
     }
 
     private void DropMeteor()

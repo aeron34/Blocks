@@ -2,4 +2,4 @@ START_COL, 5
 blue,red,yellow
 green, red, blue
 yellow, yellow, red
-COMBO, 2
+SCORE, 150

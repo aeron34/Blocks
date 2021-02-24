@@ -1,0 +1,4 @@
+In this test, stand over a Block and press space or stand beside 
+one and press "J", this is Swapping. If 3 Blocks of a color form a path, 
+press "I"(overtop)/"L"(beside) to detonate them, gaining points. 
+Path atleast 3 Blocks and detonate them. |

@@ -4,10 +4,12 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using TMPro;
 
 public class scorer : MonoBehaviour
 {
-    Text txt, chain, combo;
+    TextMeshProUGUI txt;
+    Text chain, combo;
     int score = 0;
     int last_chn = 0;
     public int com;
@@ -15,7 +17,7 @@ public class scorer : MonoBehaviour
 
     public void Start()
     {
-        txt = gameObject.GetComponent<Text>();
+        txt = gameObject.GetComponent<TextMeshProUGUI>();
         chain = GameObject.Find("Chain_Cnt").GetComponent<Text>();
         combo = GameObject.Find("Com_Cnt").GetComponent<Text>();
     }
@@ -27,6 +29,16 @@ public class scorer : MonoBehaviour
             chain.text = x.ToString() + "X CHAIN";
 
         }
+    }
+    public void SetScore(int x)
+    {
+        txt.text = x.ToString();
+    }   
+    public void Reset(int x)
+    {
+        txt.text = x.ToString();
+        com = 0;
+        combo.text = com.ToString();
     }
 
     private void Update()
@@ -53,6 +65,10 @@ public class scorer : MonoBehaviour
         }
     }
 
+    public int GetScore()
+    {
+        return score;
+    }
     public void UpdateScore(int x)
     {
         score += x;
