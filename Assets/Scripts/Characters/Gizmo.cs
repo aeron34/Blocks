@@ -123,7 +123,7 @@ public class Gizmo : MonoBehaviour
         {
             if (h_blk != null)
             {
-                if (h_blk.GetComponent<block>().Check() == 1)
+                if (h_blk.GetComponent<block>().Check(true) == 1)
                 {
                     dist_blk = null;
                     transform.GetChild(2).gameObject.SetActive(false);
@@ -135,7 +135,7 @@ public class Gizmo : MonoBehaviour
         {
             if (v_blk != null)
             {
-                if (v_blk.GetComponent<block>().Check() == 1)
+                if (v_blk.GetComponent<block>().Check(true) == 1)
                 {
 
                     dist_blk = null;

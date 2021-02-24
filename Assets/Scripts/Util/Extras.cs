@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System;
 using System.Text;
 using System.Linq;
 
@@ -9,9 +10,9 @@ namespace Extras
 {
     public class Utilites
     {
-        public List<string[]> Meme()
+        public List<string[]> Load(int number)
         {
-            var trialDataText = File.ReadAllLines("Assets/Data/oh.txt");
+            var trialDataText = File.ReadAllLines($"Assets/Data/Gizmo{number}.txt");
             List<string[]> xy = new List<string[]>();
 
             for (int i = 0; i < trialDataText.Length; i++)
@@ -21,6 +22,31 @@ namespace Extras
             }
 
             return xy;//[0][0]);
+        }
+
+        public bool CheckCondition(GameObject this_obj, string[] condition)
+        {
+            bool satisfied = false;
+            switch(condition[0])
+            {
+                case "COMBO":
+                    satisfied = CheckCombo(this_obj, Int32.Parse(condition[1]));
+                    break;
+                default:
+                    break;
+            }
+            return satisfied;
+        }
+
+        public bool CheckCombo(GameObject obj, int expected)
+        {
+            
+            int combo = obj.GetComponent<block_queue>().scorer.GetComponent<scorer>().com;
+            if (combo >= expected)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

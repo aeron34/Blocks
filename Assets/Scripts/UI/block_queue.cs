@@ -12,11 +12,12 @@ public class block_queue : MonoBehaviour
     public Transform g, blk_spn;
     float s = 0.5f, drp_tm;
     double time_passed = 0;
-    bool moving;
+    bool moving, checking;
     public float default_col_X = -20.3f;
     Queue<GameObject> blk_queue = new Queue<GameObject>();
-    public GameObject colm, null_block, block, meteor;
+    public GameObject colm, null_block, block, meteor, scorer = null;
     GameObject c_b = null;
+    int trialNumber = 0;
     float t_m = 0.05f, bts = 0.055f;
     System.Random random = new System.Random();
     public int meteors = 0, default_col_number = 19;
@@ -25,13 +26,14 @@ public class block_queue : MonoBehaviour
     Queue<string> color = new Queue<string>();
     public List<GameObject> colms = new List<GameObject>();
     private Extras.Utilites util;
-    public string Game_Mode = "Game", block_arrangment;
-    
+    public string Game_Mode = "Game";
+    private string[] condition = new string[] { "", "" };
     // Start is called before the first frame update
     void Start()
     {
         util = new Extras.Utilites();
         column_positions[0] = default_col_X;
+        scorer = GameObject.FindObjectOfType<scorer>().gameObject;
 
         for (int i = 1; i < default_col_number; i++)
         {
@@ -48,18 +50,7 @@ public class block_queue : MonoBehaviour
 
         if(Game_Mode == "Training")
         {
-            var list = util.Meme();
-            int c_n = 5;
-            foreach (string[] arr in list)
-            {
-                c_n++;
-                //Debug.Log(arr[0][i]);
-                for (int i = 0; i < arr.Length; i++)
-                {
-                    Debug.Log(arr[i]);
-                    colms[c_n].GetComponent<column>().MakeTrainingBlock(arr[i], i);
-                }
-            }
+            GetTrial(1);
         }
 
         if (Game_Mode == "Game")
@@ -126,6 +117,30 @@ public class block_queue : MonoBehaviour
        // StartCoroutine(MeteorTime());
     }
 
+    public void GetTrial(int number)
+    {
+        var list = util.Load(number);
+        int c_n = 5;
+        condition = list[list.Count - 1];
+        
+        for (int i = 0; i < colms.Count; i++)
+        {
+            colms[i].GetComponent<column>().DestoryBlocks();
+        }
+
+        for (int i = 1; i < list.Count - 1; i++)
+        {
+            string[] arr = list[i];
+            c_n++;
+            for (int x = 0; x < arr.Length; x++)
+            {
+                colms[c_n].GetComponent<column>().MakeTrainingBlock(arr[x], x);
+            }
+        }
+        checking = true;
+
+    }
+
     public IEnumerator MeteorTime()
     {
         Debug.Log("BQ: " + meteors);
@@ -138,10 +153,8 @@ public class block_queue : MonoBehaviour
         }
 
         Debug.Log("BQ: " + meteors);
-        /*DropMeteor();
-        yield return new WaitForSeconds(1f);
-        StartCoroutine(MeteorTime());*/
     }
+
     public void setColor(GameObject a)
     {
         var color_number = random.Next(4) + 1;
@@ -185,8 +198,25 @@ public class block_queue : MonoBehaviour
                 }
             }
         }
+
+        if(Game_Mode == "Training")
+        {
+            if (util.CheckCondition(gameObject, condition) && checking)
+            {
+                StartCoroutine(LoadNewTrial());
+            }
+        }
     }
 
+    private IEnumerator LoadNewTrial()
+    {
+        Debug.Log("called");
+        checking = false;
+        yield return new WaitForSeconds(2f);
+        GameObject.Find("pic").transform.position = new Vector3(-5f, -3.1f, 1);
+
+        GetTrial(2);
+    }
 
     private void DropMeteor()
     {

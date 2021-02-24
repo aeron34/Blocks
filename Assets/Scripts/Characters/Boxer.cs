@@ -340,7 +340,7 @@ public class Boxer : MonoBehaviour
         {
             if (h_blk != null)
             {
-                h_blk.GetComponent<block>().Check();
+                h_blk.GetComponent<block>().Check(true);
             }
         }
 
@@ -348,7 +348,7 @@ public class Boxer : MonoBehaviour
         {
             if (v_blk != null)
             {
-                v_blk.GetComponent<block>().Check();
+                v_blk.GetComponent<block>().Check(true);
             }
         }
 

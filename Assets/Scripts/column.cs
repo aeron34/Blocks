@@ -59,7 +59,6 @@ public class column : MonoBehaviour
     public void MakeTrainingBlock(string color="", int offset_y = 0)
     {
         float y = -4.15f + (2*offset_y) * .85f;
-        
         var new_block = Instantiate(block, transform.position, transform.rotation);
         new_block.transform.position = new Vector3(transform.position.x, y, 0);
         new_block.GetComponent<Rigidbody2D>().simulated = true;
@@ -67,6 +66,15 @@ public class column : MonoBehaviour
         new_block.GetComponent<block>().transform.localScale = new Vector3(.85f, .85f, 1);// = color;
         new_block.GetComponent<block>().colm = gameObject;
 
+    }
+
+    public void DestoryBlocks()
+    {
+        foreach (GameObject n in blocks)
+        {
+            Destroy(n);
+        }
+        blocks.Clear();
     }
     public void drop(string col="")
     {

@@ -63,7 +63,7 @@ public class block : MonoBehaviour
             rgb.velocity = new Vector2(0, 30);
         }
     }
-    public int Check()
+    public int Check(bool player_init = false)
     {
       
         if(color == "none")
@@ -120,10 +120,20 @@ public class block : MonoBehaviour
                 p.GetComponent<Boxer>().com += 1;
             }       */
 
-           
             FindObjectOfType<scorer>().c_c = 30f;
-            FindObjectOfType<scorer>().com += 1;
-            
+
+            if (!player_init)
+            {
+                FindObjectOfType<scorer>().com += 1;
+            }
+            else
+            {
+                if(FindObjectOfType<scorer>().com <= 1)
+                { 
+                    FindObjectOfType<scorer>().com = 1;
+                }
+            }
+
             if (FindObjectOfType<Online>() != null)
             {
                 if (FindObjectOfType<Online>().online)
@@ -501,7 +511,7 @@ public class block : MonoBehaviour
     {
         var ply = GameObject.Find("pic");
 
-        if (ply.GetComponent<Gizmo>().on == 0)
+        if (ply.GetComponent<Gizmo>().on != 0)
         {
             spr.color = new Color(135f, 0, 150f, 1);
         }

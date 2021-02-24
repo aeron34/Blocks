@@ -40,7 +40,7 @@ public class scorer : MonoBehaviour
             chain.gameObject.SetActive(false);
         }
 
-        c_c -= 0.08f;
+        c_c -= 0.12f;
 
         if (c_c > 0)
         {
@@ -56,7 +56,7 @@ public class scorer : MonoBehaviour
     public void UpdateScore(int x)
     {
         score += x;
-        Debug.Log(score);
+
         txt.text = score.ToString();
     }
 }
