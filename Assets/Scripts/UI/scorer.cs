@@ -26,7 +26,7 @@ public class scorer : MonoBehaviour
     {        
         if(last_chn < x)
         {
-            chain.text = x.ToString() + "X CHAIN";
+            chain.text = x.ToString() + "X LINK";
 
         }
     }
@@ -36,6 +36,7 @@ public class scorer : MonoBehaviour
     }   
     public void Reset(int x)
     {
+        score = 0;
         txt.text = x.ToString();
         com = 0;
         combo.text = com.ToString();
@@ -52,14 +53,14 @@ public class scorer : MonoBehaviour
             chain.gameObject.SetActive(false);
         }
 
-        c_c -= 0.12f;
+        c_c -= 0.08f;
 
         if (c_c > 0)
         {
             if (com >= 2)
             {
                 combo.gameObject.SetActive(true);
-                combo.text = com + "x combo";
+                combo.text = com + "X COMBO";
             }
             chain.gameObject.SetActive(true);
         }

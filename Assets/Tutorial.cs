@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class Tutorial_Images : MonoBehaviour
+public class Tutorial : MonoBehaviour
 {
-    public Sprite[] sprs = new Sprite[2];
+    public Sprite[] sprs = new Sprite[5];
     int current_image = 0;
     SpriteRenderer spr_renderer;
-    TextMeshProUGUI tut_text;
+    public TextMeshProUGUI tut_text;
     // Start is called before the first frame update
     void Start()
     {
         spr_renderer = GetComponent<SpriteRenderer>();
         tut_text = GameObject.Find("tutorial").GetComponent<TextMeshProUGUI>();
         tut_text.enabled = false;
+    }
+
+    public void SetText(string text)
+    {
+        tut_text.text = text;
     }
 
     public void NextImage()

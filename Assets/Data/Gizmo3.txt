@@ -1,0 +1,5 @@
+START_COL, 5
+blue,yellow, blue
+red, blue, green
+yellow, red, green, blue
+SCORE, 1024

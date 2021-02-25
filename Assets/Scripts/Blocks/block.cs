@@ -154,7 +154,7 @@ public class block : MonoBehaviour
 
             if (len >= 4)
             {
-                FindObjectOfType<scorer>().UpdateScore((int)Math.Pow(combo * touching.ToArray().Length * .75, 5));
+                FindObjectOfType<scorer>().UpdateScore((int)Math.Pow(combo * touching.ToArray().Length, 5));
                 FindObjectOfType<scorer>().UpdateChain(len);
                 return 1;
             }

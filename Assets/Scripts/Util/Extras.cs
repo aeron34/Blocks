@@ -10,13 +10,13 @@ namespace Extras
 {
     public class Utilites
     {
-        public List<string[]> LoadTutText()
+        public string[] LoadTutText()
         {
             var textData = File.ReadAllText($"Assets/Data/Tut Text.txt");
             List<string[]> xy = new List<string[]>();
-            var arr = textData.Split('|').ToArray();
+            return textData.Split('|').ToArray();
 
-            return xy;
+            //return xy;
         }
         public List<string[]> Load(int number)
         {

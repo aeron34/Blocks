@@ -1,4 +1,12 @@
 In this test, stand over a Block and press space or stand beside 
 one and press "J", this is Swapping. If 3 Blocks of a color form a path, 
 press "I"(overtop)/"L"(beside) to detonate them, gaining points. 
-Path atleast 3 Blocks and detonate them. |
+Path atleast 3 Blocks and detonate them. |Like other puzzle games such as Puyo-Puyo, you can create combos
+by detonating a Link, then having a block of a diffent color fall
+and complete another Link. Combos yield more points than regular detonations. 
+For example 2 independent links is 300 points, 
+but a 2x combo....|Links are a central concept to this game, in fact, for links greater 
+than 4 blocks in length, the points will be the length
+raised to the 5th power. This means a Link of 4 yields 1024 points.|Create a 3X Combo.|PRO TIP: If you haven't finished a distance swap yet, 
+pressing "H" will drop the block in front of you. 
+Create a 4X Combo.|

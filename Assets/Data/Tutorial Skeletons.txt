@@ -1,0 +1,14 @@
+o T1: Explode 1 block path
+
+o T2: Prompt him to Create a 2 hit combo
+to show the difference in score.
+
+o T3: Talk about Link/chains.
+
+o T4: 3 hit combo.
+
+o From T5 - T7: have the player execute
+[T-NUM - 1] hit combo, for ex: T5 should be
+4 hit combo.
+
+o 

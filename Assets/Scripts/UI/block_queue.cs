@@ -27,7 +27,7 @@ public class block_queue : MonoBehaviour
     public List<GameObject> colms = new List<GameObject>();
     private Extras.Utilites util;
     public string Game_Mode = "Game";
-    private string[] condition = new string[] { "", "" };
+    private string[] condition = new string[] { "", "" }, tutorial_text;
     // Start is called before the first frame update
     void Start()
     {
@@ -50,6 +50,7 @@ public class block_queue : MonoBehaviour
 
         if(Game_Mode == "Training")
         {
+            tutorial_text = util.LoadTutText();
             GetTrial(1);
         }
 
@@ -122,7 +123,9 @@ public class block_queue : MonoBehaviour
         var list = util.Load(number);
         int c_n = 5;
         condition = list[list.Count - 1];
-        
+
+        GameObject.Find("tut").GetComponent<Tutorial>().SetText(tutorial_text[number-1]);
+
         for (int i = 0; i < colms.Count; i++)
         {
             colms[i].GetComponent<column>().DestoryBlocks();
@@ -215,6 +218,7 @@ public class block_queue : MonoBehaviour
         yield return new WaitForSeconds(3f);
         GameObject.Find("pic").transform.position = new Vector3(-5f, -3.1f, 1);
         trialNumber += 1;
+        GameObject.Find("tut").GetComponent<Tutorial>().NextImage();
         GetTrial(trialNumber);       
         scorer.GetComponent<scorer>().Reset(0);
 

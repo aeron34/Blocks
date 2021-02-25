@@ -1,0 +1,5 @@
+START_COL, 5
+blue,red,yellow, green
+green, red, blue, blue, yellow
+yellow, yellow, red, green
+COMBO, 4
