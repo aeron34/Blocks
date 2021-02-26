@@ -1,5 +1,5 @@
 START_COL, 5
-blue,red,yellow
+blue, red,yellow, red
 green, red, blue, blue, yellow
 yellow, yellow, red
 COMBO, 3

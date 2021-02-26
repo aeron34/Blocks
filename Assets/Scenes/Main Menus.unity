@@ -990,12 +990,12 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1398734965}
-        m_MethodName: 
+      - m_Target: {fileID: 1398734966}
+        m_MethodName: TrainingToCharSelect
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1073,6 +1073,8 @@ MonoBehaviour:
   weap_box: {fileID: 3688172403930154453, guid: 40a501a8e5f184c45b9e5056072655f9,
     type: 3}
   ultra_bar: {fileID: 1622688231734626657, guid: a509ff97dd1a1fc469f1722c38baae43,
+    type: 3}
+  tutorial: {fileID: 5675816327395518783, guid: 6816fe08e9f47d048be49bd8b5d3cd07,
     type: 3}
 --- !u!4 &1398734967
 Transform:

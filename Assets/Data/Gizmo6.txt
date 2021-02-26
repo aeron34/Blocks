@@ -1,0 +1,6 @@
+START_COL, 5
+blue,red,yellow,red, red
+green, red, blue, red, blue, yellow
+yellow, yellow, red
+red, blue, blue, red
+SCORE, 7776

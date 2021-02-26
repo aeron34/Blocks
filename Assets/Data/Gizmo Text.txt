@@ -9,4 +9,8 @@ but a 2x combo....|Links are a central concept to this game, in fact, for links 
 than 4 blocks in length, the points will be the length
 raised to the 5th power. This means a Link of 4 yields 1024 points.|Create a 3X Combo.|PRO TIP: If you haven't finished a distance swap yet, 
 pressing "H" will drop the block in front of you. 
-Create a 4X Combo.|
+Create a 4X Combo.| Create a 8x Link. |That's It! You know how to play!
+Both characters have thier own moves and abilities spefic to them. 
+Gizmo has grenades, crawlers, and an ultimate swapping technique. 
+The box under your health is the weapons box, they're listed in
+ the order used above. They're limited so use them wisely. |

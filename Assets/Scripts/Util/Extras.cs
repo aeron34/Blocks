@@ -10,17 +10,17 @@ namespace Extras
 {
     public class Utilites
     {
-        public string[] LoadTutText()
+        public string[] LoadTutText(string charc="")
         {
-            var textData = File.ReadAllText($"Assets/Data/Tut Text.txt");
+            var textData = File.ReadAllText($"Assets/Data/{charc} Text.txt");
             List<string[]> xy = new List<string[]>();
             return textData.Split('|').ToArray();
 
             //return xy;
         }
-        public List<string[]> Load(int number)
+        public List<string[]> Load(int number, string charc="")
         {
-            var trialDataText = File.ReadAllLines($"Assets/Data/Gizmo{number}.txt");
+            var trialDataText = File.ReadAllLines($"Assets/Data/{charc}{number}.txt");
             List<string[]> xy = new List<string[]>();
 
             for (int i = 0; i < trialDataText.Length; i++)

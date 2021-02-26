@@ -50,8 +50,9 @@ public class block_queue : MonoBehaviour
 
         if(Game_Mode == "Training")
         {
-            tutorial_text = util.LoadTutText();
-            GetTrial(1);
+            var char_name = GameObject.Find("tut").GetComponent<Tutorial>().character;
+            tutorial_text = util.LoadTutText(char_name);
+            GetTrial(trialNumber);
         }
 
         if (Game_Mode == "Game")
@@ -120,12 +121,18 @@ public class block_queue : MonoBehaviour
 
     public void GetTrial(int number)
     {
-        var list = util.Load(number);
+        var char_name = GameObject.Find("tut").GetComponent<Tutorial>().character;
+
+        var list = util.Load(number, char_name);
         int c_n = 5;
         condition = list[list.Count - 1];
 
         GameObject.Find("tut").GetComponent<Tutorial>().SetText(tutorial_text[number-1]);
 
+        if(number == 7)
+        {
+            GameObject.Find("pic").GetComponent<Gizmo>().weapons = new int[3] { 5, 5, 5 };
+        }
         for (int i = 0; i < colms.Count; i++)
         {
             colms[i].GetComponent<column>().DestoryBlocks();
@@ -216,12 +223,16 @@ public class block_queue : MonoBehaviour
         Debug.Log("called");        
         checking = false;        
         yield return new WaitForSeconds(3f);
+        NextTrial();
+    }
+
+    public void NextTrial()
+    {
         GameObject.Find("pic").transform.position = new Vector3(-5f, -3.1f, 1);
         trialNumber += 1;
         GameObject.Find("tut").GetComponent<Tutorial>().NextImage();
-        GetTrial(trialNumber);       
+        GetTrial(trialNumber);
         scorer.GetComponent<scorer>().Reset(0);
-
     }
 
     private void DropMeteor()

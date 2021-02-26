@@ -1,0 +1,16 @@
+This is the Boxer archetype. He can do the same
+things as Gizmo except for distance swapping and using
+weapons. But he is faster than Gizmo, can jump higher, can
+explode blocks in place, and more.  Press "O" beside a block
+to punch and explode it. Click next to progress.|Hold "S" and press "O" to explode a block underneath you.
+|Near a block, holding "A"(left) or "D"(right) and 
+pressing "K" will perform a push punch, pushing the 
+block a distance of 3 blocks. Holding no direction 
+will simply push it one block distance.|The Boxer, like Gizmo, has tools apart from basic mechanics
+that help you score higher than other players. He has moves 
+that be utilised via button inputs. These work like they do in 
+fighting games.|Here are the input combinations:
+** / = OR ** Meaning you use can either key 
+UPPERCUT - "S", "D"/"A", "U"
+OVERHAND - "S", "D"/"A", "S", "D"/"A", "U"
+GROUND POUND - "S", "S", "S", "O" |You now know how to use the Boxer!|

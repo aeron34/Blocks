@@ -36,33 +36,70 @@ public class MainController : MonoBehaviour
     }
     public void LoadGizmo()
     {
-        LobbyMenu();
+        if (!training)
+        {
+            LobbyMenu();
+           
+        }
+        else
+        {
+            LoadTrainingRoom();
+        }
         char_name = "Gizmo";
+        
     }   
     public void LoadBoxer()
     {
-        LobbyMenu();
+        if (!training)
+        {
+            LobbyMenu();
+        }
+        else
+        {
+            LoadTrainingRoom();
+        }
         char_name = "Boxer";
     }
 
     private void LoadChar(Scene scene, LoadSceneMode mode)
     {
-        if(scene.name == "Game")
-        { 
+        var canvas = GameObject.Find("Canvas");
+
+        if (scene.name == "Game")
+        {                 
+
             if (char_name == "Gizmo")
             {
-                var canvas = GameObject.Find("Canvas");
                 var g = Instantiate(Gizmo);
                 g.name = "pic";
                 Instantiate(weap_box, canvas.transform).name = "weap_box";
             }
             if (char_name == "Boxer")
             {
-                var canvas = GameObject.Find("Canvas");
                 var g = Instantiate(Boxer);
                 g.name = "pic";
                 Instantiate(ultra_bar, canvas.transform).name = "ultra_bar";
             }
+        }
+        if(scene.name == "Training")
+        {
+            if (char_name == "Gizmo")
+            {
+                var g = Instantiate(Gizmo);
+                g.name = "pic";
+                Instantiate(weap_box, canvas.transform).name = "weap_box";
+                weap_box.transform.position = new Vector3(-725f, -275f, 0);
+            }
+            if (char_name == "Boxer")
+            {
+                var g = Instantiate(Boxer);
+                g.name = "pic";
+                Instantiate(ultra_bar, canvas.transform).name = "ultra_bar";
+            }
+
+            var tut = GameObject.Find("tut");
+            tut.GetComponent<Tutorial>().character = char_name;
+
         }
     }
 
@@ -71,6 +108,10 @@ public class MainController : MonoBehaviour
     public void LobbyMenu()
     {
         SceneManager.LoadScene("Lobby");
+    }
+    public void LoadTrainingRoom()
+    {
+        SceneManager.LoadScene("Training");
     }
     public void MainMenu()
     {
@@ -83,6 +124,11 @@ public class MainController : MonoBehaviour
         char_select.SetActive(true);
     }
     
+    public void TrainingToCharSelect()
+    {
+        training = true;
+        CharSelect();
+    }
     #endregion
 
     void Update()
