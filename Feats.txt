@@ -162,3 +162,9 @@ would be favorable
 to his current block
 layout/situation.
 
+------- TABLE:
+
+- chat combination feature. 
+basically 2 different chat
+rooms can combine with 
+each other.

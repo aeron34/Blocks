@@ -3,3 +3,4 @@ red
 red
 green, blue, yellow
 blue, red, 
+SCORE, 150000

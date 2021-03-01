@@ -20,7 +20,7 @@ public class block_queue : MonoBehaviour
     int trialNumber = 1;
     float t_m = 0.05f, bts = 0.055f;
     System.Random random = new System.Random();
-    public int meteors = 0, default_col_number = 19;
+    public int meteors = 0, default_col_number = 19, max_trials=0;
     float[] minutes_passed = { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f };
     float[] column_positions = new float[19];
     Queue<string> color = new Queue<string>();
@@ -228,11 +228,14 @@ public class block_queue : MonoBehaviour
 
     public void NextTrial()
     {
-        GameObject.Find("pic").transform.position = new Vector3(-5f, -3.1f, 1);
-        trialNumber += 1;
-        GameObject.Find("tut").GetComponent<Tutorial>().NextImage();
-        GetTrial(trialNumber);
-        scorer.GetComponent<scorer>().Reset(0);
+        if ((trialNumber + 1) <= max_trials)
+        { 
+            GameObject.Find("pic").transform.position = new Vector3(-5f, -3.1f, 1);
+            trialNumber += 1;
+            GameObject.Find("tut").GetComponent<Tutorial>().NextImage();
+            GetTrial(trialNumber);
+            scorer.GetComponent<scorer>().Reset(0);
+        }
     }
 
     private void DropMeteor()

@@ -27,7 +27,7 @@ public class scorer : MonoBehaviour
         if(last_chn < x)
         {
             chain.text = x.ToString() + "X LINK";
-
+            last_chn = x;
         }
     }
     public void SetScore(int x)

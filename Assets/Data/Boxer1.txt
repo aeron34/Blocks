@@ -1,3 +1,4 @@
 START_COL, 5
 red, blue, yellow
-blue, red, 
+blue, red
+SCORE, 150000

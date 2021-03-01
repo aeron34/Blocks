@@ -354,7 +354,7 @@ public class block : MonoBehaviour
         {
             var p = GameObject.Find("pic");
 
-            if (p.GetComponent<Gizmo>() != null)
+            if (GameObject.FindObjectOfType<Gizmo>() != null)
             {
                 if (p.GetComponent<Gizmo>().dist_blk == gameObject)
                 {
@@ -369,7 +369,7 @@ public class block : MonoBehaviour
             }
             else
             {
-                if (p.GetComponent<Gizmo>() != null)
+                if (GameObject.FindObjectOfType<Gizmo>() != null)
                 {
                     System.Random random = new System.Random();
                     GetComponent<BoxCollider2D>().enabled = false;
@@ -517,7 +517,7 @@ public class block : MonoBehaviour
     {
         var ply = GameObject.Find("pic");
 
-        if (ply.GetComponent<Gizmo>().on != 0)
+        if(GameObject.FindObjectOfType<Gizmo>() && (ply.GetComponent<Gizmo>().on != 0))
         {
             spr.color = new Color(135f, 0, 150f, 1);
         }
@@ -530,7 +530,8 @@ public class block : MonoBehaviour
         /* Code that only applies to Gizmo,
         If he is chosen.
         */
-        if (ply.GetComponent<Gizmo>() != null)
+     
+        if (GameObject.FindObjectOfType<Gizmo>() != null)
         {
             if (Input.GetMouseButtonDown(0) && ply.GetComponent<Gizmo>().on == 2
             && ply.GetComponent<Gizmo>().v_blk != null)

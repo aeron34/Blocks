@@ -435,6 +435,13 @@ public class Boxer : MonoBehaviour
 
                 if (g.transform.localScale.x < 0f)
                 {
+                    if(GameObject.FindObjectOfType<MainController>() != null)
+                    {
+                        var main_con = GameObject.FindObjectOfType<MainController>();
+                        main_con.score = FindObjectOfType<scorer>().GetScore();
+                        main_con.LoadLoss();
+                    }
+
                     n_hel = 0;
                     break;
                 }
@@ -555,7 +562,6 @@ public class Boxer : MonoBehaviour
 
         if (!hurt_b)
         {
-            
             hurt_b = true;
             rgb.simulated = false;
             StartCoroutine(LowerBar(by));

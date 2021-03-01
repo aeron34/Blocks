@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class Tutorial : MonoBehaviour
 {
@@ -18,21 +19,26 @@ public class Tutorial : MonoBehaviour
         tut_text.enabled = false;
         if(character == "Boxer")
         {
+            GameObject.FindObjectOfType<block_queue>().max_trials = 6;
             spr_renderer.sprite = sprs[9];
             for (int i = 1; i < 10; i++)
             {
                 sprs[i] = null;
             }
+            GameObject.Find("Keys").GetComponent<Text>().text = "";
+
         }
         else
         {
+            GameObject.Find("Keys").SetActive(false);
+            GameObject.FindObjectOfType<block_queue>().max_trials = 7;
             Destroy(GameObject.Find("next"));
         }
     }
 
-    public void SetText(string tesxt)
+    public void SetText(string text)
     {
-        GameObject.Find("tutorial").GetComponent<TextMeshProUGUI>().text = tesxt;
+        GameObject.Find("tutorial").GetComponent<TextMeshProUGUI>().text = text;
     }
 
     public void NextImage()
@@ -52,6 +58,12 @@ public class Tutorial : MonoBehaviour
         {
             spr_renderer.enabled = false;
             tut_text.enabled = true;
+        }
+
+        if(GameObject.FindObjectOfType<Boxer>() != null)
+        {
+            var box = GameObject.FindObjectOfType<Boxer>();
+            GameObject.Find("Keys").GetComponent<Text>().text = string.Join("", box.inps.ToArray());
         }
     }
     

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class MainController : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class MainController : MonoBehaviour
     private string char_name;
     GameObject char_select, main_menu;
     public GameObject Gizmo, Boxer, weap_box, ultra_bar;
+    public int score = 0;
     void Awake()
     {
         if (FindObjectsOfType(GetType()).Length > 1)
@@ -32,7 +34,7 @@ public class MainController : MonoBehaviour
 
     private void OnEnable()
     {
-        SceneManager.sceneLoaded += LoadChar;
+        SceneManager.sceneLoaded += LoadedScene;
     }
     public void LoadGizmo()
     {
@@ -61,12 +63,12 @@ public class MainController : MonoBehaviour
         char_name = "Boxer";
     }
 
-    private void LoadChar(Scene scene, LoadSceneMode mode)
+    private void LoadedScene(Scene scene, LoadSceneMode mode)
     {
         var canvas = GameObject.Find("Canvas");
 
         if (scene.name == "Game")
-        {                 
+        {
 
             if (char_name == "Gizmo")
             {
@@ -81,7 +83,7 @@ public class MainController : MonoBehaviour
                 Instantiate(ultra_bar, canvas.transform).name = "ultra_bar";
             }
         }
-        if(scene.name == "Training")
+        if (scene.name == "Training")
         {
             if (char_name == "Gizmo")
             {
@@ -94,12 +96,21 @@ public class MainController : MonoBehaviour
             {
                 var g = Instantiate(Boxer);
                 g.name = "pic";
-                Instantiate(ultra_bar, canvas.transform).name = "ultra_bar";
+
+                var bar = Instantiate(ultra_bar, canvas.transform);
+                bar.name = "ultra_bar";
+                bar.transform.localPosition = new Vector3(-738f, -430f, 0);
+
             }
 
             var tut = GameObject.Find("tut");
             tut.GetComponent<Tutorial>().character = char_name;
 
+        }
+
+        if (scene.name == "Loss Screen")
+        {
+            GameObject.Find("score").GetComponent<TextMeshProUGUI>().text = score.ToString();
         }
     }
 
@@ -128,6 +139,12 @@ public class MainController : MonoBehaviour
     {
         training = true;
         CharSelect();
+    }
+
+    public void LoadLoss()
+    {
+        SceneManager.LoadScene("Loss Screen");
+
     }
     #endregion
 

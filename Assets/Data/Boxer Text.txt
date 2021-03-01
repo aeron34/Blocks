@@ -9,7 +9,7 @@ block a distance of 3 blocks. Holding no direction
 will simply push it one block distance.|The Boxer, like Gizmo, has tools apart from basic mechanics
 that help you score higher than other players. He has moves 
 that be utilised via button inputs. These work like they do in 
-fighting games.|Here are the input combinations:
+fighting games. Click next|Here are the input combinations:
 ** / = OR ** Meaning you use can either key 
 UPPERCUT - "S", "D"/"A", "U"
 OVERHAND - "S", "D"/"A", "S", "D"/"A", "U"

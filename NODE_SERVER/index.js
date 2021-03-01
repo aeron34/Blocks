@@ -160,7 +160,7 @@ app.get('/rooms', async (req, res) => {
   }
 
   const user_list = await knx('users').orderBy('room','desc').select('*')
-  .limit(5).then(obj_arr => {
+  .limit(ROOM_SIZE+2).then(obj_arr => {
       console.log(obj_arr)
       obj_arr = obj_arr.slice(0, ROOM_SIZE);
       mode = methods.GetRoom(obj_arr, ROOM_SIZE, user);

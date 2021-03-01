@@ -13,25 +13,22 @@ const createUser = (req, res, u, knx) => {
 
 const login = (req, res, u, knx) => {
 
-  let good = false;
-  b = {};
+  knx('users').where({
+      username: u.username,
+      password: u.pass
+    }).update({
+      online_status: "online",
+      meteors: 0
+    }).then( a=> {
+      if(a == 0)
+      {
+        return res.send('nope');
+      }
+      res.send('logged in');
+    }).catch(e => {
+      res.send('nope');
+    });
 
- knx('users').where({
-    username: u.username,
-    password: u.pass,
-    online_status: 'offline'
-  }).update({
-    online_status: "online",
-    meteors: 0
-  }).then( a=> {
-    if(a == 0)
-    {
-      return res.send('nope');
-    }
-    res.send('logged in');
-  }).catch(e => {
-    res.send('nope');
-  });
 };
 
 module.exports = {
