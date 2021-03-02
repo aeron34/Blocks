@@ -147,6 +147,7 @@ public class block : MonoBehaviour
             }
 
             int combo = FindObjectOfType<scorer>().com;
+
             if (combo < 1)
             {
                 combo = 1;

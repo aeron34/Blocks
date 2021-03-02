@@ -46,8 +46,30 @@ public class Boxer : MonoBehaviour
         ani = GetComponent<Animator>();
         spr = GetComponent<SpriteRenderer>();
 
-        health = GameObject.Find("health_bar");
+        var online_controller = FindObjectOfType<Online>();
+
+        if (online_controller != null)
+        {
+            switch (online_controller.game_mode)
+            {
+                case "last man standing":
+                    health = GameObject.Find("health_bar");
+                    break;
+                case "highest score wins":
+                    Destroy(GameObject.Find("bar_holder"));
+                    break;
+                default:
+                    break;
+
+            }
+        }
+        else
+        {
+            Destroy(GameObject.Find("bar_holder"));
+        }
+
         ult_bar = GameObject.Find("ult_bar");
+
 
         moves = new Action[3] { Straight, ULTIMATE, Upper };//, Go };
         xS = 18;
@@ -59,31 +81,12 @@ public class Boxer : MonoBehaviour
             new string[]{"s", "s", "s", "o"},
             new string[]{"s", "d", "u"}};
 
-        com_c = GameObject.Find("Com_Cnt");
-
         StartCoroutine(AddBar());
         //StartCoroutine(FindObjectOfType<Online>().GetMeteors());
         Get();
     }
 
  
-    public void ComboCounter()
-    {
-        
-        if(c_c < 0)
-        {
-            com = 0;
-            com_c.SetActive(false);
-        }
-        c_c -= 0.08f;
-        if (c_c > 0 && com >= 2)
-        {
-            com_c.SetActive(true);
-
-            com_c.GetComponent<Text>().text = com + "x combo"; 
-        }
-    }
-
     private static async Task Get()
     {
         /*var values = new Dictionary<string, string>
@@ -408,14 +411,19 @@ public class Boxer : MonoBehaviour
         if (!hurt_b && movable)
         {
             UP_Logic();
-            ComboCounter();
         }
     }
 
     public IEnumerator LowerBar(float by = 0, GameObject g = null)
     {
+        
         if(g == null)
         {
+            if(FindObjectOfType<Online>().game_mode == "highest score wins"
+            || GameObject.Find("bar_holder") == null)
+            {
+                yield break;
+            }
             g = health;
         }
 

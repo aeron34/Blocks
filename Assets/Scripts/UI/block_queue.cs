@@ -17,8 +17,8 @@ public class block_queue : MonoBehaviour
     Queue<GameObject> blk_queue = new Queue<GameObject>();
     public GameObject colm, null_block, block, meteor, scorer = null;
     GameObject c_b = null;
-    int trialNumber = 1;
-    float t_m = 0.05f, bts = 0.055f;
+    int trialNumber = 1, minutes, seconds;
+    float t_m = 0.05f, bts = 0.055f, time = (60*3);
     System.Random random = new System.Random();
     public int meteors = 0, default_col_number = 19, max_trials=0;
     float[] minutes_passed = { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f };
@@ -153,16 +153,12 @@ public class block_queue : MonoBehaviour
 
     public IEnumerator MeteorTime()
     {
-        Debug.Log("BQ: " + meteors);
-
         while (meteors > 0) 
         {
             meteors -= 1;
             DropMeteor();
             yield return new WaitForSeconds(1f);
         }
-
-        Debug.Log("BQ: " + meteors);
     }
 
     public void setColor(GameObject a)
@@ -207,10 +203,20 @@ public class block_queue : MonoBehaviour
                     bts += 0.025f;
                 }
             }
+
+            time -= Time.deltaTime;
+            minutes = Mathf.FloorToInt(time / 60);
+            seconds = Mathf.FloorToInt(time % 60);
+            GameObject.Find("minutes").GetComponent<Text>().text = $"{minutes}:{seconds}";
         }
 
         if(Game_Mode == "Training")
         {
+            if(Input.GetKeyDown(KeyCode.R))
+            {
+                trialNumber -= 1;
+                StartCoroutine(LoadNewTrial());
+            }
             if (util.CheckCondition(gameObject, condition) && checking)
             {
                 StartCoroutine(LoadNewTrial());

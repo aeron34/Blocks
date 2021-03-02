@@ -41,7 +41,28 @@ public class Gizmo : MonoBehaviour
         spr = GetComponent<SpriteRenderer>();
 
         weapons = new int[3] { 0,0,0 };
-        health = GameObject.Find("health_bar");
+
+        var online_controller = FindObjectOfType<Online>();
+
+        if (online_controller != null)
+        {
+            switch (online_controller.game_mode)
+            {
+                case "last man standing":
+                    health = GameObject.Find("health_bar");
+                    break;
+                case "highest score wins":
+                    Destroy(GameObject.Find("bar_holder"));
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            Destroy(GameObject.Find("bar_holder"));
+        }
+
         GameObject.Find("weap_box").transform.Find("1").
         GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 1);
         

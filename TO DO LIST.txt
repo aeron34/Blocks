@@ -106,18 +106,28 @@ o Sometime in the future update the site and add:
 	you to see your wins/losses.
 
 
+
 o Make a game over screen,
 
 o Make it so that the when the column
-reaches a certain number you'll lose.
+reaches a certain number, the column
+deletes it's blocks, restaring.
 
 o make a gameover animation by deleting
 the ground beneath the blocks to create
 a falling effect.
 
+o To fix last man standing, give it a countdown
+of 10 mins, and if you're both still alive
+then highest score wins.
 
-o (KNEX and DB) Only take a list of the top rows, do
-not take the entire list. 
+o  Add pause.
+
+o Create the trials of training mode (NOW).
+
+o Finish box's ultimate (NEXT).
+
+o Recode the net code with a controller.
 
 o (LATER, AFTER RELEASE) create a dictionary object, initially
 set it as empty. this will be a dict that
@@ -165,9 +175,5 @@ block (left or right), then deploying which
 will give a wierd effect.
 
 
-o  Add pause.
 
-o Create the trials of training mode (NOW).
-
-o Finish box's ultimate (NEXT).
 

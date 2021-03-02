@@ -11,8 +11,12 @@ using UnityEngine.SceneManagement;
 public class Online : MonoBehaviour
 {
     static readonly HttpClient h = new HttpClient();
-    private static Dictionary<string, string> na;
-    private static bool call;
+    private static Dictionary<string, string> user_info;
+    private static bool call, running_room;
+    
+    // The game modes are: highest score wins & last man standing. self explanitory.
+    public string game_mode = "highest score wins"; 
+    
     public bool online = true;
     private static int room, metes = 0;
 
@@ -31,8 +35,8 @@ public class Online : MonoBehaviour
     void Start()
     {
         online = true;
-        na = new Dictionary<string, string> { };
-
+        user_info = new Dictionary<string, string> { };
+        game_mode = "highest score wins";
     }
 
     public void Get()
@@ -44,14 +48,27 @@ public class Online : MonoBehaviour
     {
         SendMets(x);
     }
+    public void GetOpponentsScoreCaller()
+    {
+        GetOpponentsScore();
+    }
+    private static async Task GetOpponentsScore()
+    {
+        string username = user_info["username"];
+        string a = $"http://localhost:3000/getoppentsscore?username={username}&room={room}";
+        string content = "none";
+
+        content = await h.GetStringAsync(a);
+
+    }
 
     private static async Task SendMets(int x)
     {
         //string u = na["username"];
         var dict = new Dictionary<string, string>
         {
-            { "username", na["username"] }, 
-            { "room", na["room"] }, 
+            { "username", user_info["username"] }, 
+            { "room", user_info["room"] }, 
             { "mets", x.ToString()}, 
         };
 
@@ -83,10 +100,10 @@ public class Online : MonoBehaviour
         l.GetComponent<Button>().enabled = true;
 
 
-        if (content == "logged in" && na.Count == 0)
+        if (content == "logged in" && user_info.Count == 0)
         {
-            na.Add("username", u);
-            na.Add("password", p);
+            user_info.Add("username", u);
+            user_info.Add("password", p);
             GameObject.Find("Login Box").SetActive(false);
             call = true;
         }
@@ -95,7 +112,7 @@ public class Online : MonoBehaviour
 
     private static async Task Logout()
     {
-        var content = new FormUrlEncodedContent(na);
+        var content = new FormUrlEncodedContent(user_info);
         var response = await h.PostAsync("http://localhost:3000/logout", content);
         //var responseString = await response.Content.ReadAsStringAsync();
 
@@ -103,23 +120,39 @@ public class Online : MonoBehaviour
 
     private static async Task CheckRooms()
     {
-        string b = na["username"];
-        string a = $"http://localhost:3000/rooms?username={b}";
-        var content = await h.GetStringAsync(a);
+        string b = user_info["username"], room_number = "-1";
 
-        Debug.Log(content);
-        
-        if(Int32.Parse(content) > -1)
+        if(user_info.ContainsKey("room"))
         {
-            room = Int32.Parse(content);
-            na.Add("room", room.ToString());
+            room_number = user_info["room"];
+        }
+
+        Debug.Log($"ROOM: {room_number}");
+
+        string a = $"http://localhost:3000/check_rooms?username={b}&room={room_number}";
+        var content = await h.GetStringAsync(a);
+        
+        var arr = content.Split(',');
+
+        if(arr.Length == 2)
+        {
+            room = Int32.Parse(arr[1]);
+            running_room = true;
+            user_info.Add("room", room.ToString());
             SceneManager.LoadScene("Game");
         }
+
+        if (!user_info.ContainsKey("room"))
+        {
+            room = Int32.Parse(content);
+            user_info.Add("room", room.ToString());
+        }
+      
     }
 
     private static async Task CheckMeteors()
     {
-        var b = na["username"];
+        var b = user_info["username"];
         string a = $"http://localhost:3000/get_mets?username={b}";
         var content = await h.GetStringAsync(a);
 
@@ -145,13 +178,19 @@ public class Online : MonoBehaviour
         StartCoroutine(GetMeteors());
     }
 
-    public IEnumerator SendUP()
+    public IEnumerator CheckRoomsCaller()
     {
-        if (!na.ContainsKey("room"))
+        /*
+         * If user_info contains a "room" key 
+         * then that means your good to go
+         * bcuz you can only have a room key if
+         * the room is full.
+         */
+        if (!running_room)
         {
             yield return new WaitForSeconds(1f);
             CheckRooms();
-            StartCoroutine(SendUP());
+            StartCoroutine(CheckRoomsCaller());
         }
     }
 
@@ -160,28 +199,40 @@ public class Online : MonoBehaviour
     {
         if(call)
         {
-          
-            Debug.Log("aosjd");
-            GameObject.Find("welcome").GetComponent<TextMeshProUGUI>().text = na["username"];
-
+            GameObject.Find("welcome").GetComponent<TextMeshProUGUI>().text = user_info["username"];
             GameObject.Find("welcome").SetActive(false);
-            StartCoroutine(SendUP());
+            StartCoroutine(CheckRoomsCaller());
             call = false;
         }
+    }
+
+    private static async Task DeleteFromRoom()
+    {
+        var content = new FormUrlEncodedContent(user_info);
+        string a = $"http://localhost:3000/delete_from_room";
+
+        var response = await h.PostAsync(a, content);
     }
 
     private void OnApplicationQuit()
     {
         try
-        {    
-            if(na["username"] != "")
+        {
+            if (user_info.ContainsKey("username"))
             {
-                Logout();
+                if (user_info["username"] != "")
+                {
+                    Logout();
+                    if (!running_room)
+                    {
+                        DeleteFromRoom();
+                    }
+                }
             }
         }
         catch(NullReferenceException e)
         {
-            return;
+
         }
     }
 }

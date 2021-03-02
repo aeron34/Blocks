@@ -16,24 +16,112 @@ const knx = require('knex')({
   },
 });
 
-/*
-class RoomAssigner
+
+class RoomManager
 {
   constructor()
   {
     console.log('made');
   }
 
-  /*Users_array is
+  rooms_dictionary = {};
+  numberOfRooms = 0;
 
-  users_array =
-  here = () => {
-    console.log('hurr');
+  addUserToRoom = (room_no = -1, username="") => {
+
+    let {rooms_dictionary, numberOfRooms} = this;
+
+    if(room_no != -1)
+    {
+      /*I'm using a slick trick, if room_no is
+      greater than -1, menaing the user does have
+      a room number, then set numberOfRooms to
+      that number, remember this doesn't effect
+      this.numberOfRooms (the actual number representing
+      the number of rooms), so numberOfRooms =/= this.numberOfRooms*/
+      numberOfRooms = room_no
+    }
+
+    /*
+        If the function makes it to this line, that means
+        that the user who called this function doesn't have
+        a room number, so it'll be assigned numberOfRooms+1 as
+        a room number. This is good because if multiple users
+        make the room that's numberOfRooms+1 then the dictionary
+        won't create duplicates and they'll be assigned the
+        same room, userobjects CANNOT be reassigned a new room
+        number unless they sign out or the match is over.
+    */
+
+
+    /*If the user doens't have a number AND the room at
+    said number doesn't either, create it and increase
+    the number so total rooms is updated and other players
+    with no number can find it easily:
+    */
+    if(!rooms_dictionary.hasOwnProperty(`${numberOfRooms}`))
+    {
+      rooms_dictionary[`${numberOfRooms}`] = [];
+      rooms_dictionary[`${numberOfRooms}`].push(username)
+      return numberOfRooms;
+    }else {
+
+
+      /*If the username doesn't exist inside the array
+      and the room is less than the max size, push him in*/
+      if(rooms_dictionary[`${numberOfRooms}`].includes(`${username}`))
+      {
+        if(rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
+        {
+          let index = rooms_dictionary[`${numberOfRooms}`].indexOf(username);
+          rooms_dictionary[`${numberOfRooms}`][index] = {username:username,
+          score: 0};
+          return `${["running", numberOfRooms]}`;
+
+        }
+        return numberOfRooms;
+      }
+
+      if(!rooms_dictionary[`${numberOfRooms}`].includes(`${username}`)
+      && rooms_dictionary[`${numberOfRooms}`].length < ROOM_SIZE )
+      {
+        rooms_dictionary[`${numberOfRooms}`].push(username)
+
+        if(rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
+        {
+          this.numberOfRooms++;
+          rooms_dictionary[`${this.numberOfRooms}`] = [];
+          let index = rooms_dictionary[`${numberOfRooms}`].indexOf(username);
+          rooms_dictionary[`${numberOfRooms}`][index] = {username:username,
+          score: 0};
+
+
+          return `${["running", numberOfRooms]}`;
+        }
+
+        return numberOfRooms;
+      }
+
+      if(rooms_dictionary[`${numberOfRooms}`].length >= ROOM_SIZE)
+      {
+          this.numberOfRooms++;
+          rooms_dictionary[`${this.numberOfRooms}`] = [];
+          return `${"running", `${numberOfRooms}`}`;
+      }
+    }
+  }
+
+  deleteUser = (username='', room) => {
+
+    let {rooms_dictionary} = this;
+
+    let index = rooms_dictionary[`${room}`].indexOf(username);
+    rooms_dictionary[room].splice(index, 1);
   }
 }
 
-let r = new RoomAssigner();
-*/
+let room_manager = new RoomManager();
+
 const ROOM_SIZE = 3;
 
 
@@ -78,8 +166,25 @@ app.post('/logout', (req, res) => {
 
 })
 
-app.get('/check_rooms/:rn', (req, res) => {
-  res.send(req.params.rn);
+app.post('/delete_from_room', (req, res) => {
+  let user = req.body;
+  if(user.room != null)
+  {
+    room_manager.deleteUser(user.username, user.room);
+  }
+  console.log(room_manager.rooms_dictionary);
+  res.send("done");
+});
+
+app.get('/check_rooms', (req, res) => {
+
+  let result = room_manager.addUserToRoom(parseInt(req.query.room),
+  req.query.username);
+
+  console.log(room_manager.rooms_dictionary);
+
+  res.send(`${result}`);
+
 });
 
 app.post('/check_in', (req, res) => {
@@ -190,6 +295,15 @@ app.get('/rooms', async (req, res) => {
   }
 });
 
+app.get('/getoppenentsscore', (req, res) => {
+  const u = req.query;
+  knx('users').select('*').where({
+    room: u["room"]
+  }).then(a => {
+    console.log(a);
+    res.send(a);
+  })
+});
 
 app.get('/login', (req, res) => {
   const u = req.query;
