@@ -24,7 +24,17 @@ class RoomManager
     console.log('made');
   }
 
-  rooms_dictionary = {};
+  rooms_dictionary = {
+    '0': [
+      'mono',
+      //'dolo',
+      { username: 'claus', score: 0 },
+      { username: 'son', score: 0 },
+      { username: 'remo', score: 0 },
+      { username: 'noob', score: 0 }
+    ]
+  };
+
   numberOfRooms = 0;
 
   addUserToRoom = (room_no = -1, username="") => {
@@ -106,7 +116,8 @@ class RoomManager
       {
           this.numberOfRooms++;
           rooms_dictionary[`${this.numberOfRooms}`] = [];
-          return `${"running", `${numberOfRooms}`}`;
+          rooms_dictionary[`${this.numberOfRooms}`].push(username)
+          return `${"running", `${this.numberOfRooms}`}`;
       }
     }
   }
@@ -122,7 +133,7 @@ class RoomManager
 
 let room_manager = new RoomManager();
 
-const ROOM_SIZE = 3;
+const ROOM_SIZE = 6;
 
 
 const app = express();
@@ -154,7 +165,6 @@ app.post('/logout', (req, res) => {
         knx('users').where('username', u.username).
         update({
           online_status: "offline",
-          room: -1,
           meteors: 0
           }).then(a => {
           res.send('logged out');
@@ -172,7 +182,7 @@ app.post('/delete_from_room', (req, res) => {
   {
     room_manager.deleteUser(user.username, user.room);
   }
-  console.log(room_manager.rooms_dictionary);
+  //console.log(room_manager.rooms_dictionary);
   res.send("done");
 });
 
@@ -180,8 +190,6 @@ app.get('/check_rooms', (req, res) => {
 
   let result = room_manager.addUserToRoom(parseInt(req.query.room),
   req.query.username);
-
-  console.log(room_manager.rooms_dictionary);
 
   res.send(`${result}`);
 
@@ -195,35 +203,39 @@ app.post('/check_in', (req, res) => {
 
 app.post('/send_mets', async (req, res) => {
 
-  let name = req.body.username;
-  let room = req.body.room;
-  let mets = req.body.mets;
+  try
+  {
+    let name = req.body.username;
+    let room = req.body.room;
+    let mets = req.body.mets;
 
-  console.log(`called by ${name}`);
+    console.log(`called by ${name}`);
 
-  let user_arr = [];
+    let user_arr = methods.FilterRoomForUser(room_manager, room, name);
 
-  await knx('users').where('room', room).
-  then(users => {
-    user_arr = users.filter(a => {
-      if(a.username != name)
-      {
-        return a;
-      }
+    let user = user_arr[Math.floor(Math.random() * user_arr.length)];
+    let target_users_meteors = 0;
+
+    await knx('users').where('username', user.username).
+    then(found_user => {
+      target_users_meteors = found_user[0].meteors
+    }).catch(e => {
+      res.send(e);
     })
-  }).catch(e => {
-    res.json(e);
-  })
 
-  let user = user_arr[Math.floor(Math.random() * user_arr.length)]
-
-  await knx('users').where('username', user.username).
-  update({
-    meteors: parseInt(mets) + parseInt(user.meteors)
-  }).returning('*').then(a => {
-    res.send('meteors sent')
-  });
-
+    await knx('users').where('username', user.username)
+    .update({
+      meteors: parseInt(mets) + parseInt(target_users_meteors)
+    }).then(a => {
+      res.send('meteors sent');
+    }).catch(e => {
+      res.send(e);
+    })
+  }
+  catch(err)
+  {
+    res.send('error')
+  }
 })
 
 app.get('/get_mets', async (req, res) => {
@@ -246,63 +258,22 @@ app.get('/get_mets', async (req, res) => {
 
 });
 
-app.get('/rooms', async (req, res) => {
+app.get('/getopponentsscore', (req, res) => {
+  const user = req.query;
+  console.log(user);
+  let user_list = methods.FilterRoomForUser(room_manager, user.room, user.username)
 
-  let params = req.query;
+  user_list_string = "";
 
-  const user = await knx('users').where('username', params.username).
-  then(users => {
-    return users[0];
-  }).catch(e => {
-    res.send(e);
+  user_list.map(user => {
+    user_list_string += `${user["username"]}, ${user["score"]}|`;
   })
 
-  let mode = [];
-
-  if(user.room <= -1)
-  {
-    user.room = 0;
-  }
-
-  const user_list = await knx('users').orderBy('room','desc').select('*')
-  .limit(ROOM_SIZE+2).then(obj_arr => {
-      console.log(obj_arr)
-      obj_arr = obj_arr.slice(0, ROOM_SIZE);
-      mode = methods.GetRoom(obj_arr, ROOM_SIZE, user);
-      return obj_arr;
-  });
-
-  try {
-    switch(mode[0])
-    {
-      case 1:
-        methods.AssignRoom(knx, mode[1]+1, user.username, res);
-        break;
-      case 0:
-
-        await Promise.all(methods.AssignAndRunRoom(knx, mode[1], user_list)).then(
-        a => {return res.send(`${mode[1]}`)});
-        break;
-      case -1:
-          await methods.AssignRoom(knx, mode[1], user.username, res);
-        break;
-      default:
-        break;
-      }
-  }
-  catch (e) {
-    res.send(e);
-  }
+  res.send(`${user_list_string}`);
 });
 
-app.get('/getoppenentsscore', (req, res) => {
-  const u = req.query;
-  knx('users').select('*').where({
-    room: u["room"]
-  }).then(a => {
-    console.log(a);
-    res.send(a);
-  })
+app.post('/find_winner', (req, res) => {
+
 });
 
 app.get('/login', (req, res) => {

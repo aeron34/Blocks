@@ -44,25 +44,49 @@ public class Online : MonoBehaviour
         Login();   
     }
 
-    public void SendMeteors(int x)
+    public void SendMeteorsCaller(int x)
     {
-        SendMets(x);
+        SendMeteors(x);
     }
+
     public void GetOpponentsScoreCaller()
     {
         GetOpponentsScore();
     }
+
     private static async Task GetOpponentsScore()
     {
         string username = user_info["username"];
-        string a = $"http://localhost:3000/getoppentsscore?username={username}&room={room}";
+        string room = "";//ser_info["room"];
+
+        if (user_info.ContainsKey("room"))
+        {
+            room = user_info["room"];
+        }
+        else { 
+            return; 
+        }
+        string a = $"http://localhost:3000/getopponentsscore?username={username}&room={room}";
         string content = "none";
 
         content = await h.GetStringAsync(a);
+        Debug.Log(content);
 
+        List<string[]> full_arr = new List<string[]>();
+        var arr = content.Split('|');
+
+        for (int i = 0; i < arr.Length; i++)
+        {
+            var sub_arr = arr[i].Split(',');
+            full_arr.Add(sub_arr);
+        }
+
+        for (int i = 0; i < arr.Length; i++)
+        {
+            Debug.Log($"{full_arr[i][0]}, {full_arr[i][1]}");
+        }
     }
-
-    private static async Task SendMets(int x)
+    private static async Task SendMeteors(int x)
     {
         //string u = na["username"];
         var dict = new Dictionary<string, string>
@@ -77,7 +101,13 @@ public class Online : MonoBehaviour
         string a = $"http://localhost:3000/send_mets";
 
         var response = await h.PostAsync(a, content);
-        var str = await response.Content.ReadAsStringAsync();
+        var responseString = await response.Content.ReadAsStringAsync();
+
+        if (responseString == "error")
+        {
+            SendMeteors(x);
+            return;
+        }
     }
 
     private static async Task Login()
@@ -120,32 +150,44 @@ public class Online : MonoBehaviour
 
     private static async Task CheckRooms()
     {
-        string b = user_info["username"], room_number = "-1";
-
-        if(user_info.ContainsKey("room"))
+        if (!running_room)
         {
-            room_number = user_info["room"];
-        }
+            string b = user_info["username"], room_number = "-1";
 
-        Debug.Log($"ROOM: {room_number}");
+            if (user_info.ContainsKey("room"))
+            {
+                room_number = user_info["room"];
+            }
 
-        string a = $"http://localhost:3000/check_rooms?username={b}&room={room_number}";
-        var content = await h.GetStringAsync(a);
-        
-        var arr = content.Split(',');
 
-        if(arr.Length == 2)
-        {
-            room = Int32.Parse(arr[1]);
-            running_room = true;
-            user_info.Add("room", room.ToString());
-            SceneManager.LoadScene("Game");
-        }
+            string a = $"http://localhost:3000/check_rooms?username={b}&room={room_number}";
+            var content = await h.GetStringAsync(a);
 
-        if (!user_info.ContainsKey("room"))
-        {
-            room = Int32.Parse(content);
-            user_info.Add("room", room.ToString());
+            var arr = content.Split(',');
+
+            if (arr.Length == 2)
+            {
+
+                if (!user_info.ContainsKey("room"))
+                {
+                    room = Int32.Parse(arr[1]);
+                    user_info.Add("room", room.ToString());       
+                    Debug.Log($"ROOM: {room}");
+
+                }
+                running_room = true;
+
+                SceneManager.LoadScene("Game");
+
+            }
+
+            if (!user_info.ContainsKey("room"))
+            {
+                room = Int32.Parse(content); 
+                Debug.Log($"ROOM: {room}");
+
+                user_info.Add("room", room.ToString());
+            }
         }
       
     }
@@ -190,9 +232,11 @@ public class Online : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
             CheckRooms();
+            GetOpponentsScore();
             StartCoroutine(CheckRoomsCaller());
         }
     }
+    
 
     // Update is called once per frame
     void Update()

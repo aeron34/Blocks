@@ -141,7 +141,7 @@ public class block : MonoBehaviour
                     if (len / 4 > 0)
                     {
                         int x = (int)(len / 4);
-                        FindObjectOfType<Online>().SendMeteors(x);
+                        FindObjectOfType<Online>().SendMeteorsCaller(x);
                     }
                 }
             }
