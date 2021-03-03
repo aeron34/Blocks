@@ -13,12 +13,16 @@ public class Online : MonoBehaviour
     static readonly HttpClient h = new HttpClient();
     private static Dictionary<string, string> user_info;
     private static bool call, running_room;
-    
+    private static List<string[]> opponent_info;
+
+    private List<GameObject> opp_infos;
     // The game modes are: highest score wins & last man standing. self explanitory.
-    public string game_mode = "highest score wins"; 
-    
+    public string game_mode = "highest score wins";
+    private float timer = 0.0f;
+    private int opp_info_init = -1;
+
     public bool online = true;
-    private static int room, metes = 0;
+    private static int room, metes = 0, fetch_status;
 
     void Awake()
     {
@@ -49,13 +53,9 @@ public class Online : MonoBehaviour
         SendMeteors(x);
     }
 
-    public void GetOpponentsScoreCaller()
-    {
-        GetOpponentsScore();
-    }
-
     private static async Task GetOpponentsScore()
     {
+       
         string username = user_info["username"];
         string room = "";//ser_info["room"];
 
@@ -70,21 +70,19 @@ public class Online : MonoBehaviour
         string content = "none";
 
         content = await h.GetStringAsync(a);
-        Debug.Log(content);
 
-        List<string[]> full_arr = new List<string[]>();
+        opponent_info = new List<string[]>();
         var arr = content.Split('|');
 
         for (int i = 0; i < arr.Length; i++)
         {
             var sub_arr = arr[i].Split(',');
-            full_arr.Add(sub_arr);
+            opponent_info.Add(sub_arr);
         }
 
-        for (int i = 0; i < arr.Length; i++)
-        {
-            Debug.Log($"{full_arr[i][0]}, {full_arr[i][1]}");
-        }
+       // await FindObjectOfType<block_queue>().util.DisplayOpponentInfo(opponent_info);
+        Debug.Log("Called");
+        fetch_status = 2;
     }
     private static async Task SendMeteors(int x)
     {
@@ -140,6 +138,45 @@ public class Online : MonoBehaviour
         
     }
 
+    public async Task GetOppInfo()
+    {
+        await GetOpponentsScore();
+        Debug.Log(opp_info_init);
+        if (opp_info_init == -1)
+        {
+            opp_info_init = 1;
+
+            opp_infos = new List<GameObject>();
+            var prefab = GameObject.FindObjectOfType<block_queue>().opp_info_container;
+            var canvas = GameObject.Find("Canvas");
+            float x = -1175, y = -450;
+            int m = 0;
+
+            for (int i = 0; i < opponent_info.Count-1; i++)
+            {
+                if (i % 5 == 0)
+                {
+                    m = 0;
+                }
+                var g = GameObject.Instantiate(prefab, canvas.transform);
+                g.transform.localPosition = new Vector3((x + (500 * m)), y - ((int)(i / 5) * 180),
+                g.transform.localPosition.z);
+                g.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = opponent_info[i][0];
+                g.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text
+                    = $"SCORE: {opponent_info[i][1]}";
+                m++;
+                opp_infos.Add(g);
+            }
+        }
+
+        for (int i = 0; i < opponent_info.Count; i++)
+        {
+            var obj = opp_infos.Find(a =>
+           a.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text == opponent_info[i][0]);
+
+            obj.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = opponent_info[i][1];
+        }
+    }
     private static async Task Logout()
     {
         var content = new FormUrlEncodedContent(user_info);
@@ -232,7 +269,6 @@ public class Online : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
             CheckRooms();
-            GetOpponentsScore();
             StartCoroutine(CheckRoomsCaller());
         }
     }
@@ -247,6 +283,37 @@ public class Online : MonoBehaviour
             GameObject.Find("welcome").SetActive(false);
             StartCoroutine(CheckRoomsCaller());
             call = false;
+        }
+
+        if(SceneManager.GetActiveScene().name == "Game")
+        {
+            if(fetch_status == 0)
+            {
+                GetOppInfo();
+                fetch_status = 1;
+            }
+            /*
+             FETCH_STATUS, 0 means time for update,
+             1 means pending arrival, 
+                2 means arrived from which we 
+            count down a timer and when it's up
+            we reset to 0.
+             */
+            if(fetch_status == 1)
+            {
+                timer = 30f;
+            }
+            if(fetch_status == 2)
+            {
+                if (timer > 0f)
+                {
+                    timer -= 1f;
+                }
+                else
+                {
+                    fetch_status = 0;
+                }
+            }
         }
     }
 

@@ -5,11 +5,15 @@ using System.IO;
 using System;
 using System.Text;
 using System.Linq;
+using TMPro;
+using System.Threading.Tasks;
 
 namespace Extras
 {
     public class Utilites
     {
+        public bool opp_info_init = false;
+        //private List<GameObject> opp_infos;
         public string[] LoadTutText(string charc="")
         {
             var textData = File.ReadAllText($"Assets/Data/{charc} Text.txt");
@@ -69,5 +73,7 @@ namespace Extras
             }
             return false;
         }
+
+       
     }
 }

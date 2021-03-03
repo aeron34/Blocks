@@ -15,7 +15,8 @@ public class block_queue : MonoBehaviour
     bool moving, checking;
     public float default_col_X = -20.3f;
     Queue<GameObject> blk_queue = new Queue<GameObject>();
-    public GameObject colm, null_block, block, meteor, scorer = null;
+    public GameObject colm, null_block, block, meteor, 
+    scorer = null, opp_info_container;
     GameObject c_b = null;
     int trialNumber = 1, minutes, seconds;
     float t_m = 0.05f, bts = 0.055f, time = (60*3);
@@ -25,7 +26,7 @@ public class block_queue : MonoBehaviour
     float[] column_positions = new float[19];
     Queue<string> color = new Queue<string>();
     public List<GameObject> colms = new List<GameObject>();
-    private Extras.Utilites util;
+    public Extras.Utilites util;
     public string Game_Mode = "Game";
     private string[] condition = new string[] { "", "" }, tutorial_text;
     // Start is called before the first frame update
@@ -79,7 +80,7 @@ public class block_queue : MonoBehaviour
 
             int[,] orien = new int[2, 4] { { 0, 1, 2, 3 }, { 2, 3, 0, 1 } };
             int oi = 0;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 7; i++)
             {
 
                 col_i++;
@@ -94,6 +95,14 @@ public class block_queue : MonoBehaviour
                     {
                         oi = 0;
                     }
+                    if (i < 3)
+                    {
+                        //These are the null gray blocks
+                        var blk = Instantiate(null_block, blk_spn.position, blk_spn.rotation);
+                        blk.transform.position = new Vector3(column_positions[b], st_y, 0);
+                    }
+                    else
+                    {
                         //These are the actual blocks
                         var blk = Instantiate(block, blk_spn.position, blk_spn.rotation);
                         blk.transform.position = new Vector3(column_positions[b], st_y, 0);
@@ -101,7 +110,7 @@ public class block_queue : MonoBehaviour
                         blk.GetComponent<block>().colm = colms[b];
                         //colms[b].GetComponent<column>().
                         col_i++;
-                    
+                    }
                 }
 
                 st_y += 2;

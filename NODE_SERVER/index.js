@@ -26,11 +26,11 @@ class RoomManager
 
   rooms_dictionary = {
     '0': [
-      'mono',
-      //'dolo',
-      { username: 'claus', score: 0 },
+      //{ username: 'mono', score: 0 },
+      'dolo',
+      { username: 'claus', score: 312134120 },
       { username: 'son', score: 0 },
-      { username: 'remo', score: 0 },
+      { username: 'remo', score:3122310 },
       { username: 'noob', score: 0 }
     ]
   };
@@ -203,8 +203,6 @@ app.post('/check_in', (req, res) => {
 
 app.post('/send_mets', async (req, res) => {
 
-  try
-  {
     let name = req.body.username;
     let room = req.body.room;
     let mets = req.body.mets;
@@ -212,30 +210,34 @@ app.post('/send_mets', async (req, res) => {
     console.log(`called by ${name}`);
 
     let user_arr = methods.FilterRoomForUser(room_manager, room, name);
-
+    let user_exists = false;
     let user = user_arr[Math.floor(Math.random() * user_arr.length)];
     let target_users_meteors = 0;
 
     await knx('users').where('username', user.username).
     then(found_user => {
-      target_users_meteors = found_user[0].meteors
-    }).catch(e => {
-      res.send(e);
-    })
+      console.log(found_user);
+      if(found_user.length == 1)
+      {
+        user_exists = true;
+        target_users_meteors = found_user[0].meteors
+      }else{
+        user_exists = false;
+        return res.send('error');
+      }
+    });
 
-    await knx('users').where('username', user.username)
-    .update({
-      meteors: parseInt(mets) + parseInt(target_users_meteors)
-    }).then(a => {
-      res.send('meteors sent');
-    }).catch(e => {
-      res.send(e);
-    })
-  }
-  catch(err)
-  {
-    res.send('error')
-  }
+    if(user_exists)
+    {
+      await knx('users').where('username', user.username)
+      .update({
+        meteors: parseInt(mets) + parseInt(target_users_meteors)
+      }).then(a => {
+        res.send('meteors sent');
+      }, a => {
+        res.send("not send")
+      })
+    }
 })
 
 app.get('/get_mets', async (req, res) => {
@@ -260,7 +262,7 @@ app.get('/get_mets', async (req, res) => {
 
 app.get('/getopponentsscore', (req, res) => {
   const user = req.query;
-  console.log(user);
+console.log(user);
   let user_list = methods.FilterRoomForUser(room_manager, user.room, user.username)
 
   user_list_string = "";
