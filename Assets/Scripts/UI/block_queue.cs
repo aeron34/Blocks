@@ -19,11 +19,12 @@ public class block_queue : MonoBehaviour
     scorer = null, opp_info_container;
     GameObject c_b = null;
     int trialNumber = 1, minutes, seconds;
-    float t_m = 0.05f, bts = 0.055f, time = (60*3);
+    float t_m = 0.05f, bts = 0.055f, time = (60*.2f);
     System.Random random = new System.Random();
     public int meteors = 0, default_col_number = 19, max_trials=0;
     float[] minutes_passed = { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f };
     float[] column_positions = new float[19];
+    public bool over;
     Queue<string> color = new Queue<string>();
     public List<GameObject> colms = new List<GameObject>();
     public Extras.Utilites util;
@@ -208,7 +209,17 @@ public class block_queue : MonoBehaviour
             time -= Time.deltaTime;
             minutes = Mathf.FloorToInt(time / 60);
             seconds = Mathf.FloorToInt(time % 60);
-            GameObject.Find("minutes").GetComponent<Text>().text = $"{minutes}:{seconds}";
+
+            if ((int)time <= 0)
+            {
+                over = true;
+                Time.timeScale = 0;                
+                enabled = false;
+
+            }
+
+            GameObject.Find("minutes").GetComponent<Text>().text = 
+                string.Format("{0:00}:{1:00}", minutes, seconds);
         }
 
         if(Game_Mode == "Training")

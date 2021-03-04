@@ -446,8 +446,9 @@ public class Boxer : MonoBehaviour
                     if(GameObject.FindObjectOfType<MainController>() != null)
                     {
                         var main_con = GameObject.FindObjectOfType<MainController>();
-                        main_con.score = FindObjectOfType<scorer>().GetScore();
-                        main_con.LoadLoss();
+ 
+                        main_con.LoadLoss(FindObjectOfType<scorer>().GetScore(), 
+                        FindObjectOfType<Online>().GetPlace());
                     }
 
                     n_hel = 0;

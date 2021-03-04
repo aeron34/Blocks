@@ -27,12 +27,14 @@ class RoomManager
   rooms_dictionary = {
     '0': [
       //{ username: 'mono', score: 0 },
-      'dolo',
-      { username: 'claus', score: 312134120 },
-      { username: 'son', score: 0 },
-      { username: 'remo', score:3122310 },
-      { username: 'noob', score: 0 }
-    ]
+      {username:'dolo', score: 20},
+      //'dolo',
+      { username: 'claus', score: 21310 },
+      { username: 'son', score: 2141241 },
+      { username: 'remo', score:10 },
+      { username: 'noob', score: 4231000 }
+    ],
+    '1': []
   };
 
   numberOfRooms = 0;
@@ -52,8 +54,7 @@ class RoomManager
       numberOfRooms = room_no
     }
 
-    /*
-        If the function makes it to this line, that means
+    /*  If the function makes past this line, that means
         that the user who called this function doesn't have
         a room number, so it'll be assigned numberOfRooms+1 as
         a room number. This is good because if multiple users
@@ -63,6 +64,7 @@ class RoomManager
         number unless they sign out or the match is over.
     */
 
+    methods.CleanRoom(rooms_dictionary, numberOfRooms);
 
     /*If the user doens't have a number AND the room at
     said number doesn't either, create it and increase
@@ -154,6 +156,44 @@ b = now.utc().format();
 
 //console.log(a.diff(b, 'minutes'));
 
+app.post('/end_game', async (req, res) => {
+    const user = req.body;
+    let db_user_info;
+
+    await knx('users').where({
+      'username': user.username,
+      'password': user.password
+    }).then(response => {
+        if(response.length != 0)
+        {
+          db_user_info = response[0];
+          delete room_manager.rooms_dictionary[`${user.room}`];
+        }else{
+          return res.send("not ending game");
+        }
+    });
+
+    if(user.score > db_user_info.highest_score)
+    {
+      await knx('users').where({
+        'username': user.username,
+        'password': user.password
+      }).update({
+        highest_score: user.score
+      }).then(response => {
+          res.send(`${db_user_info.win}, ${db_user_info.loss},
+          ${db_user_info.highest_score}`);
+      })
+    } else {
+      res.send(`${db_user_info.win}, ${db_user_info.loss},
+      ${db_user_info.highest_score}`);
+    }
+});
+
+app.get('/show_dictionary', (req, res) => {
+    console.log(room_manager.rooms_dictionary);
+    res.send(room_manager.rooms_dictionary);
+})
 
 app.post('/logout', (req, res) => {
     let u = req.body;
@@ -182,7 +222,6 @@ app.post('/delete_from_room', (req, res) => {
   {
     room_manager.deleteUser(user.username, user.room);
   }
-  //console.log(room_manager.rooms_dictionary);
   res.send("done");
 });
 
@@ -200,6 +239,10 @@ app.post('/check_in', (req, res) => {
     res.send('done');
 });
 
+app.post('/send_result', async (req, res) => {
+  const user = req.body;
+  await urls.SendResult(req, res, knx, user);
+})
 
 app.post('/send_mets', async (req, res) => {
 

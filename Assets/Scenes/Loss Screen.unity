@@ -177,7 +177,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'PREVIOUS HIGH SCORE :'
+  m_text: 'PREVIOUS HIGH SCORE:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7474b15acdeac8049a8c11923c891bd2, type: 2}
   m_sharedMaterial: {fileID: -1727130284730214373, guid: 7474b15acdeac8049a8c11923c891bd2,
@@ -445,7 +445,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'FINAL SCORE: 12380123'
+  m_text: 'FINAL SCORE:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7474b15acdeac8049a8c11923c891bd2, type: 2}
   m_sharedMaterial: {fileID: -1727130284730214373, guid: 7474b15acdeac8049a8c11923c891bd2,
@@ -766,7 +766,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: YOU PLACED 4TH
+  m_text: 'YOU PLACED '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7474b15acdeac8049a8c11923c891bd2, type: 2}
   m_sharedMaterial: {fileID: -1727130284730214373, guid: 7474b15acdeac8049a8c11923c891bd2,
@@ -856,7 +856,7 @@ GameObject:
   - component: {fileID: 1861752937}
   - component: {fileID: 1861752936}
   m_Layer: 5
-  m_Name: new record (1)
+  m_Name: winloss
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1056,7 +1056,7 @@ GameObject:
   - component: {fileID: 1911330471}
   - component: {fileID: 1911330470}
   m_Layer: 5
-  m_Name: winloss
+  m_Name: result
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

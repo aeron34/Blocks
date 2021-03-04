@@ -1074,8 +1074,7 @@ MonoBehaviour:
     type: 3}
   ultra_bar: {fileID: 1622688231734626657, guid: a509ff97dd1a1fc469f1722c38baae43,
     type: 3}
-  tutorial: {fileID: 5675816327395518783, guid: 6816fe08e9f47d048be49bd8b5d3cd07,
-    type: 3}
+  score: 0
 --- !u!4 &1398734967
 Transform:
   m_ObjectHideFlags: 0

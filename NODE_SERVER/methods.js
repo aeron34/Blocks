@@ -10,6 +10,24 @@ function FilterRoomForUser(room_manager, room, name)
   })
 }
 
+
+
+function CleanRoom(rooms_dictionary, room)
+{
+  if(!rooms_dictionary.hasOwnProperty(`${room}`))
+  {
+    return;
+  }
+
+  rooms_dictionary[`${room}`] = rooms_dictionary[`${room}`].filter(user => {
+    if(user['username'] != null)
+    {
+      return user;
+    }
+  });
+}
+
 module.exports = {
-  FilterRoomForUser
+  FilterRoomForUser,
+  CleanRoom,
 };

@@ -37,40 +37,6 @@ o Tables the DB will have:
 	- Solo_LB (this is the game mode we have
 	now)
 
-
-
-
-TEST LOGIN FUNCT.
-
-
-
-
-o The DB user table will have:
-	
-	- room address. This is the current 
-	room you're in, this will be used for:
-		
-		o determining how many people
-		are in a room (helps with limit).
-
-		o help other players pool the 
-		players in a room and randomly
-		pick someone to send to.
-	
-	
-	- username 
-
-	- password
-
-	- How many meteors you have
-	coming at you.
-
-	- online state, string that
-	has states like "running", 
-	"waiting", "offline", etc.
-
-	- How many games you've won.
-
 o ONLINE:
 
 	- When your in the waiting room, have it 
@@ -105,15 +71,21 @@ o Sometime in the future update the site and add:
 	o Add a profile section that allows
 	you to see your wins/losses.
 
-o fix the get and send_mets URI's (NEXT [4])
-
 o Make a game over screen,
 
 o Make it so that the when the column
 reaches a certain number, the column
 deletes it's blocks, restaring (NEXT [1]).
 
-o grab the scores of other opponents available (NOW)
+o allow loss screen to send results (NOW)
+
+o Make it so when you lose the game sends
+a call to /send_result (this is a post request), 
+and have the parameters be username, pass, [win/loss in string].
+
+And once the request has resolved then goto the loss
+screen (this is the screen that shows you're place, 
+final score, etc.) 
 
 o make a gameover animation by deleting
 the ground beneath the blocks to create

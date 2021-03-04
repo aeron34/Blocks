@@ -31,7 +31,38 @@ const login = (req, res, u, knx) => {
 
 };
 
+async function SendResult(req, res, knx, user)
+{
+  let result_num = 0;
+
+  await knx('users').where({
+    'username': user.username,
+    'password': user.pass
+  }).then(response => {
+    if(response.length > 0)
+    {
+      result_num = response[0][`${user.result}`] + 1;
+    }else{
+      return res.send('user doesnt exist');
+    }
+  });
+
+  if(result_num != 0)
+  {
+    let update_obj = {}
+    update_obj[user.result] = result_num;
+
+    await knx('users').where('username', user.username)
+    .update(update_obj).then(response => {
+      res.send('done');
+    }, reject => {
+      res.send('not done')
+    })
+  }
+}
+
 module.exports = {
   login,
-  createUser
+  createUser,
+  SendResult
 };

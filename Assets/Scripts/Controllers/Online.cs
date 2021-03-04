@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Net.Http;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine.SceneManagement;
@@ -14,13 +15,14 @@ public class Online : MonoBehaviour
     private static Dictionary<string, string> user_info;
     private static bool call, running_room;
     private static List<string[]> opponent_info;
+    private static GameObject room_txt;
 
     private List<GameObject> opp_infos;
     // The game modes are: highest score wins & last man standing. self explanitory.
+
     public string game_mode = "highest score wins";
     private float timer = 0.0f;
-    private int opp_info_init = -1;
-
+    private int opp_info_init = -1;//, place;
     public bool online = true;
     private static int room, metes = 0, fetch_status;
 
@@ -41,6 +43,8 @@ public class Online : MonoBehaviour
         online = true;
         user_info = new Dictionary<string, string> { };
         game_mode = "highest score wins";
+        room_txt = GameObject.Find("room_txt");
+        room_txt.SetActive(false);
     }
 
     public void Get()
@@ -81,7 +85,8 @@ public class Online : MonoBehaviour
         }
 
        // await FindObjectOfType<block_queue>().util.DisplayOpponentInfo(opponent_info);
-        Debug.Log("Called");
+        
+
         fetch_status = 2;
     }
     private static async Task SendMeteors(int x)
@@ -132,6 +137,8 @@ public class Online : MonoBehaviour
         {
             user_info.Add("username", u);
             user_info.Add("password", p);
+            room_txt.SetActive(true);
+            room_txt.GetComponent<TextMeshProUGUI>().text = "Looking for room...";
             GameObject.Find("Login Box").SetActive(false);
             call = true;
         }
@@ -140,10 +147,12 @@ public class Online : MonoBehaviour
 
     public async Task GetOppInfo()
     {
+        
         await GetOpponentsScore();
-        Debug.Log(opp_info_init);
+
         if (opp_info_init == -1)
         {
+
             opp_info_init = 1;
 
             opp_infos = new List<GameObject>();
@@ -169,13 +178,26 @@ public class Online : MonoBehaviour
             }
         }
 
+        foreach(GameObject g in opp_infos)
+        {
+            g.transform.GetChild(0).GetComponent<Image>().color = new Color(255f, 0, 0, 183f);
+        }
+
         for (int i = 0; i < opponent_info.Count; i++)
         {
             var obj = opp_infos.Find(a =>
-           a.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text == opponent_info[i][0]);
-
+            a.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text == opponent_info[i][0]);
             obj.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = opponent_info[i][1];
+            obj.transform.GetChild(0).GetComponent<Image>().color = new Color(255f, 0, 0, 183f);
         }
+
+        /*
+         Use this for last man standing
+        
+        if(opponent_info.Count == 0)
+        {
+            FindObjectOfType<MainController>().LoadLoss();
+        }*/
     }
     private static async Task Logout()
     {
@@ -209,11 +231,9 @@ public class Online : MonoBehaviour
                 {
                     room = Int32.Parse(arr[1]);
                     user_info.Add("room", room.ToString());       
-                    Debug.Log($"ROOM: {room}");
-
                 }
                 running_room = true;
-
+                room_txt.GetComponent<TextMeshProUGUI>().text = $"Starting Game...";
                 SceneManager.LoadScene("Game");
 
             }
@@ -222,7 +242,7 @@ public class Online : MonoBehaviour
             {
                 room = Int32.Parse(content); 
                 Debug.Log($"ROOM: {room}");
-
+                room_txt.GetComponent<TextMeshProUGUI>().text = $"Waiting in Room \n\n {room}";
                 user_info.Add("room", room.ToString());
             }
         }
@@ -299,10 +319,12 @@ public class Online : MonoBehaviour
             count down a timer and when it's up
             we reset to 0.
              */
+
             if(fetch_status == 1)
             {
-                timer = 30f;
+                timer = 60f;
             }
+
             if(fetch_status == 2)
             {
                 if (timer > 0f)
@@ -314,15 +336,68 @@ public class Online : MonoBehaviour
                     fetch_status = 0;
                 }
             }
+
+            if (FindObjectOfType<block_queue>().over && fetch_status!=-1)
+            {
+                var orderedlist = OrderContestants();
+                var main_con = FindObjectOfType<MainController>();
+                int score = FindObjectOfType<scorer>().GetScore();
+
+                var g = orderedlist.First();
+
+                Debug.Log($"{g[0]}, {g[1]}");
+                int place = GetPlace();
+                EndGame();
+                fetch_status = -1;
+
+                main_con.LoadLoss(score, place);
+
+            }
         }
     }
 
+    public List<string[]> OrderContestants()
+    {
+        opponent_info.RemoveAt(opponent_info.Count - 1);
+        opponent_info.Add(new string[] {$"{user_info["username"]}",
+        $"{FindObjectOfType<scorer>().GetScore()}" });
+
+        return opponent_info.OrderByDescending(x => Int32.Parse(x[1])).ToList();
+    }
+
+    public int GetPlace()
+    {
+        var list = OrderContestants();
+        int place = opponent_info.FindIndex(x => x[0] == user_info["username"]);
+        return place;
+    }
     private static async Task DeleteFromRoom()
     {
         var content = new FormUrlEncodedContent(user_info);
         string a = $"http://localhost:3000/delete_from_room";
-
         var response = await h.PostAsync(a, content);
+    }
+   
+    public static async Task EndGame()
+    {
+
+        user_info.Add("score", FindObjectOfType<scorer>().GetScore().ToString());
+        var content = new FormUrlEncodedContent(user_info);
+        string a = $"http://localhost:3000/end_game";
+        var response = await h.PostAsync(a, content);
+
+        var res_string = await response.Content.ReadAsStringAsync();
+
+        var arr = res_string.Split(',');
+        var texts = FindObjectOfType<MainController>().texts;
+
+        texts[0].text = $"WINS: {arr[0]} 		LOSSES: {arr[1]}";
+        texts[2].text = $"HIGHSCORE: {Int32.Parse(arr[2])}";
+        if(Int32.Parse(arr[2]) < Int32.Parse(user_info["score"]))
+        {
+            FindObjectOfType<MainController>().new_record.SetActive(true);
+        }
+
     }
 
     private void OnApplicationQuit()
