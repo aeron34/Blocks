@@ -305,7 +305,7 @@ app.get('/get_mets', async (req, res) => {
 
 app.get('/getopponentsscore', (req, res) => {
   const user = req.query;
-console.log(user);
+
   let user_list = methods.FilterRoomForUser(room_manager, user.room, user.username)
 
   user_list_string = "";

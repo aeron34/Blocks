@@ -85,6 +85,8 @@ public class MainController : MonoBehaviour
                 g.name = "pic";
                 Instantiate(ultra_bar, canvas.transform).name = "ultra_bar";
             }
+            StartCoroutine(FindObjectOfType<Online>().GetMeteors());
+
         }
         if (scene.name == "Training")
         {

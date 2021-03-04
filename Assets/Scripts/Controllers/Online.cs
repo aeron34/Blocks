@@ -252,8 +252,9 @@ public class Online : MonoBehaviour
     private static async Task CheckMeteors()
     {
         var b = user_info["username"];
+        HttpClient http = new HttpClient();
         string a = $"http://localhost:3000/get_mets?username={b}";
-        var content = await h.GetStringAsync(a);
+        var content = await http.GetStringAsync(a);
 
         if (content != "none")
         {
