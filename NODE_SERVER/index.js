@@ -19,6 +19,7 @@ const knx = require('knex')({
 
 class RoomManager
 {
+
   constructor()
   {
     console.log('made');
@@ -26,14 +27,14 @@ class RoomManager
 
   rooms_dictionary = {
     '0': [
-      //{ username: 'mono', score: 0 },
-      {username:'dolo', score: 20},
-      //'dolo',
-      { username: 'claus', score: 21310 },
-      { username: 'son', score: 2141241 },
-      { username: 'remo', score:10 },
-      { username: 'noob', score: 4231000 }
-    ],
+         //{ username: 'mono', score: 0 },
+         {username:'dolo', score: 20},
+         //'dolo',
+         { username: 'claus', score: 20 },
+         { username: 'son', score: 21 },
+         { username: 'remo', score:10 },
+         { username: 'noob', score: 42 }
+     ],
     '1': []
   };
 
@@ -157,8 +158,9 @@ b = now.utc().format();
 //console.log(a.diff(b, 'minutes'));
 
 app.post('/end_game', async (req, res) => {
-    const user = req.body;
+    let user = req.body;
     let db_user_info;
+    let done = false;
 
     await knx('users').where({
       'username': user.username,
@@ -167,26 +169,31 @@ app.post('/end_game', async (req, res) => {
         if(response.length != 0)
         {
           db_user_info = response[0];
-          delete room_manager.rooms_dictionary[`${user.room}`];
+          room_manager.rooms_dictionary[`${user.room}`] =  methods.FilterRoomForUser(
+            room_manager, user.room, user.username);
         }else{
-          return res.send("not ending game");
+          res.send("not ending game");
+          done = true;
         }
     });
 
-    if(user.score > db_user_info.highest_score)
+    if(!done)
     {
-      await knx('users').where({
-        'username': user.username,
-        'password': user.password
-      }).update({
-        highest_score: user.score
-      }).then(response => {
-          res.send(`${db_user_info.win}, ${db_user_info.loss},
-          ${db_user_info.highest_score}`);
-      })
-    } else {
-      res.send(`${db_user_info.win}, ${db_user_info.loss},
-      ${db_user_info.highest_score}`);
+      if(user.score > db_user_info.highest_score)
+      {
+        await knx('users').where({
+          'username': user.username,
+          'password': user.password
+        }).update({
+          highest_score: user.score
+        }).then(response => {
+            res.send(`${db_user_info.win}, ${db_user_info.loss},
+            ${db_user_info.highest_score}`);
+        })
+      } else {
+        res.send(`${db_user_info.win}, ${db_user_info.loss},
+        ${db_user_info.highest_score}`);
+      }
     }
 });
 

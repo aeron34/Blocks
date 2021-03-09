@@ -123,6 +123,26 @@ public class MainController : MonoBehaviour
             texts[2] = GameObject.Find("previous highscore").GetComponent<TextMeshProUGUI>();
             texts[3] = GameObject.Find("score").GetComponent<TextMeshProUGUI>();
             texts[4] = GameObject.Find("your place").GetComponent<TextMeshProUGUI>();
+
+            string result = "YOU WIN";
+            if (place > 1)
+            {
+                string[] quotes = new string[4]{
+                    "better luck next time", "They got lucky", "you got it next time",
+                    "every pro has a bad game"
+                };
+                System.Random rand = new System.Random();
+                int i = rand.Next(4);
+                result = quotes[i];
+            }
+
+            if (place == 2)
+            {
+                result = "So Close";
+            }
+
+            GameObject.Find("result").GetComponent<TextMeshProUGUI>().text = $"{result.ToUpper()}";
+
             texts[0].text = "WINS: ... 		LOSSES: ...";
             for (int i = 2; i < 5; i++)
             {
@@ -145,6 +165,7 @@ public class MainController : MonoBehaviour
             }
             texts[3].text = $"FINAL SCORE: {score}";
             texts[4].text = $"YOU PLACED {place}{suffix}";
+
         }
     }
 

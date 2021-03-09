@@ -11,7 +11,16 @@ function FilterRoomForUser(room_manager, room, name)
 }
 
 
+/*
+  This function sanitizes the room. this gets
+  rid of any array indexes that aren't
+  dicts, for example:
 
+    [
+      {...},
+      'dolo', <--- this will get deleted/"cleaned"
+    ]
+*/
 function CleanRoom(rooms_dictionary, room)
 {
   if(!rooms_dictionary.hasOwnProperty(`${room}`))

@@ -31,18 +31,20 @@ const login = (req, res, u, knx) => {
 
 };
 
-async function SendResult(req, res, knx, user)
+async function SendResult(req, res, knx, user, sending=true)
 {
   let result_num = 0;
+  console.log("Called Send");
 
   await knx('users').where({
     'username': user.username,
-    'password': user.pass
+    'password': user.password
   }).then(response => {
     if(response.length > 0)
     {
       result_num = response[0][`${user.result}`] + 1;
-    }else{
+    }
+    if(response.length < 0 && sending){
       return res.send('user doesnt exist');
     }
   });
@@ -54,9 +56,15 @@ async function SendResult(req, res, knx, user)
 
     await knx('users').where('username', user.username)
     .update(update_obj).then(response => {
-      res.send('done');
+      if(sending)
+      {
+        res.send('done');
+      }
     }, reject => {
-      res.send('not done')
+      if(sending)
+      {
+        res.send('not done')
+      }
     })
   }
 }

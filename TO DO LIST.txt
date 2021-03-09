@@ -54,8 +54,6 @@ o ONLINE:
 o Add the button mashing to the boxers
 ultimate - NEXT(1) 
 
-o Use the meteor row to document how many of them you have 
-coming at you. - NEXT(2)
 
 o Maybe after the Initial release, allow direct peer to 
 peer matches, this could be accomplised by creating
@@ -78,6 +76,13 @@ reaches a certain number, the column
 deletes it's blocks, restaring (NEXT [1]).
 
 o allow loss screen to send results (NOW)
+
+o Have a button on the loss screen that
+redirects to the char select screen 
+that still goes to the online scene, 
+but have the online scene not load
+the login box if the user is already 
+logged in, just go straight to waiting room.(NEXT [2]).
 
 o Make it so when you lose the game sends
 a call to /send_result (this is a post request), 
