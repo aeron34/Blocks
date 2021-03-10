@@ -34,7 +34,20 @@ class RoomManager
          { username: 'claus', score: 20 },
          { username: 'son', score: 21 }
      ],
-    '1': []
+     '1': [{
+            "username": "mono",
+            "score": 624
+        },{username:'dolo', score: 20},
+        { username: 'claus', score: 20 },
+        { username: 'son', score: 21 },
+        {
+            "username": "mono242",
+            "score": 0
+        },
+        {
+            "username": "mono242s",
+            "score": 0
+        }]
   };
 
   numberOfRooms = 0;
@@ -101,6 +114,7 @@ class RoomManager
       if(obj_inside &&
       rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
       {
+        console.log();
         //Make a new room.
         this.numberOfRooms++;
         rooms_dictionary[`${this.numberOfRooms}`] = [];
@@ -138,6 +152,19 @@ class RoomManager
         }
 
         return numberOfRooms;
+      }
+
+      if(rooms_dictionary[`${numberOfRooms}`].includes(`${username}`)
+      && rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE )
+      {
+
+         this.numberOfRooms++;
+          rooms_dictionary[`${this.numberOfRooms}`] = [];
+
+          //Objify all the names
+          ObjifyRoom(rooms_dictionary[`${numberOfRooms}`]);
+
+          return `${["running", numberOfRooms]}`;
       }
 
       if(rooms_dictionary[`${numberOfRooms}`].length >= ROOM_SIZE)

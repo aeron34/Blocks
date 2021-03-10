@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
 public class Online : MonoBehaviour
 {
@@ -24,8 +25,8 @@ public class Online : MonoBehaviour
     public string game_mode = "highest score wins";
     private float timer = 0.0f;
     private int opp_info_init = -1;//, place;
-    public bool online = true;
-    private static int room, metes = 0, fetch_status, place;
+    public bool online = true, runnable;
+    private static int room=-1, metes = 0, fetch_status, place;
 
     void Awake()
     {
@@ -117,7 +118,7 @@ public class Online : MonoBehaviour
         }
     }
 
-    private static async Task Login()
+    private async Task Login()
     {
 
         var u = GameObject.Find("username").GetComponent<TMP_InputField>().text;
@@ -132,7 +133,6 @@ public class Online : MonoBehaviour
         l.GetComponent<Button>().enabled = false;
 
         content = await h.GetStringAsync(a);
-        Debug.Log(content);
 
         l.GetComponent<Button>().enabled = true;
 
@@ -144,7 +144,8 @@ public class Online : MonoBehaviour
             room_txt.SetActive(true);
             room_txt.GetComponent<TextMeshProUGUI>().text = "Looking for room...";
             GameObject.Find("Login Box").SetActive(false);
-            call = true;
+            runnable = true;
+            StartCoroutine(CheckRooms());
         }
         
     }
@@ -153,10 +154,8 @@ public class Online : MonoBehaviour
         GameObject.Find("Login Box").SetActive(true);
         room_txt = GameObject.Find("room_txt");
         timer = 0.0f;
-        h = new HttpClient();
         opp_info_init = -1;//, place;
         online = true;
-        user_info = new Dictionary<string, string> { };
         running_room = false;
         metes = 0;
         room = -1;
@@ -165,11 +164,12 @@ public class Online : MonoBehaviour
     public void SkipLogin()
     {
         Restart();      
-        /*call = true;
-
+        call = true;
         room_txt.SetActive(true);
         room_txt.GetComponent<TextMeshProUGUI>().text = "Looking for room...";
-        GameObject.Find("Login Box").SetActive(false);*/
+        GameObject.Find("Login Box").SetActive(false);
+        StartCoroutine(CheckRooms());
+
     }
     public async Task GetOppInfo()
     {
@@ -233,26 +233,23 @@ public class Online : MonoBehaviour
 
     }
 
-    private static async Task CheckRooms()
+    private IEnumerator CheckRooms()
     {
-        Debug.Log("inside check rooms");
          
-        if (!running_room)
+        while(!running_room)
         {
             string b = user_info["username"], room_number = "-1";
 
-            Debug.Log("at user_info");
 
             if (user_info.ContainsKey("room"))
             {
                 room_number = user_info["room"];
             }
 
-            Debug.Log("calling the API");
+            UnityWebRequest uwr = UnityWebRequest.Get($"http://localhost:3000/check_rooms?username={b}&room={room_number}");
+            yield return uwr.SendWebRequest();
 
-            string a = $"http://localhost:3000/check_rooms?username={b}&room={room_number}";
-            var content = await h.GetStringAsync(a);
-            Debug.Log("Got Response");
+            var content = uwr.downloadHandler.text;
 
             var arr = content.Split(',');
 
@@ -267,20 +264,19 @@ public class Online : MonoBehaviour
                 running_room = true;
                 room_txt.GetComponent<TextMeshProUGUI>().text = $"Starting Game...";
                 SceneManager.LoadScene("Game");
+                yield break;
 
             }
 
             if (!user_info.ContainsKey("room"))
             {
                 room = Int32.Parse(content); 
-                Debug.Log($"ROOM: {room}");
                 room_txt.GetComponent<TextMeshProUGUI>().text = $"Waiting in Room \n\n {room}";
                 user_info.Add("room", room.ToString());
             }
-        }
 
-        
-      
+            yield return new WaitForEndOfFrame();
+        } 
     }
 
     private static async Task CheckMeteors()
@@ -301,45 +297,26 @@ public class Online : MonoBehaviour
     public IEnumerator GetMeteors()
     {
 
-        yield return new WaitForSeconds(3f);
-        CheckMeteors();
-
-        if (metes > 0)
+        while (true)
         {
-            StartCoroutine(FindObjectOfType<block_queue>().MeteorTime());
-            metes = 0;
-        }
+            CheckMeteors();
 
-        StartCoroutine(GetMeteors());
+            if (metes > 0)
+            {
+                StartCoroutine(FindObjectOfType<block_queue>().MeteorTime());
+                metes = 0;
+            }
+            yield return new WaitForSeconds(4f);
+        }
     }
 
-    public IEnumerator CheckRoomsCaller()
-    {
-        /*
-         * If user_info contains a "room" key 
-         * then that means your good to go
-         * bcuz you can only have a room key if
-         * the room is full.
-         */
-        if (!running_room)
-        {
-            Debug.Log("called check rooms");
-            yield return new WaitForSeconds(1f);
-            CheckRooms();
-            StartCoroutine(CheckRoomsCaller());
-        }
-        yield break;
-    }
-    
 
     // Update is called once per frame
     void Update()
     {
 
         if(call)
-        {       
-
-            StartCoroutine(CheckRoomsCaller());
+        { 
             call = false;
         }
         if(SceneManager.GetActiveScene().name == "Game")
@@ -382,10 +359,6 @@ public class Online : MonoBehaviour
 
                 var g = orderedlist.First();
 
-                foreach (string[] a in orderedlist)
-                {
-                    Debug.Log($"{a[0]}, {a[1]}");
-                }
                 place = GetPlace();
                 EndGame();
                 fetch_status = -1;

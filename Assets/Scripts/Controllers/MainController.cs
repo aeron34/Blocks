@@ -134,9 +134,11 @@ public class MainController : MonoBehaviour
                 {
                     if (user.ContainsKey("username"))
                     {
-                        
-                         
-                        //online.StartCoroutine(online.CheckRoomsCaller());
+
+                        var online = FindObjectOfType<Online>();
+                        online.SkipLogin();
+
+                       //online.StartCoroutine(online.CheckRooms());
 
                     }
                 }catch(NullReferenceException e)
@@ -236,8 +238,6 @@ public class MainController : MonoBehaviour
     public void ResultsScreenToCharSelect()
     {
         res_to_char = true;
-        Destroy(FindObjectOfType<Online>().gameObject);
-
         SceneManager.LoadScene("Main Menus");
     }
 
