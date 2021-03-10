@@ -469,8 +469,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1398734966}
-        m_MethodName: LoadBoxer
+      - m_Target: {fileID: 0}
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1068,13 +1068,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   training: 0
+  res_to_char: 0
+  texts: []
   Gizmo: {fileID: 3216427979722535113, guid: 8670407fb50e5b74f8ecc60a672ee9a5, type: 3}
   Boxer: {fileID: 8817789057594218773, guid: 9cb124ca44a411045a9d59b335e2b3e3, type: 3}
   weap_box: {fileID: 3688172403930154453, guid: 40a501a8e5f184c45b9e5056072655f9,
     type: 3}
   ultra_bar: {fileID: 1622688231734626657, guid: a509ff97dd1a1fc469f1722c38baae43,
     type: 3}
+  new_record: {fileID: 0}
+  online_controller: {fileID: 2113220952686477, guid: c3f1a32747051ff438beb66bdba0957c,
+    type: 3}
   score: 0
+  place: 0
 --- !u!4 &1398734967
 Transform:
   m_ObjectHideFlags: 0
@@ -1409,8 +1415,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1398734966}
-        m_MethodName: LoadGizmo
+      - m_Target: {fileID: 0}
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

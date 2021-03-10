@@ -1,13 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System;
 
 public class MainController : MonoBehaviour
 {
 
-    public bool training;
+    public bool training, res_to_char;
     private string char_name;
     //public int[] stats = new int[5] {-1,-1,-1,-1,-1 }; //[win,loss,prev_score,curr_score,place];
     public TextMeshProUGUI[] texts;// = new TextMeshProUGUI[5];
@@ -28,9 +30,16 @@ public class MainController : MonoBehaviour
 
     void Start()
     {
+        Restart();
+    }
+
+    public void Restart()
+    {
         texts = new TextMeshProUGUI[5] { null, null, null, null, null };
         main_menu = GameObject.Find("Main Menu");
         char_select = GameObject.Find("Char Select");
+        GameObject.Find("Gizmo").GetComponent<Button>().onClick.AddListener(LoadGizmo);
+        GameObject.Find("Boxer").GetComponent<Button>().onClick.AddListener(LoadBoxer);
         main_menu.SetActive(true);
         char_select.SetActive(false);
     }
@@ -85,7 +94,10 @@ public class MainController : MonoBehaviour
                 g.name = "pic";
                 Instantiate(ultra_bar, canvas.transform).name = "ultra_bar";
             }
-            StartCoroutine(FindObjectOfType<Online>().GetMeteors());
+            if (FindObjectOfType<Online>() != null)
+            {
+                StartCoroutine(FindObjectOfType<Online>().GetMeteors());
+            }
 
         }
         if (scene.name == "Training")
@@ -113,8 +125,39 @@ public class MainController : MonoBehaviour
 
         }
 
+        if(scene.name == "Lobby")
+        {
+            if(FindObjectOfType<Online>() != null)
+            {
+                var user = FindObjectOfType<Online>().ReturnUser();
+                try
+                {
+                    if (user.ContainsKey("username"))
+                    {
+                        
+                         
+                        //online.StartCoroutine(online.CheckRoomsCaller());
+
+                    }
+                }catch(NullReferenceException e)
+                { }
+            }
+
+        }
+        
+        if (scene.name == "Main Menus" && res_to_char)
+        {
+            Restart();
+            res_to_char = false;
+            CharSelect();
+            
+        }
+
         if (scene.name == "Loss Screen")
         {
+            var btn = GameObject.Find("Char_select").GetComponent<Button>();
+            btn.onClick.AddListener(ResultsScreenToCharSelect);
+
             new_record = GameObject.Find("new record");// (false);
             new_record.SetActive(false);
             GameObject.Find("score").GetComponent<TextMeshProUGUI>().text = score.ToString();
@@ -190,6 +233,14 @@ public class MainController : MonoBehaviour
         char_select.SetActive(true);
     }
     
+    public void ResultsScreenToCharSelect()
+    {
+        res_to_char = true;
+        Destroy(FindObjectOfType<Online>().gameObject);
+
+        SceneManager.LoadScene("Main Menus");
+    }
+
     public void TrainingToCharSelect()
     {
         training = true;

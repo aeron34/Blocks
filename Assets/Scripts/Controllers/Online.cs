@@ -6,12 +6,13 @@ using System;
 using System.Net.Http;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 using TMPro;
 using UnityEngine.SceneManagement;
 
 public class Online : MonoBehaviour
 {
-    static readonly HttpClient h = new HttpClient();
+    private static HttpClient h = new HttpClient();
     private static Dictionary<string, string> user_info;
     private static bool call, running_room;
     private static List<string[]> opponent_info;
@@ -28,6 +29,8 @@ public class Online : MonoBehaviour
 
     void Awake()
     {
+      
+        
         if(FindObjectsOfType(GetType()).Length > 1)
         {
             Destroy(gameObject);
@@ -36,6 +39,7 @@ public class Online : MonoBehaviour
         {
             DontDestroyOnLoad(gameObject);
         }
+        
     }
     // Start is called before the first frame update
     void Start()
@@ -59,7 +63,7 @@ public class Online : MonoBehaviour
 
     private static async Task GetOpponentsScore()
     {
-       
+        int score = FindObjectOfType<scorer>().GetScore();
         string username = user_info["username"];
         string room = "";//ser_info["room"];
 
@@ -70,7 +74,7 @@ public class Online : MonoBehaviour
         else { 
             return; 
         }
-        string a = $"http://localhost:3000/getopponentsscore?username={username}&room={room}";
+        string a = $"http://localhost:3000/getopponentsscore?username={username}&room={room}&score={score}";
         string content = "none";
 
         content = await h.GetStringAsync(a);
@@ -144,7 +148,29 @@ public class Online : MonoBehaviour
         }
         
     }
+    private void Restart()
+    {
+        GameObject.Find("Login Box").SetActive(true);
+        room_txt = GameObject.Find("room_txt");
+        timer = 0.0f;
+        h = new HttpClient();
+        opp_info_init = -1;//, place;
+        online = true;
+        user_info = new Dictionary<string, string> { };
+        running_room = false;
+        metes = 0;
+        room = -1;
+        fetch_status = 0;
+    }
+    public void SkipLogin()
+    {
+        Restart();      
+        /*call = true;
 
+        room_txt.SetActive(true);
+        room_txt.GetComponent<TextMeshProUGUI>().text = "Looking for room...";
+        GameObject.Find("Login Box").SetActive(false);*/
+    }
     public async Task GetOppInfo()
     {
         
@@ -209,18 +235,24 @@ public class Online : MonoBehaviour
 
     private static async Task CheckRooms()
     {
+        Debug.Log("inside check rooms");
+         
         if (!running_room)
         {
             string b = user_info["username"], room_number = "-1";
+
+            Debug.Log("at user_info");
 
             if (user_info.ContainsKey("room"))
             {
                 room_number = user_info["room"];
             }
 
+            Debug.Log("calling the API");
 
             string a = $"http://localhost:3000/check_rooms?username={b}&room={room_number}";
             var content = await h.GetStringAsync(a);
+            Debug.Log("Got Response");
 
             var arr = content.Split(',');
 
@@ -246,6 +278,8 @@ public class Online : MonoBehaviour
                 user_info.Add("room", room.ToString());
             }
         }
+
+        
       
     }
 
@@ -263,6 +297,7 @@ public class Online : MonoBehaviour
         }
     }
 
+ 
     public IEnumerator GetMeteors()
     {
 
@@ -288,24 +323,25 @@ public class Online : MonoBehaviour
          */
         if (!running_room)
         {
+            Debug.Log("called check rooms");
             yield return new WaitForSeconds(1f);
             CheckRooms();
             StartCoroutine(CheckRoomsCaller());
         }
+        yield break;
     }
     
 
     // Update is called once per frame
     void Update()
     {
+
         if(call)
-        {
-            GameObject.Find("welcome").GetComponent<TextMeshProUGUI>().text = user_info["username"];
-            GameObject.Find("welcome").SetActive(false);
+        {       
+
             StartCoroutine(CheckRoomsCaller());
             call = false;
         }
-
         if(SceneManager.GetActiveScene().name == "Game")
         {
             if(fetch_status == 0)
@@ -384,7 +420,9 @@ public class Online : MonoBehaviour
         string a = $"http://localhost:3000/send_result";
         var response = await h.PostAsync(a, content);
 
-        var res_string = await response.Content.ReadAsStringAsync();
+        //var res_string = await response.Content.ReadAsStringAsync();
+        user_info.Remove("room");
+        user_info.Remove("score");
     }
 
     public int GetPlace()
@@ -426,7 +464,11 @@ public class Online : MonoBehaviour
         {
             FindObjectOfType<MainController>().new_record.SetActive(true);
         }
+    }
 
+    public Dictionary<string, string> ReturnUser()
+    {
+        return user_info;
     }
 
     private void OnApplicationQuit()

@@ -22,18 +22,17 @@ class RoomManager
 
   constructor()
   {
-    console.log('made');
   }
 
   rooms_dictionary = {
     '0': [
          //{ username: 'mono', score: 0 },
          {username:'dolo', score: 20},
-         //'dolo',
+
+      { username: 'remo', score:10 },
+      { username: 'noob', score: 4231000 },
          { username: 'claus', score: 20 },
-         { username: 'son', score: 21 },
-         { username: 'remo', score:10 },
-         { username: 'noob', score: 42 }
+         { username: 'son', score: 21 }
      ],
     '1': []
   };
@@ -55,45 +54,70 @@ class RoomManager
       numberOfRooms = room_no
     }
 
-    /*  If the function makes past this line, that means
-        that the user who called this function doesn't have
-        a room number, so it'll be assigned numberOfRooms+1 as
-        a room number. This is good because if multiple users
-        make the room that's numberOfRooms+1 then the dictionary
-        won't create duplicates and they'll be assigned the
-        same room, userobjects CANNOT be reassigned a new room
-        number unless they sign out or the match is over.
-    */
 
-    methods.CleanRoom(rooms_dictionary, numberOfRooms);
+    //methods.CleanRoom(rooms_dictionary, numberOfRooms);
 
     /*If the user doens't have a number AND the room at
     said number doesn't either, create it and increase
     the number so total rooms is updated and other players
     with no number can find it easily:
     */
+
+    function ObjifyRoom(room)
+    {
+      for(let i = 0; i < room.length; i++)
+      {
+        if(typeof(room[i]) != 'object')
+        {
+          room[i] = {username:room[i], score:0}
+        }
+      }
+    }
+
+    //If the room doesn't exist.
     if(!rooms_dictionary.hasOwnProperty(`${numberOfRooms}`))
     {
       rooms_dictionary[`${numberOfRooms}`] = [];
       rooms_dictionary[`${numberOfRooms}`].push(username)
       return numberOfRooms;
-    }else {
+    }
+    else {
 
+      /*TEST 1:
 
-      /*If the username doesn't exist inside the array
-      and the room is less than the max size, push him in*/
-      if(rooms_dictionary[`${numberOfRooms}`].includes(`${username}`))
+      Check if the object ({...}) is in the room and
+      if it is and the room is full, run the room*/
+
+      let obj_inside= false;
+      for(let i = 0; i < rooms_dictionary[`${numberOfRooms}`].length; i++)
       {
-        if(rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
+        if(rooms_dictionary[`${numberOfRooms}`][i].username == username)
         {
-          let index = rooms_dictionary[`${numberOfRooms}`].indexOf(username);
-          rooms_dictionary[`${numberOfRooms}`][index] = {username:username,
-          score: 0};
-          return `${["running", numberOfRooms]}`;
-
+          obj_inside = true;
+          break;
         }
-        return numberOfRooms;
       }
+
+      if(obj_inside &&
+      rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
+      {
+        //Make a new room.
+        this.numberOfRooms++;
+        rooms_dictionary[`${this.numberOfRooms}`] = [];
+
+        //Objify all the names
+        ObjifyRoom(rooms_dictionary[`${numberOfRooms}`]);
+        return `${["running", numberOfRooms]}`;
+      }
+
+
+
+      /* TEST 2:
+
+      This IF block means that if the array doesn't
+      include username and the room before addition is less
+      than max size, then after add. is room_size execute
+      this block*/
 
       if(!rooms_dictionary[`${numberOfRooms}`].includes(`${username}`)
       && rooms_dictionary[`${numberOfRooms}`].length < ROOM_SIZE )
@@ -102,14 +126,15 @@ class RoomManager
 
         if(rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
         {
+          //Make a new room.
           this.numberOfRooms++;
           rooms_dictionary[`${this.numberOfRooms}`] = [];
-          let index = rooms_dictionary[`${numberOfRooms}`].indexOf(username);
-          rooms_dictionary[`${numberOfRooms}`][index] = {username:username,
-          score: 0};
 
+          //Objify all the names
+          ObjifyRoom(rooms_dictionary[`${numberOfRooms}`]);
 
           return `${["running", numberOfRooms]}`;
+
         }
 
         return numberOfRooms;
@@ -120,7 +145,8 @@ class RoomManager
           this.numberOfRooms++;
           rooms_dictionary[`${this.numberOfRooms}`] = [];
           rooms_dictionary[`${this.numberOfRooms}`].push(username)
-          return `${"running", `${this.numberOfRooms}`}`;
+
+          return this.numberOfRooms;
       }
     }
   }
@@ -137,7 +163,6 @@ class RoomManager
 let room_manager = new RoomManager();
 
 const ROOM_SIZE = 6;
-
 
 const app = express();
 
@@ -169,9 +194,7 @@ app.post('/end_game', async (req, res) => {
         if(response.length != 0)
         {
           db_user_info = response[0];
-          room_manager.rooms_dictionary[`${user.room}`] =  methods.FilterRoomForUser(
-            room_manager, user.room, user.username);
-        }else{
+          }else{
           res.send("not ending game");
           done = true;
         }
@@ -234,6 +257,7 @@ app.post('/delete_from_room', (req, res) => {
 
 app.get('/check_rooms', (req, res) => {
 
+  console.log(req.query)
   let result = room_manager.addUserToRoom(parseInt(req.query.room),
   req.query.username);
 
@@ -312,6 +336,18 @@ app.get('/get_mets', async (req, res) => {
 
 app.get('/getopponentsscore', (req, res) => {
   const user = req.query;
+
+  for(let i = 0; i < ROOM_SIZE; i++)
+  {
+    if(room_manager.rooms_dictionary[`${user.room}`][i].username == user.username)
+    {
+      if(user.score != undefined)
+      {
+        room_manager.rooms_dictionary[`${user.room}`][i].score = parseInt(user.score);
+      }
+      break;
+    }
+  }
 
   let user_list = methods.FilterRoomForUser(room_manager, user.room, user.username)
 

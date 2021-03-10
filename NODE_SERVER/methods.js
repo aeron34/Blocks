@@ -21,6 +21,7 @@ function FilterRoomForUser(room_manager, room, name)
       'dolo', <--- this will get deleted/"cleaned"
     ]
 */
+
 function CleanRoom(rooms_dictionary, room)
 {
   if(!rooms_dictionary.hasOwnProperty(`${room}`))

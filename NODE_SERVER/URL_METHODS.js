@@ -34,7 +34,6 @@ const login = (req, res, u, knx) => {
 async function SendResult(req, res, knx, user, sending=true)
 {
   let result_num = 0;
-  console.log("Called Send");
 
   await knx('users').where({
     'username': user.username,
@@ -49,6 +48,9 @@ async function SendResult(req, res, knx, user, sending=true)
     }
   });
 
+  setTimeout(() => {
+//    console.log("we good")
+  }, 120);
   if(result_num != 0)
   {
     let update_obj = {}
