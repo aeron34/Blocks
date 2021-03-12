@@ -34,23 +34,37 @@ class RoomManager
          { username: 'claus', score: 20 },
          { username: 'son', score: 21 }
      ],
-     '1': [{
-            "username": "mono",
-            "score": 624
-        },{username:'dolo', score: 20},
-        { username: 'claus', score: 20 },
-        { username: 'son', score: 21 },
-        {
-            "username": "mono242",
-            "score": 0
-        },
-        {
-            "username": "mono242s",
-            "score": 0
-        }]
+
   };
 
   numberOfRooms = 0;
+
+  createRoom = (addSelf = false, username='', room) =>
+  {
+    let {rooms_dictionary, roomNumber} = this;
+
+    if(room == undefined)
+    {
+      this.numberOfRooms++;
+      roomNumber = this.numberOfRooms;
+    }else{
+      roomNumber = room
+    }
+
+    rooms_dictionary[`${roomNumber}`] = [];
+
+    if(addSelf)
+    {
+        rooms_dictionary[`${roomNumber}`].push(
+          {username: `${username}`, score: 0}
+        );
+    }
+
+    setTimeout(() => {
+      console.log(roomNumber);
+      delete this.rooms_dictionary[`${roomNumber}`];
+    }, 900000);
+  }
 
   addUserToRoom = (room_no = -1, username="") => {
 
@@ -76,29 +90,18 @@ class RoomManager
     with no number can find it easily:
     */
 
-    function ObjifyRoom(room)
-    {
-      for(let i = 0; i < room.length; i++)
-      {
-        if(typeof(room[i]) != 'object')
-        {
-          room[i] = {username:room[i], score:0}
-        }
-      }
-    }
-
     //If the room doesn't exist.
     if(!rooms_dictionary.hasOwnProperty(`${numberOfRooms}`))
     {
-      rooms_dictionary[`${numberOfRooms}`] = [];
-      rooms_dictionary[`${numberOfRooms}`].push(username)
+      this.createRoom(true, username, numberOfRooms);
+
       return numberOfRooms;
     }
     else {
 
       /*TEST 1:
 
-      Check if the object ({...}) is in the room and
+      Check if the object ({...}) is in the room.
       if it is and the room is full, run the room*/
 
       let obj_inside= false;
@@ -114,38 +117,50 @@ class RoomManager
       if(obj_inside &&
       rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
       {
-        console.log();
-        //Make a new room.
-        this.numberOfRooms++;
-        rooms_dictionary[`${this.numberOfRooms}`] = [];
 
-        //Objify all the names
-        ObjifyRoom(rooms_dictionary[`${numberOfRooms}`]);
+        //Make a new room.
+        this.createRoom();
+
         return `${["running", numberOfRooms]}`;
       }
 
+      /*TEST 1.5
 
+      This is an extension of Test 1, if the object
+      is inside the array BUT the room isn't full
+      just return the room number */
 
-      /* TEST 2:
+      if(obj_inside &&
+      rooms_dictionary[`${numberOfRooms}`].length < ROOM_SIZE)
+      {
+        return numberOfRooms
+      }
+
+      /* TEST 1 DIDN'T PASS, NOW FOR TEST 2:
 
       This IF block means that if the array doesn't
       include username and the room before addition is less
       than max size, then after add. is room_size execute
       this block*/
 
-      if(!rooms_dictionary[`${numberOfRooms}`].includes(`${username}`)
-      && rooms_dictionary[`${numberOfRooms}`].length < ROOM_SIZE )
+      if(!obj_inside &&
+      rooms_dictionary[`${numberOfRooms}`].length < ROOM_SIZE )
+
       {
-        rooms_dictionary[`${numberOfRooms}`].push(username)
+        /*If the room is less than ROOM_SIZE and doesn't
+          include user, add him:
+        */
+        rooms_dictionary[`${numberOfRooms}`].push(
+          {username: `${username}`, score: 0});
+
+        /*If the room length NOW equals ROOM_SIZE as a result
+        of adding user, room the room:
+        */
 
         if(rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
         {
           //Make a new room.
-          this.numberOfRooms++;
-          rooms_dictionary[`${this.numberOfRooms}`] = [];
-
-          //Objify all the names
-          ObjifyRoom(rooms_dictionary[`${numberOfRooms}`]);
+          this.createRoom();
 
           return `${["running", numberOfRooms]}`;
 
@@ -154,23 +169,9 @@ class RoomManager
         return numberOfRooms;
       }
 
-      if(rooms_dictionary[`${numberOfRooms}`].includes(`${username}`)
-      && rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE )
-      {
-
-         this.numberOfRooms++;
-          rooms_dictionary[`${this.numberOfRooms}`] = [];
-
-          //Objify all the names
-          ObjifyRoom(rooms_dictionary[`${numberOfRooms}`]);
-
-          return `${["running", numberOfRooms]}`;
-      }
-
       if(rooms_dictionary[`${numberOfRooms}`].length >= ROOM_SIZE)
       {
-          this.numberOfRooms++;
-          rooms_dictionary[`${this.numberOfRooms}`] = [];
+          this.createRoom(true);
           rooms_dictionary[`${this.numberOfRooms}`].push(username)
 
           return this.numberOfRooms;

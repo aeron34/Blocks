@@ -48,9 +48,7 @@ async function SendResult(req, res, knx, user, sending=true)
     }
   });
 
-  setTimeout(() => {
-//    console.log("we good")
-  }, 120);
+
 
   if(result_num != 0)
   {
