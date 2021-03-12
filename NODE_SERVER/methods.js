@@ -10,7 +10,26 @@ function FilterRoomForUser(room_manager, room, name)
   })
 }
 
+function GetUserInRoom(room_manager, room, name)
+{
+  return room_manager.rooms_dictionary[`${room}`].filter(user => {
+    if(user['username'] == name)
+    {
+      return user;
+    }
+  });
+}
 
+
+function GetOtherTeam(room_manager, room, team)
+{
+  return room_manager.rooms_dictionary[`${room}`].filter(user => {
+    if(user['team'] != team)
+    {
+      return user;
+    }
+  });
+}
 /*
   This function sanitizes the room. this gets
   rid of any array indexes that aren't
@@ -40,4 +59,6 @@ function CleanRoom(rooms_dictionary, room)
 module.exports = {
   FilterRoomForUser,
   CleanRoom,
+  GetUserInRoom,
+  GetOtherTeam,
 };

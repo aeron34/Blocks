@@ -34,7 +34,15 @@ class RoomManager
          { username: 'claus', score: 20 },
          { username: 'son', score: 21 }
      ],
-
+    'team0':[
+      { username: 'remo', score:10 },
+      { username: 'noob', score: 4231000 },
+      { username: 'rem2o', score:10 },
+      { username: 'no3ob', score: 4231000 },
+      { username: 'claus', score: 20 },
+      {username:'dolo', score: 20},
+      { username: 'son', score: 21 }
+    ]
   };
 
   numberOfRooms = 0;
@@ -77,21 +85,18 @@ class RoomManager
 
   splitTeamRoom = (room) =>
   {
-      let newRoom = {
-        "A":[],
-        "B":[]
-      }, team = "A";
+      let team = "A";
 
       for(let i = 0; i < 8; i++)
       {
+
         if(i == 4)
         {
           team = "B";
         }
-        newRoom[`${team}`].push(this.rooms_dictionary[`${room}`][i])
-      }
 
-      this.rooms_dictionary[`${room}`] = newRoom;
+        this.rooms_dictionary[`${room}`][i]['team'] = team
+      }
   }
 
   addUserToRoom = (room_no = -1, username="", ROOM_SIZE=DEFAULT_ROOM_SIZE) => {
@@ -131,6 +136,7 @@ class RoomManager
     with no number can find it easily:
     */
 
+
     //If the room doesn't exist.
     if(!rooms_dictionary.hasOwnProperty(`${numberOfRooms}`))
     {
@@ -157,13 +163,11 @@ class RoomManager
 
       //If the user's OBJ is inside the room already OR if
       //the room has a property "A", which means it was divided
-      if((obj_inside &&
+      if(obj_inside &&
       rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
-      || rooms_dictionary[`${numberOfRooms}`].hasOwnProperty("A"))
       {
 
         //Make a new room.
-
         if(team)
         {
             this.splitTeamRoom(numberOfRooms)
@@ -222,14 +226,11 @@ class RoomManager
       }
 
       // The special case for team rooms
-      if(team)
+      if(room_no.includes('team') &&
+      rooms_dictionary[`${numberOfRooms}`].length >= ROOM_SIZE)
       {
-        if(room_no.includes('team') &&
-        rooms_dictionary[`${numberOfRooms}`].length >= ROOM_SIZE)
-        {
-          this.numberOfTeams++;
-          return this.addUserToRoom(`team${this.numberOfTeams}`, username, DEFAULT_ROOM_SIZE);
-        }
+        this.numberOfTeams++;
+        return this.addUserToRoom(`team${this.numberOfTeams}`, username, DEFAULT_ROOM_SIZE);
       }
 
       //Case for regular number and string rooms
@@ -391,9 +392,21 @@ app.post('/send_mets', async (req, res) => {
 
     console.log(`called by ${name}`);
 
-    let user_arr = methods.FilterRoomForUser(room_manager, room, name);
+    let user_arr;
     let user_exists = false;
-    let user = user_arr[Math.floor(Math.random() * user_arr.length)];
+    let user;
+
+    if(room.includes('team'))
+    {
+      let me = methods.GetUserInRoom(room_manager, room, name)[0];
+      user_arr = methods.GetOtherTeam(room_manager, room, me.team);
+      user = user_arr[Math.floor(Math.random() * user_arr.length)];
+    } else
+    {
+      user_list = methods.FilterRoomForUser(room_manager, room, name);
+      user = user_arr[Math.floor(Math.random() * user_arr.length)];
+    }
+
     let target_users_meteors = 0;
 
     await knx('users').where('username', user.username).
