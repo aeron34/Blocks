@@ -6,59 +6,37 @@ to the character when something fell on him.
 
 o Add the animations
 
-o Imp. column upper - NEXT (1).
-
-o Have the objective of the game be to 
-get the highest block chain. There are
-2 main conditions in this game:
-
-	- Getting the longest block
-	chain automatically puts you
-	in the lead.
-
-	- But, Ultimately the person
-	with the highest score
-	wins. You can increase
-	your score by getting matches
-	and combo's. As for chains,
-	they work on a multiplier, 
-	of which the formula is:
-
-	(how_many_blocks * .25)^5 = how many points you earn.
-
-	//so for example:
-		//16 blocks
-		(16 * .25)^5 = 1024;
-
-o Tables the DB will have:
-
-	- Simon_LB
-
-	- Solo_LB (this is the game mode we have
-	now)
-
-o ONLINE:
-
-	- When your in the waiting room, have it 
-	send more requests than it would when it's
-	playing. 
-
-	- Use Bcrypt for passwords.	
-
-	- Make a funct that removes a player who hasn't contacted
-	the server in the past 30 secs (create a function
-	in unity that reaches out to the server, and a method 
-	in Node that documents the time the request was
-	processed.) - CURRENTLY
 
 o Add the button mashing to the boxers
 ultimate - NEXT(1) 
 
 
-o Maybe after the Initial release, allow direct peer to 
-peer matches, this could be accomplised by creating
-a P2P table in the DB and using the string method
-that we scrapped eariler.
+o Allow direct P2P Matches, allow users
+to limit the ammount of people who can
+join the P2P Match/free for all to
+a maximum of 8 (NEXT).
+
+o Implement a team battle, have 
+the character's online controller operate
+ a coroutine that sends out the players
+final score, wait for 5 seconds (giving it
+time to get everyone's scores) and then
+send another get request that returns
+the final verdict (the server compile
+the team's scores and determine the winner, 
+if your name is in the losing team, you get
+sent a 'loser' response) 
+
+FINISH THE DIVISION AND IMPLEMENT THE FRONT END FOR THE TEAM
+BATTLE NOW (NOW)
+
+BTW - the code for someone looking for a new team room is 
+'team-1'.
+
+o On the lobby screen, 
+Implement a side pannel where
+you can see the people waiting
+with thier usernames (NEXT)
 
 o Sometime in the future update the site and add:
 
@@ -69,42 +47,28 @@ o Sometime in the future update the site and add:
 	o Add a profile section that allows
 	you to see your wins/losses.
 
-o Make a game over screen,
 
 o Make it so that the when the column
 reaches a certain number, the column
 deletes it's blocks, restaring (NEXT [1]).
 
-o allow loss screen to send results (NOW)
-
-o Have a button on the loss screen that
-redirects to the char select screen 
-that still goes to the online scene, 
-but have the online scene not load
-the login box if the user is already 
-logged in, just go straight to waiting room.(NEXT [2]).
-
-o Make it so when you lose the game sends
-a call to /send_result (this is a post request), 
-and have the parameters be username, pass, [win/loss in string].
-
-And once the request has resolved then goto the loss
-screen (this is the screen that shows you're place, 
-final score, etc.) 
 
 o make a gameover animation by deleting
 the ground beneath the blocks to create
-a falling effect (NEXT [2]).
+a falling effect 
 
 o To fix last man standing, give it a countdown
 of 10 mins, and if you're both still alive
-then highest score wins (NEXT [3]).
+then highest score wins.
 
 o  Add pause.
 
 o Finish box's ultimate (NEXT).
 
-o (LATER, AFTER RELEASE) create a dictionary object, initially
+
+---------------- (LATER, AFTER RELEASE) --------------------
+
+o create a dictionary object, initially
 set it as empty. this will be a dict that
 tracks how many blocks are touching each other, for ex:
 {red: 4, //this means 4 reds are touching in the column

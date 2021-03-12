@@ -38,37 +38,78 @@ class RoomManager
   };
 
   numberOfRooms = 0;
+  roomAutoDeleteTime = 900000;
+  string_room = false;
 
-  createRoom = (addSelf = false, username='', room) =>
+  createRoom = (addSelf = false, username='', room, genesis=false) =>
   {
-    let {rooms_dictionary, roomNumber} = this;
-
-    if(room == undefined)
+    if(!this.string_room || genesis == true)
     {
-      this.numberOfRooms++;
-      roomNumber = this.numberOfRooms;
-    }else{
-      roomNumber = room
+      let {rooms_dictionary, roomNumber,  roomAutoDeleteTime} = this;
+
+
+      if(room == undefined)
+      {
+        this.numberOfRooms++;
+        roomNumber = this.numberOfRooms;
+      }else{
+        roomNumber = room
+      }
+
+
+      rooms_dictionary[`${roomNumber}`] = [];
+
+      if(addSelf)
+      {
+          rooms_dictionary[`${roomNumber}`].push(
+            {username: `${username}`, score: 0}
+          );
+      }
+
+      setTimeout(() => {
+        console.log(roomNumber);
+        delete this.rooms_dictionary[`${roomNumber}`];
+      }, roomAutoDeleteTime);
     }
-
-    rooms_dictionary[`${roomNumber}`] = [];
-
-    if(addSelf)
-    {
-        rooms_dictionary[`${roomNumber}`].push(
-          {username: `${username}`, score: 0}
-        );
-    }
-
-    setTimeout(() => {
-      console.log(roomNumber);
-      delete this.rooms_dictionary[`${roomNumber}`];
-    }, 900000);
   }
 
-  addUserToRoom = (room_no = -1, username="") => {
+  numberOfTeams = 0;
 
-    let {rooms_dictionary, numberOfRooms} = this;
+  splitTeamRoom = (room) =>
+  {
+      let newRoom = {
+        "A":[],
+        "B":[]
+      }, team = "A";
+
+      for(let i = 0; i < 8; i++)
+      {
+        if(i == 4)
+        {
+          team = "B";
+        }
+        newRoom[`${team}`].push(this.rooms_dictionary[`${room}`][i])
+      }
+
+      this.rooms_dictionary[`${room}`] = newRoom;
+  }
+
+  addUserToRoom = (room_no = -1, username="", ROOM_SIZE=DEFAULT_ROOM_SIZE) => {
+
+    let {rooms_dictionary, numberOfRooms, string_room} = this;
+    let team = false;
+
+    if(typeof(room_no) === 'string' &&
+    room_no.includes('team'))
+    {
+      team = true;
+      ROOM_SIZE = 8;
+    }
+
+    if(room_no == 'team-1')
+    {
+      room_no = `team${this.numberOfTeams}`;
+    }
 
     if(room_no != -1)
     {
@@ -93,7 +134,7 @@ class RoomManager
     //If the room doesn't exist.
     if(!rooms_dictionary.hasOwnProperty(`${numberOfRooms}`))
     {
-      this.createRoom(true, username, numberOfRooms);
+      this.createRoom(true, username, numberOfRooms, true);
 
       return numberOfRooms;
     }
@@ -114,12 +155,19 @@ class RoomManager
         }
       }
 
-      if(obj_inside &&
+      //If the user's OBJ is inside the room already OR if
+      //the room has a property "A", which means it was divided
+      if((obj_inside &&
       rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
+      || rooms_dictionary[`${numberOfRooms}`].hasOwnProperty("A"))
       {
 
         //Make a new room.
-        this.createRoom();
+
+        if(team)
+        {
+            this.splitTeamRoom(numberOfRooms)
+        }
 
         return `${["running", numberOfRooms]}`;
       }
@@ -154,7 +202,7 @@ class RoomManager
           {username: `${username}`, score: 0});
 
         /*If the room length NOW equals ROOM_SIZE as a result
-        of adding user, room the room:
+        of adding user, run the room:
         */
 
         if(rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
@@ -162,6 +210,10 @@ class RoomManager
           //Make a new room.
           this.createRoom();
 
+          if(team)
+          {
+              this.splitTeamRoom(numberOfRooms)
+          }
           return `${["running", numberOfRooms]}`;
 
         }
@@ -169,18 +221,36 @@ class RoomManager
         return numberOfRooms;
       }
 
+      // The special case for team rooms
+      if(team)
+      {
+        if(room_no.includes('team') &&
+        rooms_dictionary[`${numberOfRooms}`].length >= ROOM_SIZE)
+        {
+          this.numberOfTeams++;
+          return this.addUserToRoom(`team${this.numberOfTeams}`, username, DEFAULT_ROOM_SIZE);
+        }
+      }
+
+      //Case for regular number and string rooms
       if(rooms_dictionary[`${numberOfRooms}`].length >= ROOM_SIZE)
       {
-          this.createRoom(true);
-          rooms_dictionary[`${this.numberOfRooms}`].push(username)
-
+          if(!string_room)
+          {
+            this.createRoom(true, username);
+          }else{
+            this.string_room = false;
+            return this.addUserToRoom(-1, username, DEFAULT_ROOM_SIZE);
+          }
           return this.numberOfRooms;
       }
     }
   }
 
   deleteUser = (username='', room) => {
-
+    /* This is the function that deletes a user
+    from a room if the user logs out/exits the app
+    while in the waiting room */
     let {rooms_dictionary} = this;
 
     let index = rooms_dictionary[`${room}`].indexOf(username);
@@ -190,7 +260,7 @@ class RoomManager
 
 let room_manager = new RoomManager();
 
-const ROOM_SIZE = 6;
+const DEFAULT_ROOM_SIZE = 6;
 
 const app = express();
 
@@ -285,8 +355,18 @@ app.post('/delete_from_room', (req, res) => {
 
 app.get('/check_rooms', (req, res) => {
 
-  console.log(req.query)
-  let result = room_manager.addUserToRoom(parseInt(req.query.room),
+  let room_arg = req.query.room;
+  room_manager.string_room = true;
+
+  //if room_arg is a number
+  if(!isNaN(parseInt(room_arg)))
+  {
+      room_arg = parseInt(room_arg);
+      room_manager.string_room = false;
+
+  }
+
+  let result = room_manager.addUserToRoom(room_arg,
   req.query.username);
 
   res.send(`${result}`);
@@ -365,7 +445,7 @@ app.get('/get_mets', async (req, res) => {
 app.get('/getopponentsscore', (req, res) => {
   const user = req.query;
 
-  for(let i = 0; i < ROOM_SIZE; i++)
+  for(let i = 0; i < DEFAULT_ROOM_SIZE; i++)
   {
     if(room_manager.rooms_dictionary[`${user.room}`][i].username == user.username)
     {
