@@ -311,7 +311,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: A NEEEEWWW RECORD!!
+  m_text: A NEEEEWWWW RECORD!!!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7474b15acdeac8049a8c11923c891bd2, type: 2}
   m_sharedMaterial: {fileID: -1727130284730214373, guid: 7474b15acdeac8049a8c11923c891bd2,
@@ -964,7 +964,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'YOU PLACED '
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7474b15acdeac8049a8c11923c891bd2, type: 2}
   m_sharedMaterial: {fileID: -1727130284730214373, guid: 7474b15acdeac8049a8c11923c891bd2,
@@ -1098,7 +1098,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "WINS: 20 \t\tLOSSES: 30"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7474b15acdeac8049a8c11923c891bd2, type: 2}
   m_sharedMaterial: {fileID: -1727130284730214373, guid: 7474b15acdeac8049a8c11923c891bd2,
@@ -1298,7 +1298,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: YOU LOSE
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7474b15acdeac8049a8c11923c891bd2, type: 2}
   m_sharedMaterial: {fileID: -1727130284730214373, guid: 7474b15acdeac8049a8c11923c891bd2,

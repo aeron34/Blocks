@@ -169,49 +169,60 @@ public class MainController : MonoBehaviour
             texts[3] = GameObject.Find("score").GetComponent<TextMeshProUGUI>();
             texts[4] = GameObject.Find("your place").GetComponent<TextMeshProUGUI>();
 
-            string result = "YOU WIN";
-            if (place > 1)
+            var online_controller = FindObjectOfType<Online>();
+
+            texts[0].text = "WINS: ... 		LOSSES: ...";
+
+            
+
+            texts[3].text = $"FINAL SCORE: {score}";
+
+            if (!online_controller.team_battle)
             {
-                string[] quotes = new string[4]{
+                PlacedResults();
+            }
+        }
+    }
+
+    private void PlacedResults()
+    {
+        string result = "YOU WIN";
+
+        if (place > 1)
+        {
+            string[] quotes = new string[4]{
                     "better luck next time", "They got lucky", "you got it next time",
                     "every pro has a bad game"
                 };
-                System.Random rand = new System.Random();
-                int i = rand.Next(4);
-                result = quotes[i];
-            }
-
-            if (place == 2)
-            {
-                result = "So Close";
-            }
-
-            GameObject.Find("result").GetComponent<TextMeshProUGUI>().text = $"{result.ToUpper()}";
-
-            texts[0].text = "WINS: ... 		LOSSES: ...";
-            for (int i = 2; i < 5; i++)
-            {
-                texts[i].text = $"{texts[i].text} ...";
-            }
-            string suffix = "th";
-            switch(place)
-            {
-                case 1:
-                    suffix = "st";
-                    break;
-                case 2:
-                    suffix = "nd";
-                    break;
-                case 3:
-                    suffix = "rd";
-                    break;
-                default:
-                    break;
-            }
-            texts[3].text = $"FINAL SCORE: {score}";
-            texts[4].text = $"YOU PLACED {place}{suffix}";
-
+            System.Random rand = new System.Random();
+            int i = rand.Next(4);
+            result = quotes[i];
         }
+
+        if (place == 2)
+        {
+            result = "So Close";
+        }
+
+        GameObject.Find("result").GetComponent<TextMeshProUGUI>().text = $"{result.ToUpper()}";
+
+    
+        string suffix = "th";
+        switch (place)
+        {
+            case 1:
+                suffix = "st";
+                break;
+            case 2:
+                suffix = "nd";
+                break;
+            case 3:
+                suffix = "rd";
+                break;
+            default:
+                break;
+        }
+        texts[4].text = $"YOU PLACED {place}{suffix}";
     }
 
     #region View and Scene Loaders

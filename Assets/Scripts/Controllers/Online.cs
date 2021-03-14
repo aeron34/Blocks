@@ -25,8 +25,9 @@ public class Online : MonoBehaviour
     public string game_mode = "highest score wins";
     private float timer = 0.0f;
     private int opp_info_init = -1;//, place;
-    public bool online = true, runnable;
-    private static int room=-1, metes = 0, fetch_status, place;
+    public bool online = true, runnable, team_battle;
+    private string  room = "-1";
+    private static int metes = 0, fetch_status, place, wins, losses;
 
     void Awake()
     {
@@ -158,7 +159,7 @@ public class Online : MonoBehaviour
         online = true;
         running_room = false;
         metes = 0;
-        room = -1;
+        room = "-1";
         fetch_status = 0;
     }
     public void SkipLogin()
@@ -235,11 +236,11 @@ public class Online : MonoBehaviour
 
     private IEnumerator CheckRooms()
     {
-         
-        while(!running_room)
-        {
-            string b = user_info["username"], room_number = "-1";
+        team_battle = true;
 
+        while (!running_room)
+        {
+            string b = user_info["username"], room_number = "team-1";
 
             if (user_info.ContainsKey("room"))
             {
@@ -258,7 +259,8 @@ public class Online : MonoBehaviour
 
                 if (!user_info.ContainsKey("room"))
                 {
-                    room = Int32.Parse(arr[1]);
+                    
+                    room = arr[1];
                     user_info.Add("room", room.ToString());       
                 }
                 running_room = true;
@@ -270,9 +272,9 @@ public class Online : MonoBehaviour
 
             if (!user_info.ContainsKey("room"))
             {
-                room = Int32.Parse(content); 
+                room = content; 
                 room_txt.GetComponent<TextMeshProUGUI>().text = $"Waiting in Room \n\n {room}";
-                user_info.Add("room", room.ToString());
+                user_info.Add("room", room);
             }
 
             yield return new WaitForEndOfFrame();
@@ -360,12 +362,15 @@ public class Online : MonoBehaviour
                 var g = orderedlist.First();
 
                 place = GetPlace();
-                EndGame();
+                EndGame(team_battle);
                 fetch_status = -1;
-                SendResults();
-                
-                main_con.LoadLoss(score, place);
+                SendResults(team_battle);
 
+                if (team_battle)
+                {
+                    place = -1;
+                }
+                main_con.LoadLoss(score, place);
             }
         }
     }
@@ -378,22 +383,44 @@ public class Online : MonoBehaviour
 
         return opponent_info.OrderByDescending(x => Int32.Parse(x[1])).ToList();
     }
-    public static async Task SendResults()
+    public static async Task SendResults(bool team_battle = false)
     {
         Dictionary<string, string> body = new Dictionary<string, string>();
         body.Add("username", user_info["username"]);
         body.Add("password", user_info["password"]);
         string res = "win";
-        if(place > 1)
+        if (!team_battle)
         {
-            res = "loss";
+            if (place > 1)
+            {
+                res = "loss";
+            }
+
+            body.Add("result", res);
         }
-        body.Add("result", res);
+        else
+        {
+            body.Add("room", "team0");
+        }
         var content = new FormUrlEncodedContent(body);
         string a = $"http://localhost:3000/send_result";
         var response = await h.PostAsync(a, content);
 
-        //var res_string = await response.Content.ReadAsStringAsync();
+        var res_string = await response.Content.ReadAsStringAsync();
+
+        if(team_battle)
+        {
+            var result_text = GameObject.Find("result").GetComponent<TextMeshProUGUI>();
+            var winloss = FindObjectOfType<MainController>().texts[0];
+            result_text.text = $"YOU {res_string}";
+            winloss.text = $"WINS: {wins} 		LOSSES: {losses + 1}";
+
+            if (res_string == "loss")
+            {
+                winloss.text = $"WINS: {wins} 		LOSSES: {losses + 1}";
+                result_text.text = $"YOU LOSE";
+            }
+        }
         user_info.Remove("room");
         user_info.Remove("score");
     }
@@ -410,8 +437,8 @@ public class Online : MonoBehaviour
         string a = $"http://localhost:3000/delete_from_room";
         var response = await h.PostAsync(a, content);
     }
-   
-    public static async Task EndGame()
+
+    public static async Task EndGame(bool team_battle = false)
     {
 
         user_info.Add("score", FindObjectOfType<scorer>().GetScore().ToString());
@@ -423,13 +450,19 @@ public class Online : MonoBehaviour
 
         var arr = res_string.Split(',');
         var texts = FindObjectOfType<MainController>().texts;
-        if (place > 1)
-        {
-            texts[0].text = $"WINS: {arr[0]} 		LOSSES: {Int32.Parse(arr[1]) + 1}";
-        }
-        else
-        {
-            texts[0].text = $"WINS: {Int32.Parse(arr[0])+1} 		LOSSES: {arr[1]}";
+        wins = Int32.Parse(arr[0]);
+        losses = Int32.Parse(arr[1]);
+
+        if(!team_battle)
+        { 
+            if (place > 1)
+            {
+                texts[0].text = $"WINS: {wins} 		LOSSES: {losses + 1}";
+            }
+            else
+            {
+                texts[0].text = $"WINS: {wins + 1} 		LOSSES: {losses}";
+            }
         }
         texts[2].text = $"HIGHSCORE: {Int32.Parse(arr[2])}";
 

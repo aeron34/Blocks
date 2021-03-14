@@ -41,6 +41,50 @@ function GetOtherTeam(room_manager, room, team)
     ]
 */
 
+function GetWinningTeam(rooms_dictionary, room, name)
+{
+  let teamA = 0, teamB = 0;
+  let myTeam ="";
+  rooms_dictionary[`${room}`].map(player =>
+  {
+      if(player.username == name)
+      {
+        myTeam = player.team
+      }
+      if(player.team == "A")
+      {
+        teamA += player.score;
+      }else{
+        teamB += player.score;
+      }
+  })
+
+  let result = "";
+
+  if(teamA > teamB)
+  {
+    result = "A"
+  }
+  if(teamA < teamB)
+  {
+    result = "B"
+  }
+  if(teamA == teamB)
+  {
+    result = "DRAW"
+  }
+
+  if(myTeam == result)
+  {
+    result = "win"
+  }else{
+    result = "loss"
+  }
+
+
+  return result;
+}
+
 function CleanRoom(rooms_dictionary, room)
 {
   if(!rooms_dictionary.hasOwnProperty(`${room}`))
@@ -61,4 +105,5 @@ module.exports = {
   CleanRoom,
   GetUserInRoom,
   GetOtherTeam,
+  GetWinningTeam
 };

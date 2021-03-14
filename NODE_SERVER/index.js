@@ -40,8 +40,8 @@ class RoomManager
       { username: 'rem2o', score:10 },
       { username: 'no3ob', score: 4231000 },
       { username: 'claus', score: 20 },
-      {username:'dolo', score: 20},
-      { username: 'son', score: 21 }
+      {username:'dolo', score: 222231210},
+      { username: 'son', score: 123121 }
     ]
   };
 
@@ -58,8 +58,10 @@ class RoomManager
 
       if(room == undefined)
       {
-        this.numberOfRooms++;
-        roomNumber = this.numberOfRooms;
+
+          this.numberOfRooms++;
+          roomNumber = this.numberOfRooms;
+
       }else{
         roomNumber = room
       }
@@ -212,11 +214,16 @@ class RoomManager
         if(rooms_dictionary[`${numberOfRooms}`].length == ROOM_SIZE)
         {
           //Make a new room.
-          this.createRoom();
-
+          if(!team)
+          {
+            this.createRoom();
+          }
           if(team)
           {
               this.splitTeamRoom(numberOfRooms)
+
+              //Makes a new team room
+              this.numberOfTeams += 1;
           }
           return `${["running", numberOfRooms]}`;
 
@@ -381,7 +388,20 @@ app.post('/check_in', (req, res) => {
 
 app.post('/send_result', async (req, res) => {
   const user = req.body;
-  await urls.SendResult(req, res, knx, user);
+  if(user.room != null)
+  {
+    let result = methods.GetWinningTeam(room_manager.rooms_dictionary, user.room, user.name)
+    await urls.SendResult(req, res, knx, user, false);
+    return res.send(result)
+  }
+  else
+  {
+    await urls.SendResult(req, res, knx, user);
+  }
+})
+
+app.get('/get_winning_team', (req, res) => {
+
 })
 
 app.post('/send_mets', async (req, res) => {
@@ -403,7 +423,7 @@ app.post('/send_mets', async (req, res) => {
       user = user_arr[Math.floor(Math.random() * user_arr.length)];
     } else
     {
-      user_list = methods.FilterRoomForUser(room_manager, room, name);
+      user_arr = methods.FilterRoomForUser(room_manager, room, name);
       user = user_arr[Math.floor(Math.random() * user_arr.length)];
     }
 

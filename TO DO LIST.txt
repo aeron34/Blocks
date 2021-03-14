@@ -27,8 +27,12 @@ the team's scores and determine the winner,
 if your name is in the losing team, you get
 sent a 'loser' response) 
 
+
+
 IMPLEMENT THE FRONT END FOR THE TEAM
 BATTLE NOW (NOW)
+
+
 
 o Also, edit the send_mets function to 
 look in the upper4 if the character is
