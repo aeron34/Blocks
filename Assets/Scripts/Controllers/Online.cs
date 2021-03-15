@@ -161,6 +161,8 @@ public class Online : MonoBehaviour
         metes = 0;
         room = "-1";
         fetch_status = 0;
+        team_battle = FindObjectOfType<MainController>().teams;
+        
     }
     public void SkipLogin()
     {
@@ -236,11 +238,17 @@ public class Online : MonoBehaviour
 
     private IEnumerator CheckRooms()
     {
-        team_battle = true;
-
+        if (FindObjectOfType<MainController>().teams)
+        {
+            team_battle = true;
+        }
         while (!running_room)
         {
-            string b = user_info["username"], room_number = "team-1";
+            string b = user_info["username"], room_number = "-1";
+            if(team_battle)
+            {
+                room_number = "team-1";
+            }
 
             if (user_info.ContainsKey("room"))
             {
@@ -400,7 +408,7 @@ public class Online : MonoBehaviour
         }
         else
         {
-            body.Add("room", "team0");
+            body.Add("room", user_info["room"]);
         }
         var content = new FormUrlEncodedContent(body);
         string a = $"http://localhost:3000/send_result";
@@ -413,7 +421,7 @@ public class Online : MonoBehaviour
             var result_text = GameObject.Find("result").GetComponent<TextMeshProUGUI>();
             var winloss = FindObjectOfType<MainController>().texts[0];
             result_text.text = $"YOU {res_string}";
-            winloss.text = $"WINS: {wins} 		LOSSES: {losses + 1}";
+            winloss.text = $"WINS: {wins + 1} 		LOSSES: {losses}";
 
             if (res_string == "loss")
             {

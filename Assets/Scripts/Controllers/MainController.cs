@@ -13,7 +13,8 @@ public class MainController : MonoBehaviour
     private string char_name;
     //public int[] stats = new int[5] {-1,-1,-1,-1,-1 }; //[win,loss,prev_score,curr_score,place];
     public TextMeshProUGUI[] texts;// = new TextMeshProUGUI[5];
-    GameObject char_select, main_menu;
+    GameObject char_select, main_menu, mode_select;
+    public bool teams;
     public GameObject Gizmo, Boxer, weap_box, ultra_bar, new_record;
     public int score = 0, place;
     void Awake()
@@ -36,12 +37,17 @@ public class MainController : MonoBehaviour
     public void Restart()
     {
         texts = new TextMeshProUGUI[5] { null, null, null, null, null };
+        teams = false;
         main_menu = GameObject.Find("Main Menu");
         char_select = GameObject.Find("Char Select");
+        mode_select = GameObject.Find("Mode Select");
+        GameObject.Find("Teams").GetComponent<Button>().onClick.AddListener(TeamsToCharSelect);
+        GameObject.Find("Free For All").GetComponent<Button>().onClick.AddListener(EveryManToCharSel);
         GameObject.Find("Gizmo").GetComponent<Button>().onClick.AddListener(LoadGizmo);
         GameObject.Find("Boxer").GetComponent<Button>().onClick.AddListener(LoadBoxer);
         main_menu.SetActive(true);
         char_select.SetActive(false);
+        mode_select.SetActive(false);
     }
 
     private void OnEnable()
@@ -150,15 +156,16 @@ public class MainController : MonoBehaviour
         if (scene.name == "Main Menus" && res_to_char)
         {
             Restart();
+            teams = false;
             res_to_char = false;
-            CharSelect();
+            MatchToModeSelect();
             
         }
 
         if (scene.name == "Loss Screen")
         {
             var btn = GameObject.Find("Char_select").GetComponent<Button>();
-            btn.onClick.AddListener(ResultsScreenToCharSelect);
+            btn.onClick.AddListener(ResultsScreenToModeSelect);
 
             new_record = GameObject.Find("new record");// (false);
             new_record.SetActive(false);
@@ -177,13 +184,25 @@ public class MainController : MonoBehaviour
 
             texts[3].text = $"FINAL SCORE: {score}";
 
-            if (!online_controller.team_battle)
+            if (!teams)
             {
                 PlacedResults();
             }
         }
     }
 
+    private void TeamsToCharSelect()
+    {
+        teams = true;
+        mode_select.SetActive(false);
+        CharSelect();
+    }
+    private void EveryManToCharSel()
+    {
+        teams = false;
+        mode_select.SetActive(false);
+        CharSelect();
+    }
     private void PlacedResults()
     {
         string result = "YOU WIN";
@@ -240,13 +259,19 @@ public class MainController : MonoBehaviour
         main_menu.SetActive(true);
         char_select.SetActive(false);
     }
+
+    public void MatchToModeSelect()
+    {
+        main_menu.SetActive(false);
+        mode_select.SetActive(true);
+    }
     public void CharSelect()
     {
         main_menu.SetActive(false);
         char_select.SetActive(true);
     }
     
-    public void ResultsScreenToCharSelect()
+    public void ResultsScreenToModeSelect()
     {
         res_to_char = true;
         SceneManager.LoadScene("Main Menus");

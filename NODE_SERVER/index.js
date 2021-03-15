@@ -19,11 +19,6 @@ const knx = require('knex')({
 
 class RoomManager
 {
-
-  constructor()
-  {
-  }
-
   rooms_dictionary = {
     '0': [
          //{ username: 'mono', score: 0 },
