@@ -14,31 +14,11 @@ ultimate - NEXT(1)
 o Allow direct P2P Matches, allow users
 to limit the ammount of people who can
 join the P2P Match/free for all to
-a maximum of 8 (NEXT).
+a maximum of 8 (NOW)
 
-o Implement a team battle, have 
-the character's online controller operate
- a coroutine that sends out the players
-final score, wait for 5 seconds (giving it
-time to get everyone's scores) and then
-send another get request that returns
-the final verdict (the server compile
-the team's scores and determine the winner, 
-if your name is in the losing team, you get
-sent a 'loser' response) 
+Create the P2P Front END because backend
+is already done.
 
-
-
-IMPLEMENT THE FRONT END FOR THE TEAM
-BATTLE NOW (NOW)
-
-
-
-o Also, edit the send_mets function to 
-look in the upper4 if the character is
-in team B and vice versa for A(NEXT 1)
-BTW - the code for someone looking for a new team room is 
-'team-1'.
 
 o On the lobby screen, 
 Implement a side pannel where

@@ -22,26 +22,37 @@ class RoomManager
   rooms_dictionary = {
     '0': [
          //{ username: 'mono', score: 0 },
-         {username:'dolo', score: 20},
 
       { username: 'remo', score:10 },
-      { username: 'noob', score: 4231000 },
          { username: 'claus', score: 20 },
          { username: 'son', score: 21 }
      ],
-    'team0':[
-      { username: 'remo', score:10 },
-      { username: 'noob', score: 4231000 },
-      { username: 'rem2o', score:10 },
-      { username: 'no3ob', score: 4231000 },
-      { username: 'claus', score: 20 },
-      {username:'dolo', score: 222231210},
-      { username: 'son', score: 123121 }
-    ]
+     "michael":[
+     {
+           "username": "syad234a",
+           "score": 0
+       },
+       {
+           "username": "syad2",
+           "score": 0
+       },
+       {
+           "username": "syad212",
+           "score": 0
+       },
+       {
+           "username": "syad212s",
+           "score": 0
+       },
+       {
+           "username": "syad212sa",
+           "score": 0
+       }
+   ]
   };
 
   numberOfRooms = 0;
-  roomAutoDeleteTime = 900000;
+  roomAutoDeleteTime = 1800000/2;
   string_room = false;
 
   createRoom = (addSelf = false, username='', room, genesis=false) =>
@@ -256,7 +267,16 @@ class RoomManager
     while in the waiting room */
     let {rooms_dictionary} = this;
 
-    let index = rooms_dictionary[`${room}`].indexOf(username);
+    let index = 0;
+
+    for(let i = 0; rooms_dictionary[`${room}`].length; i++)
+    {
+      if(rooms_dictionary[`${room}`][i].username == username)
+      {
+        index = i;
+      }
+    };
+
     rooms_dictionary[room].splice(index, 1);
   }
 }
@@ -358,15 +378,15 @@ app.post('/delete_from_room', (req, res) => {
 
 app.get('/check_rooms', (req, res) => {
 
-  let room_arg = req.query.room;
+  let room_arg=req.query.room;
   room_manager.string_room = true;
+
 
   //if room_arg is a number
   if(!isNaN(parseInt(room_arg)))
   {
       room_arg = parseInt(room_arg);
       room_manager.string_room = false;
-
   }
 
   let result = room_manager.addUserToRoom(room_arg,
@@ -383,6 +403,11 @@ app.post('/check_in', (req, res) => {
 
 app.post('/send_result', async (req, res) => {
   const user = req.body;
+  console.log(user);
+  setTimeout(() => {
+    delete room_manager.rooms_dictionary[`${user.room}`];
+  }, 5000);
+
   if(user.room != null)
   {
     let result = methods.GetWinningTeam(room_manager.rooms_dictionary, user.room, user.name)
@@ -395,8 +420,17 @@ app.post('/send_result', async (req, res) => {
   }
 })
 
-app.get('/get_winning_team', (req, res) => {
+app.get('/get_users_in_room', (req, res) => {
+  let params = req.query;
+  console.log(params);
+  const room = [room_manager.rooms_dictionary[`${params.room}`]];
+  let usernames = room[0].map(user => {
+    return user.username
+  });
 
+  //Basically stringifies the response so it can be read by unity
+
+  res.send(`${usernames.map(a=>a)}`)
 })
 
 app.post('/send_mets', async (req, res) => {

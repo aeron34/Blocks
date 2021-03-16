@@ -14,7 +14,7 @@ public class MainController : MonoBehaviour
     //public int[] stats = new int[5] {-1,-1,-1,-1,-1 }; //[win,loss,prev_score,curr_score,place];
     public TextMeshProUGUI[] texts;// = new TextMeshProUGUI[5];
     GameObject char_select, main_menu, mode_select;
-    public bool teams;
+    public bool teams, peer2peer;
     public GameObject Gizmo, Boxer, weap_box, ultra_bar, new_record;
     public int score = 0, place;
     void Awake()
@@ -38,10 +38,12 @@ public class MainController : MonoBehaviour
     {
         texts = new TextMeshProUGUI[5] { null, null, null, null, null };
         teams = false;
+        peer2peer = false;
         main_menu = GameObject.Find("Main Menu");
         char_select = GameObject.Find("Char Select");
         mode_select = GameObject.Find("Mode Select");
         GameObject.Find("Teams").GetComponent<Button>().onClick.AddListener(TeamsToCharSelect);
+        GameObject.Find("P2P").GetComponent<Button>().onClick.AddListener(FriendsToCharSel);
         GameObject.Find("Free For All").GetComponent<Button>().onClick.AddListener(EveryManToCharSel);
         GameObject.Find("Gizmo").GetComponent<Button>().onClick.AddListener(LoadGizmo);
         GameObject.Find("Boxer").GetComponent<Button>().onClick.AddListener(LoadBoxer);
@@ -197,9 +199,17 @@ public class MainController : MonoBehaviour
         mode_select.SetActive(false);
         CharSelect();
     }
+
+    private void FriendsToCharSel()
+    {
+        peer2peer = true;
+        EveryManToCharSel();
+    }
+    
     private void EveryManToCharSel()
     {
         teams = false;
+        Debug.Log($"p2p is {peer2peer}");
         mode_select.SetActive(false);
         CharSelect();
     }

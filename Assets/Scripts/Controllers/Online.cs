@@ -17,8 +17,9 @@ public class Online : MonoBehaviour
     private static Dictionary<string, string> user_info;
     private static bool call, running_room;
     private static List<string[]> opponent_info;
-    private static GameObject room_txt;
-
+    private List<GameObject> room_usernames;
+    private static GameObject room_txt, room_box, friend_box;
+    public GameObject username_text;
     private List<GameObject> opp_infos;
     // The game modes are: highest score wins & last man standing. self explanitory.
 
@@ -49,8 +50,8 @@ public class Online : MonoBehaviour
         online = true;
         user_info = new Dictionary<string, string> { };
         game_mode = "highest score wins";
-        room_txt = GameObject.Find("room_txt");
-        room_txt.SetActive(false);
+        room_usernames = new List<GameObject>();
+        Restart();
     }
 
     public void Get()
@@ -142,24 +143,48 @@ public class Online : MonoBehaviour
         {
             user_info.Add("username", u);
             user_info.Add("password", p);
-            room_txt.SetActive(true);
-            room_txt.GetComponent<TextMeshProUGUI>().text = "Looking for room...";
             GameObject.Find("Login Box").SetActive(false);
             runnable = true;
-            StartCoroutine(CheckRooms());
+            if (FindObjectOfType<MainController>().peer2peer == false)
+            {
+                room_txt.SetActive(true);
+                room_txt.GetComponent<TextMeshProUGUI>().text = "Looking for room...";
+                StartCoroutine(CheckRooms());
+            }
+            else
+            {
+                team_battle = false;
+                friend_box.SetActive(true);
+            }
         }
-        
     }
+
+    public void AddP2PRoom()
+    {
+        string txt = GameObject.Find("room").GetComponent<TMP_InputField>().text;
+        user_info.Add("room", txt.Replace(" ", ""));
+        StartCoroutine(CheckRooms());
+    }
+
     private void Restart()
     {
         GameObject.Find("Login Box").SetActive(true);
         room_txt = GameObject.Find("room_txt");
+        room_box = GameObject.Find("Room Box");
+        friend_box = GameObject.Find("Friend Box");
+        GameObject.Find("create room").GetComponent<Button>().onClick.AddListener(AddP2PRoom);
+        friend_box.SetActive(false);
+
+        room_txt.SetActive(false);
+        room_box.SetActive(false);
         timer = 0.0f;
         opp_info_init = -1;//, place;
         online = true;
         running_room = false;
         metes = 0;
         room = "-1";
+        user_info.Remove("room");
+        room_usernames.Clear();
         fetch_status = 0;
         team_battle = FindObjectOfType<MainController>().teams;
         
@@ -169,10 +194,21 @@ public class Online : MonoBehaviour
         Restart();      
         call = true;
         room_txt.SetActive(true);
-        room_txt.GetComponent<TextMeshProUGUI>().text = "Looking for room...";
-        GameObject.Find("Login Box").SetActive(false);
-        StartCoroutine(CheckRooms());
-
+        room_box.SetActive(true);
+        // GameObject.Find("Login Box").SetActive(false);
+        if (FindObjectOfType<MainController>().peer2peer == false)
+        {
+            room_txt.GetComponent<TextMeshProUGUI>().text = "Looking for room...";
+            
+            StartCoroutine(CheckRooms());
+        }
+        else
+        {
+            GameObject.Find("Login Box").SetActive(false);
+            room_txt.SetActive(false);
+            team_battle = false;
+            friend_box.SetActive(true);
+        }
     }
     public async Task GetOppInfo()
     {
@@ -252,10 +288,13 @@ public class Online : MonoBehaviour
 
             if (user_info.ContainsKey("room"))
             {
-                room_number = user_info["room"];
-            }
 
-            UnityWebRequest uwr = UnityWebRequest.Get($"http://localhost:3000/check_rooms?username={b}&room={room_number}");
+                room_number = $"{user_info["room"]}";                
+                room_txt.GetComponent<TextMeshProUGUI>().text = $"Waiting in Room \n\n {user_info["room"]}";
+                room_txt.SetActive(true);
+            }
+            string url = $"http://localhost:3000/check_rooms?username={b}&room={room_number}";
+            UnityWebRequest uwr = UnityWebRequest.Get(url);
             yield return uwr.SendWebRequest();
 
             var content = uwr.downloadHandler.text;
@@ -283,6 +322,52 @@ public class Online : MonoBehaviour
                 room = content; 
                 room_txt.GetComponent<TextMeshProUGUI>().text = $"Waiting in Room \n\n {room}";
                 user_info.Add("room", room);
+            }
+
+            //Get a list of usernames for the people that are in the room
+            //We can assign room_number to the userinfo because we can't 
+            //reach this line until the above has finished.
+            
+            room_box.SetActive(true);
+
+            UnityWebRequest get_users = UnityWebRequest.Get($"http://localhost:3000/get_users_in_room?room={room_number}");
+            yield return get_users.SendWebRequest();
+
+            var get_response = get_users.downloadHandler.text;
+
+            var users_array = get_response.Split(',');
+            GameObject.Find("Player Count").GetComponent<TextMeshProUGUI>().text = $"Players In Room: {users_array.Length}";
+
+            foreach(GameObject g in room_usernames)
+            {
+               
+                Destroy(g);
+                
+            }
+            room_usernames.Clear();
+            for (int i = 0; i < users_array.Length; i++)
+            {
+                float offset_y = 121 - (room_usernames.ToArray().Length * 41);
+                var username = Instantiate(username_text, room_box.transform);
+                room_usernames.Add(username);
+                string obj_text = $"{users_array[i]}";
+                
+                if(team_battle)
+                {
+                    char team = 'A';
+                    if(i >= 4)
+                    {
+                        team = 'B';
+                    }
+                    obj_text = $"{users_array[i]}       TEAM {team}";
+                }
+                username.GetComponent<TextMeshProUGUI>().text = obj_text;
+                username.transform.localPosition = new Vector3(
+                    username.transform.localPosition.x,
+                    offset_y,
+                    username.transform.localPosition.z);
+                
+            
             }
 
             yield return new WaitForEndOfFrame();
@@ -396,6 +481,8 @@ public class Online : MonoBehaviour
         Dictionary<string, string> body = new Dictionary<string, string>();
         body.Add("username", user_info["username"]);
         body.Add("password", user_info["password"]);
+        body.Add("room", user_info["room"]);
+
         string res = "win";
         if (!team_battle)
         {
@@ -406,10 +493,7 @@ public class Online : MonoBehaviour
 
             body.Add("result", res);
         }
-        else
-        {
-            body.Add("room", user_info["room"]);
-        }
+
         var content = new FormUrlEncodedContent(body);
         string a = $"http://localhost:3000/send_result";
         var response = await h.PostAsync(a, content);
