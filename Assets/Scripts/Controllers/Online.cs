@@ -199,7 +199,8 @@ public class Online : MonoBehaviour
         if (FindObjectOfType<MainController>().peer2peer == false)
         {
             room_txt.GetComponent<TextMeshProUGUI>().text = "Looking for room...";
-            
+            GameObject.Find("Login Box").SetActive(false);
+            Debug.Log(team_battle);
             StartCoroutine(CheckRooms());
         }
         else
@@ -330,47 +331,49 @@ public class Online : MonoBehaviour
             
             room_box.SetActive(true);
 
-            UnityWebRequest get_users = UnityWebRequest.Get($"http://localhost:3000/get_users_in_room?room={room_number}");
-            yield return get_users.SendWebRequest();
-
-            var get_response = get_users.downloadHandler.text;
-
-            var users_array = get_response.Split(',');
-            GameObject.Find("Player Count").GetComponent<TextMeshProUGUI>().text = $"Players In Room: {users_array.Length}";
-
-            foreach(GameObject g in room_usernames)
+            if (user_info.ContainsKey("room"))
             {
-               
-                Destroy(g);
-                
-            }
-            room_usernames.Clear();
-            for (int i = 0; i < users_array.Length; i++)
-            {
-                float offset_y = 121 - (room_usernames.ToArray().Length * 41);
-                var username = Instantiate(username_text, room_box.transform);
-                room_usernames.Add(username);
-                string obj_text = $"{users_array[i]}";
-                
-                if(team_battle)
+                UnityWebRequest get_users = UnityWebRequest.Get($"http://localhost:3000/get_users_in_room?room={room_number}");
+                yield return get_users.SendWebRequest();
+
+                var get_response = get_users.downloadHandler.text;
+
+                var users_array = get_response.Split(',');
+                GameObject.Find("Player Count").GetComponent<TextMeshProUGUI>().text = $"Players In Room: {users_array.Length}";
+
+                foreach (GameObject g in room_usernames)
                 {
-                    char team = 'A';
-                    if(i >= 4)
-                    {
-                        team = 'B';
-                    }
-                    obj_text = $"{users_array[i]}       TEAM {team}";
+
+                    Destroy(g);
+
                 }
-                username.GetComponent<TextMeshProUGUI>().text = obj_text;
-                username.transform.localPosition = new Vector3(
-                    username.transform.localPosition.x,
-                    offset_y,
-                    username.transform.localPosition.z);
-                
-            
+                room_usernames.Clear();
+                for (int i = 0; i < users_array.Length; i++)
+                {
+                    float offset_y = 121 - (room_usernames.ToArray().Length * 41);
+                    var username = Instantiate(username_text, room_box.transform);
+                    room_usernames.Add(username);
+                    string obj_text = $"{users_array[i]}";
+
+                    if (team_battle)
+                    {
+                        char team = 'A';
+                        if (i >= 4)
+                        {
+                            team = 'B';
+                        }
+                        obj_text = $"{users_array[i]}       TEAM {team}";
+                    }
+                    username.GetComponent<TextMeshProUGUI>().text = obj_text;
+                    username.transform.localPosition = new Vector3(
+                        username.transform.localPosition.x,
+                        offset_y,
+                        username.transform.localPosition.z);
+
+                }
             }
 
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSecondsRealtime(2.5f);
         } 
     }
 

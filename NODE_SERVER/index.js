@@ -21,11 +21,24 @@ class RoomManager
 {
   rooms_dictionary = {
     '0': [
-         //{ username: 'mono', score: 0 },
+      //{ username: 'mono', score: 0 },
+      { username: 'sons', score: 0 },
+      { username: 'woj', score: 0 },
 
       { username: 'remo', score:10 },
          { username: 'claus', score: 20 },
          { username: 'son', score: 21 }
+     ],
+     'team0':[
+       { username: 'sons', score: 0 },
+       { username: 'woj', score: 0 },
+
+       { username: 'remo', score:10 },
+          { username: 'claus', score: 20 },
+          { username: 'son', score: 21 },
+          { username: '12on', score: 21 },
+          { username: 'ms2on', score: 21 },
+
      ],
      "michael":[
      {
@@ -261,7 +274,7 @@ class RoomManager
     }
   }
 
-  deleteUser = (username='', room) => {
+  deleteUser = (username='', room=0) => {
     /* This is the function that deletes a user
     from a room if the user logs out/exits the app
     while in the waiting room */
@@ -269,7 +282,7 @@ class RoomManager
 
     let index = 0;
 
-    for(let i = 0; rooms_dictionary[`${room}`].length; i++)
+    for(let i = 0; i < rooms_dictionary[`${room}`].length; i++)
     {
       if(rooms_dictionary[`${room}`][i].username == username)
       {
@@ -277,7 +290,7 @@ class RoomManager
       }
     };
 
-    rooms_dictionary[room].splice(index, 1);
+    rooms_dictionary[`${room}`].splice(index, 1);
   }
 }
 
@@ -369,6 +382,7 @@ app.post('/logout', (req, res) => {
 
 app.post('/delete_from_room', (req, res) => {
   let user = req.body;
+
   if(user.room != null)
   {
     room_manager.deleteUser(user.username, user.room);
@@ -380,7 +394,7 @@ app.get('/check_rooms', (req, res) => {
 
   let room_arg=req.query.room;
   room_manager.string_room = true;
-
+  console.log(req.query);
 
   //if room_arg is a number
   if(!isNaN(parseInt(room_arg)))
@@ -403,7 +417,6 @@ app.post('/check_in', (req, res) => {
 
 app.post('/send_result', async (req, res) => {
   const user = req.body;
-  console.log(user);
   setTimeout(() => {
     delete room_manager.rooms_dictionary[`${user.room}`];
   }, 5000);
@@ -422,15 +435,22 @@ app.post('/send_result', async (req, res) => {
 
 app.get('/get_users_in_room', (req, res) => {
   let params = req.query;
-  console.log(params);
-  const room = [room_manager.rooms_dictionary[`${params.room}`]];
-  let usernames = room[0].map(user => {
-    return user.username
-  });
 
-  //Basically stringifies the response so it can be read by unity
+  if(params.room != '-1' &&
+  room_manager.rooms_dictionary[`${params.room}`] != null)
+  {
+    const room = [room_manager.rooms_dictionary[`${params.room}`]];
 
-  res.send(`${usernames.map(a=>a)}`)
+    let usernames = room[0].map(user => {
+      return user.username
+    });
+
+    //Basically stringifies the response so it can be read by unity
+    res.send(`${usernames.map(a=>a)}`)
+
+  }else{
+    res.send("")
+  }
 })
 
 app.post('/send_mets', async (req, res) => {

@@ -209,7 +209,6 @@ public class MainController : MonoBehaviour
     private void EveryManToCharSel()
     {
         teams = false;
-        Debug.Log($"p2p is {peer2peer}");
         mode_select.SetActive(false);
         CharSelect();
     }
