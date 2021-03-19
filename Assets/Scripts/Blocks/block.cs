@@ -85,17 +85,8 @@ public class block : MonoBehaviour
             {
                 break;
             }
-           
-           // yield return null;
         }
 
-        /*
-         Fix the Check function with this:
-
-            o Keep the checking routine the exact same but 
-            use raycasts instead
-
-         */
 
 
         if(touching.ToArray().Length >= 3)
@@ -108,17 +99,6 @@ public class block : MonoBehaviour
                 n.GetComponent<block>().colm.GetComponent<column>().casc = true;
 
             }
-            /*var p = GameObject.Find("pic");
-            if(p.GetComponent<Gizmo>() != null)
-            {
-                p.GetComponent<Gizmo>().c_c = 20f;
-                p.GetComponent<Gizmo>().com += 1;
-            }
-            if(p.GetComponent<Boxer>() != null)
-            {
-                p.GetComponent<Boxer>().c_c = 20f;
-                p.GetComponent<Boxer>().com += 1;
-            }       */
 
             FindObjectOfType<scorer>().c_c = 30f;
 

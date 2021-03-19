@@ -15,8 +15,9 @@ public class MainController : MonoBehaviour
     public TextMeshProUGUI[] texts;// = new TextMeshProUGUI[5];
     GameObject char_select, main_menu, mode_select;
     public bool teams, peer2peer;
-    public GameObject Gizmo, Boxer, weap_box, ultra_bar, new_record;
+    public GameObject Gizmo, Boxer, weap_box, ultra_bar, back, new_record;
     public int score = 0, place;
+    //Action[] Menus;
     void Awake()
     {
         if (FindObjectsOfType(GetType()).Length > 1)
@@ -31,14 +32,21 @@ public class MainController : MonoBehaviour
 
     void Start()
     {
-        Restart();
+        Restart();        
+        back.GetComponent<Button>().onClick.AddListener(MainMenu);
+
     }
 
+    public string GetChar()
+    {
+        return char_name;
+    }
     public void Restart()
     {
         texts = new TextMeshProUGUI[5] { null, null, null, null, null };
         teams = false;
         peer2peer = false;
+        back = GameObject.Find("Back");
         main_menu = GameObject.Find("Main Menu");
         char_select = GameObject.Find("Char Select");
         mode_select = GameObject.Find("Mode Select");
@@ -47,9 +55,26 @@ public class MainController : MonoBehaviour
         GameObject.Find("Free For All").GetComponent<Button>().onClick.AddListener(EveryManToCharSel);
         GameObject.Find("Gizmo").GetComponent<Button>().onClick.AddListener(LoadGizmo);
         GameObject.Find("Boxer").GetComponent<Button>().onClick.AddListener(LoadBoxer);
-        main_menu.SetActive(true);
-        char_select.SetActive(false);
-        mode_select.SetActive(false);
+        MainMenu();
+    }
+
+    private void Update()
+    {
+        //If your on main menu (Online & Training Buttons)
+        if (SceneManager.GetActiveScene().name == "Main Menus"
+        && main_menu != null)
+        {
+            if (!main_menu.activeSelf && !res_to_char)
+            {
+                back.SetActive(true);
+            }
+
+            //If your not on main menu
+            if (main_menu.activeSelf && !res_to_char)
+            {
+                back.SetActive(false);
+            }
+        }
     }
 
     private void OnEnable()
@@ -94,12 +119,18 @@ public class MainController : MonoBehaviour
             {
                 var g = Instantiate(Gizmo);
                 g.name = "pic";
-                Instantiate(weap_box, canvas.transform).name = "weap_box";
+                g.transform.position = new Vector3(0f, 15f, 0);
+                var bar = Instantiate(weap_box, canvas.transform);
+                bar.name = "weap_box";
+                bar.transform.localPosition = new Vector3(-800f, 400f, 0);
+                
             }
             if (char_name == "Boxer")
             {
                 var g = Instantiate(Boxer);
                 g.name = "pic";
+                g.transform.position = new Vector3(0f, 15f, 0);
+
                 Instantiate(ultra_bar, canvas.transform).name = "ultra_bar";
             }
             if (FindObjectOfType<Online>() != null)
@@ -114,8 +145,9 @@ public class MainController : MonoBehaviour
             {
                 var g = Instantiate(Gizmo);
                 g.name = "pic";
-                Instantiate(weap_box, canvas.transform).name = "weap_box";
-                weap_box.transform.position = new Vector3(-725f, -275f, 0);
+                var v = Instantiate(weap_box, canvas.transform);
+                v.name = "weap_box";
+                v.transform.localPosition = new Vector3(-725f, -275f, 0);
             }
             if (char_name == "Boxer")
             {
@@ -157,11 +189,11 @@ public class MainController : MonoBehaviour
         
         if (scene.name == "Main Menus" && res_to_char)
         {
+
             Restart();
+                back.SetActive(false); 
             teams = false;
-            res_to_char = false;
-            MatchToModeSelect();
-            
+            MatchToModeSelect();            
         }
 
         if (scene.name == "Loss Screen")
@@ -259,14 +291,19 @@ public class MainController : MonoBehaviour
     {
         SceneManager.LoadScene("Lobby");
     }
+    
+    private void MainMenu()
+    {
+        training = false;
+        peer2peer = false;
+        teams = false;
+        main_menu.SetActive(true);
+        char_select.SetActive(false);
+        mode_select.SetActive(false);
+    }
     public void LoadTrainingRoom()
     {
         SceneManager.LoadScene("Training");
-    }
-    public void MainMenu()
-    {
-        main_menu.SetActive(true);
-        char_select.SetActive(false);
     }
 
     public void MatchToModeSelect()
@@ -301,8 +338,4 @@ public class MainController : MonoBehaviour
     }
     #endregion
 
-    void Update()
-    {
-        
-    }
 }

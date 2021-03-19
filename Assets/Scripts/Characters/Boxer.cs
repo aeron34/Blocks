@@ -18,7 +18,7 @@ public class Boxer : MonoBehaviour
     pwr_dur = 0, pwr_drn; //pwr_drn variable, the higher it is the faster
     // your pwr up runs out.
     private float n_hel = 1f;
-    private bool movable = true, can_punch;
+    public bool movable = true, can_punch;
     public bool ground = false, good_space, top_hit, hurt_b = false;
     public GameObject h_blk = null, v_blk = null;
     public GameObject ult_bar;
@@ -157,9 +157,39 @@ public class Boxer : MonoBehaviour
 
     private void ULTIMATE()
     {
-        Camera.main.GetComponent<cam>().zoom = true;
-        Camera.main.GetComponent<cam>().Target = transform.position;
-        ani.Play("upper");
+        if (h_blk != null)
+        {
+            var ori = h_blk.transform.position;
+
+            List<RaycastHit2D[]> blocks_for_del = new List<RaycastHit2D[]>();
+
+            int start = -6;
+            for(int i = 0; i < 9; i++)
+            {
+                blocks_for_del.Add(
+                Physics2D.RaycastAll(new Vector2(ori.x + start, ori.y),
+                Vector2.down, 20f, LayerMask.GetMask("blocks")));
+                start += 2;
+            }
+
+            foreach(var ray in blocks_for_del)
+            {
+                for (int i = 0; i < ray.Length; i++)
+                {
+                    var obj = ray[i].collider.gameObject.GetComponent<block>();
+
+                    if (obj.color != h_blk.GetComponent<block>().color)
+                    {
+                        QuickEXP(obj.gameObject);
+                    }
+                }
+            }
+            ani.Play("upper");
+        }
+        else
+        {
+            revertBack();
+        }
     }
 
     private void Upper()
@@ -200,7 +230,7 @@ public class Boxer : MonoBehaviour
             spr.flipX = false;
             Combos = new string[][]{
             new string[]{"s","d","s","d","u"}, // 
-            new string[]{"s", "s", "s", "o"},
+            new string[]{"s", "u"},
             new string[]{"s", "d", "u"}};
             //transform.position += m * Time.deltaTime;
         }
@@ -211,7 +241,7 @@ public class Boxer : MonoBehaviour
             spr.flipX = true;
             Combos = new string[][]{
             new string[]{"s","a","s","a","u"}, // 
-            new string[]{"s", "s", "s", "o"},
+            new string[]{"s", "u"},
             new string[]{"s", "a", "u"}};
 
         }
@@ -237,7 +267,7 @@ public class Boxer : MonoBehaviour
         if (Input.inputString != "")
         {
             inps.Add(Input.inputString);
-            frame_C = 45;
+            frame_C = 60;
             return;
         }
 

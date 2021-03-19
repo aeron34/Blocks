@@ -15,7 +15,7 @@ public class Gizmo : MonoBehaviour
     pwr_dur = 0, pwr_drn; //pwr_drn variable, the higher it is the faster
     // your pwr up runs out.
     private float n_hel = 1f;
-    public bool ground = false, good_space, top_hit, hurt_b = false;
+    public bool movable = true,ground = false, good_space, top_hit, hurt_b = false;
     public GameObject h_blk = null, v_blk = null;
     public GameObject gren, spider;
     public int[] weapons;
@@ -211,7 +211,7 @@ public class Gizmo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!hurt_b)
+        if(!hurt_b && movable)
         { 
             UP_Logic();
         }

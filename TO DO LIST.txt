@@ -4,26 +4,14 @@ o Create the main menu.
 o Add a megaman style explode animation
 to the character when something fell on him.
 
-o Add the animations
+o Add the animations - NEXT(1)
 
+o Set up google Ads.
 
-o Add the button mashing to the boxers
-ultimate - NEXT(1) 
-
-
-o Allow direct P2P Matches, allow users
-to limit the ammount of people who can
-join the P2P Match/free for all to
-a maximum of 8 (NOW)
-
-Create the P2P Front END because backend
-is already done.
-
-
-o On the lobby screen, 
-Implement a side pannel where
-you can see the people waiting
-with thier usernames (NEXT)
+o Take a random photo from the internet with a 
+futuristic background (maybe royalty free), but 
+if not take one and stretch out a vent and 
+repeat it to make the background - (NOW)
 
 o Sometime in the future update the site and add:
 
@@ -37,7 +25,7 @@ o Sometime in the future update the site and add:
 
 o Make it so that the when the column
 reaches a certain number, the column
-deletes it's blocks, restaring (NEXT [1]).
+deletes it's blocks, restaring (AFTER LAUNCH AND 500+ Steady Player Base).
 
 
 o make a gameover animation by deleting

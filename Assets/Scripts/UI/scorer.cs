@@ -9,8 +9,9 @@ using TMPro;
 public class scorer : MonoBehaviour
 {
     TextMeshProUGUI txt;
-    Text chain, combo;
-    int score = 0;
+    Text chain, combo, met_text;
+    GameObject met_box;
+    int score = 0, mets;
     int last_chn = 0;
     public int com;
     public float c_c;
@@ -20,11 +21,15 @@ public class scorer : MonoBehaviour
         txt = gameObject.GetComponent<TextMeshProUGUI>();
         chain = GameObject.Find("Chain_Cnt").GetComponent<Text>();
         combo = GameObject.Find("Com_Cnt").GetComponent<Text>();
+        met_box = GameObject.Find("meteors_box");
+        met_box.SetActive(false);
     }
 
     public void UpdateChain(int x)
-    {        
-        if(last_chn < x)
+    {
+        met_box.SetActive(true);
+        met_box.transform.GetChild(1).GetComponent<Text>().text = $"{x / 4} METEORS SENT";
+        if (last_chn < x)
         {
             chain.text = x.ToString() + "X LINK";
             last_chn = x;
@@ -51,6 +56,8 @@ public class scorer : MonoBehaviour
             chain.text = "";
             combo.gameObject.SetActive(false);
             chain.gameObject.SetActive(false);
+            met_box.SetActive(false);
+
         }
 
         c_c -= 0.08f;

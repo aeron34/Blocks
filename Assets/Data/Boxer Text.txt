@@ -10,7 +10,7 @@ will simply push it one block distance.|The Boxer, like Gizmo, has tools apart f
 that help you score higher than other players. He has moves 
 that be utilised via button inputs. These work like they do in 
 fighting games. Click next|Here are the input combinations:
-** / = OR ** Meaning you use can either key 
-UPPERCUT - "S", "D"/"A", "U"
-OVERHAND - "S", "D"/"A", "S", "D"/"A", "U"
-GROUND POUND - "S", "S", "S", "O" |You now know how to use the Boxer!|
+** " / " means OR ** Meaning you use can either key 
+UPPERCUT - "S", "D" / "A", "U"
+OVERHAND - "S", "D" / "A", "S", "D" / "A", "U" (1/4 BAR)
+GROUND POUND - "S", "U" (FULL BAR) |You now know how to use the Boxer!|

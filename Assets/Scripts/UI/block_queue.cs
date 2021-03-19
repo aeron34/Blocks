@@ -12,14 +12,14 @@ public class block_queue : MonoBehaviour
     public Transform g, blk_spn;
     float s = 0.5f, drp_tm;
     double time_passed = 0;
-    bool moving, checking;
+    bool moving, checking, begin, start_update;
     public float default_col_X = -20.3f;
     Queue<GameObject> blk_queue = new Queue<GameObject>();
     public GameObject colm, null_block, block, meteor, 
     scorer = null, opp_info_container;
-    GameObject c_b = null;
-    int trialNumber = 1, minutes, seconds;
-    float t_m = 0.05f, bts = 0.055f, time = (60*.1f);
+    GameObject c_b = null, count_down_obj;
+    int trialNumber = 1, minutes, seconds, seconds_to_start = 3;
+    float t_m = 0.05f, bts = 0.055f, time = (60*.75f), count_timer;
     System.Random random = new System.Random();
     public int meteors = 0, default_col_number = 19, max_trials=0;
     float[] minutes_passed = { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f };
@@ -30,6 +30,9 @@ public class block_queue : MonoBehaviour
     public Extras.Utilites util;
     public string Game_Mode = "Game";
     private string[] condition = new string[] { "", "" }, tutorial_text;
+
+    [SerializeField] private Sprite[] count_sprites = new Sprite[3];
+
     // Start is called before the first frame update
     void Start()
     {
@@ -59,6 +62,9 @@ public class block_queue : MonoBehaviour
 
         if (Game_Mode == "Game")
         {
+            count_down_obj = GameObject.Find("count_down");
+            StartCoroutine(WaitToStartUP());
+
             for (int i = 0; i < 10; i++)
             {
                 minutes_passed[i] *= 60f;
@@ -98,7 +104,7 @@ public class block_queue : MonoBehaviour
                     }
                     if (i < 3)
                     {
-                        //These are the null gray blocks
+                       // These are the null gray blocks
                         var blk = Instantiate(null_block, blk_spn.position, blk_spn.rotation);
                         blk.transform.position = new Vector3(column_positions[b], st_y, 0);
                     }
@@ -119,6 +125,26 @@ public class block_queue : MonoBehaviour
         }
 
        // StartCoroutine(MeteorTime());
+    }
+
+    private IEnumerator WaitToStartUP()
+    {
+        count_down_obj.SetActive(false);
+        switch(FindObjectOfType<MainController>().GetChar())
+        {
+            case "Gizmo":
+                FindObjectOfType<Gizmo>().movable = false;
+                break;
+            case "Boxer":
+                FindObjectOfType<Boxer>().movable = false;
+                break;
+            default:
+                break;
+        }
+
+        yield return new WaitForSecondsRealtime(2);
+        start_update = true;
+        count_down_obj.SetActive(true);
     }
 
     public void GetTrial(int number)
@@ -191,35 +217,51 @@ public class block_queue : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Game_Mode == "Game")
+        if (Game_Mode == "Game" && start_update)
         {
-            drop();
-
-            time_passed += Time.deltaTime;
-            time_passed = Math.Round(time_passed, 2);
-            for (int i = 0; i < 10; i++)
+            if (!begin)
             {
-
-                if (time_passed == minutes_passed[i])
+                count_down_obj.GetComponent<SpriteRenderer>().sprite = 
+                    count_sprites[seconds_to_start-1];
+                count_timer += Time.deltaTime;
+                seconds_to_start = 3 - Mathf.FloorToInt(count_timer % 60);
+                if(seconds_to_start == 0)
                 {
-                    bts += 0.025f;
+                    begin = true;
+                    Destroy(GameObject.Find("count_down"));
+                    switch (FindObjectOfType<MainController>().GetChar())
+                    {
+                        case "Gizmo":
+                            FindObjectOfType<Gizmo>().movable = true;
+                            break;
+                        case "Boxer":
+                            FindObjectOfType<Boxer>().movable = true;
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
-            time -= Time.deltaTime;
-            minutes = Mathf.FloorToInt(time / 60);
-            seconds = Mathf.FloorToInt(time % 60);
-
-            if ((int)time <= 0)
+            if (begin)
             {
-                over = true;
-                Time.timeScale = 0;                
-                enabled = false;
+                drop();
 
+                time -= Time.deltaTime;
+                minutes = Mathf.FloorToInt(time / 60);
+                seconds = Mathf.FloorToInt(time % 60);
+
+                if ((int)time <= 0)
+                {
+                    over = true;
+                    Time.timeScale = 0;
+                    enabled = false;
+
+                }
+
+                GameObject.Find("minutes").GetComponent<Text>().text =
+                    string.Format("{0:00}:{1:00}", minutes, seconds);
             }
-
-            GameObject.Find("minutes").GetComponent<Text>().text = 
-                string.Format("{0:00}:{1:00}", minutes, seconds);
         }
 
         if(Game_Mode == "Training")
