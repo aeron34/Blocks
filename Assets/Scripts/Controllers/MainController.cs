@@ -167,22 +167,25 @@ public class MainController : MonoBehaviour
 
         if(scene.name == "Lobby")
         {
-            if(FindObjectOfType<Online>() != null)
+            try
             {
-                var user = FindObjectOfType<Online>().ReturnUser();
-                try
+                if (FindObjectOfType<Online>() != null)
                 {
+                    var user = FindObjectOfType<Online>().ReturnUser();
+              
                     if (user.ContainsKey("username"))
                     {
 
                         var online = FindObjectOfType<Online>();
                         online.SkipLogin();
 
-                       //online.StartCoroutine(online.CheckRooms());
+                        //online.StartCoroutine(online.CheckRooms());
 
                     }
-                }catch(NullReferenceException e)
-                { }
+                }
+            }
+            catch(NullReferenceException e)
+            { 
             }
 
         }
@@ -201,20 +204,15 @@ public class MainController : MonoBehaviour
             var btn = GameObject.Find("Char_select").GetComponent<Button>();
             btn.onClick.AddListener(ResultsScreenToModeSelect);
 
+            SetTexts();
+
             new_record = GameObject.Find("new record");// (false);
             new_record.SetActive(false);
             GameObject.Find("score").GetComponent<TextMeshProUGUI>().text = score.ToString();
-            texts[0] = GameObject.Find("winloss").GetComponent<TextMeshProUGUI>();
-            texts[1] = null;
-            texts[2] = GameObject.Find("previous highscore").GetComponent<TextMeshProUGUI>();
-            texts[3] = GameObject.Find("score").GetComponent<TextMeshProUGUI>();
-            texts[4] = GameObject.Find("your place").GetComponent<TextMeshProUGUI>();
 
             var online_controller = FindObjectOfType<Online>();
 
             texts[0].text = "WINS: ... 		LOSSES: ...";
-
-            
 
             texts[3].text = $"FINAL SCORE: {score}";
 
@@ -225,6 +223,17 @@ public class MainController : MonoBehaviour
         }
     }
 
+    public void SetTexts()
+    {
+        if(texts[0] == null)
+        {
+            texts[0] = GameObject.Find("winloss").GetComponent<TextMeshProUGUI>();
+            texts[1] = null;
+            texts[2] = GameObject.Find("previous highscore").GetComponent<TextMeshProUGUI>();
+            texts[3] = GameObject.Find("score").GetComponent<TextMeshProUGUI>();
+            texts[4] = GameObject.Find("your place").GetComponent<TextMeshProUGUI>();
+        }
+    }
     private void TeamsToCharSelect()
     {
         teams = true;

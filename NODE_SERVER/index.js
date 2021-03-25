@@ -34,7 +34,7 @@ class RoomManager
        { username: 'woj', score: 0 },
 
        { username: 'remo', score:10 },
-          { username: 'claus', score: 20 },
+          { username: 'claus', score: 120 },
           { username: 'son', score: 21 },
           { username: '12on', score: 21 },
           { username: 'ms2on', score: 21 },
@@ -302,6 +302,8 @@ const app = express();
 
 app.use(express.urlencoded({extended: false})); //Parses the request body
 app.use(express.json());
+const cors = require('cors');
+app.use(cors());
 app.use('/files', express.static('static'));
 
 
@@ -417,9 +419,10 @@ app.post('/check_in', (req, res) => {
 
 app.post('/send_result', async (req, res) => {
   const user = req.body;
+
   setTimeout(() => {
     delete room_manager.rooms_dictionary[`${user.room}`];
-  }, 5000);
+  }, 8000);
 
   if(user.room != null)
   {
@@ -432,6 +435,12 @@ app.post('/send_result', async (req, res) => {
     await urls.SendResult(req, res, knx, user);
   }
 })
+
+app.use(express.static(__dirname + '/build/'));
+
+app.get('/super8', (req, res) => {
+	res.sendFile(__dirname + '/build/index.html');
+});
 
 app.get('/get_users_in_room', (req, res) => {
   let params = req.query;

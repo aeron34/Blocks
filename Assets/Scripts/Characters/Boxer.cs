@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 public class Boxer : MonoBehaviour
 {
@@ -34,7 +32,6 @@ public class Boxer : MonoBehaviour
     public bool able;
     Queue<string> colors;
     Action[] moves;
-    static readonly HttpClient h= new HttpClient();
 
     void Start()
     {
@@ -83,27 +80,6 @@ public class Boxer : MonoBehaviour
 
         StartCoroutine(AddBar());
         //StartCoroutine(FindObjectOfType<Online>().GetMeteors());
-        Get();
-    }
-
- 
-    private static async Task Get()
-    {
-        /*var values = new Dictionary<string, string>
-        {
-            { "blocks", "2" }
-        };
-        var cnt = new FormUrlEncodedContent(values);
-        var response = await h.PostAsync("http://localhost:3000/", cnt);
-        var responseString = await response.Content.ReadAsStringAsync();
-        */
-
-        string user = "noasm";
-        string a = $"http://localhost:3000/get/{user}";
-
-        var content = await h.GetStringAsync("http://localhost:3000/get/");
-
-        Debug.Log(a);
     }
 
     private void Straight()

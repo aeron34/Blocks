@@ -19,7 +19,7 @@ public class block_queue : MonoBehaviour
     scorer = null, opp_info_container;
     GameObject c_b = null, count_down_obj;
     int trialNumber = 1, minutes, seconds, seconds_to_start = 3;
-    float t_m = 0.05f, bts = 0.055f, time = (60*.75f), count_timer;
+    float t_m = 0.05f, bts = 0.055f, time = (60*.25f), count_timer;
     System.Random random = new System.Random();
     public int meteors = 0, default_col_number = 19, max_trials=0;
     float[] minutes_passed = { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f };
@@ -31,7 +31,7 @@ public class block_queue : MonoBehaviour
     public string Game_Mode = "Game";
     private string[] condition = new string[] { "", "" }, tutorial_text;
 
-    [SerializeField] private Sprite[] count_sprites = new Sprite[3];
+    [SerializeField] private Sprite[] count_sprites = new Sprite[4];
 
     // Start is called before the first frame update
     void Start()
@@ -214,6 +214,28 @@ public class block_queue : MonoBehaviour
         }
         //"purple", "white", "yellow"
     }
+
+    private IEnumerator WaitForEnd()
+    {
+        count_down_obj.SetActive(true);
+
+        count_down_obj.GetComponent<SpriteRenderer>().sprite = count_sprites[3];
+        switch (FindObjectOfType<MainController>().GetChar())
+        {
+            case "Gizmo":
+                FindObjectOfType<Gizmo>().movable = false;
+                break;
+            case "Boxer":
+                FindObjectOfType<Boxer>().movable = false;
+                break;
+            default:
+                break;
+        }
+        yield return new WaitForSecondsRealtime(3f);
+        over = true;
+        
+        enabled = false;
+    }
     // Update is called once per frame
     void Update()
     {
@@ -228,7 +250,7 @@ public class block_queue : MonoBehaviour
                 if(seconds_to_start == 0)
                 {
                     begin = true;
-                    Destroy(GameObject.Find("count_down"));
+                    count_down_obj.SetActive(false);
                     switch (FindObjectOfType<MainController>().GetChar())
                     {
                         case "Gizmo":
@@ -253,9 +275,8 @@ public class block_queue : MonoBehaviour
 
                 if ((int)time <= 0)
                 {
-                    over = true;
                     Time.timeScale = 0;
-                    enabled = false;
+                    StartCoroutine(WaitForEnd());
 
                 }
 

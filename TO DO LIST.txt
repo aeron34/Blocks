@@ -8,10 +8,9 @@ o Add the animations - NEXT(1)
 
 o Set up google Ads.
 
-o Take a random photo from the internet with a 
-futuristic background (maybe royalty free), but 
-if not take one and stretch out a vent and 
-repeat it to make the background - (NOW)
+o create the front end - NOW
+
+o Introduce level up system (AFTER LAUNCH)
 
 o Sometime in the future update the site and add:
 
@@ -64,6 +63,28 @@ of the for loop that looks for blocks above the exploded one, this
 is an array of those above blocks)
 
 o Add puzzle creator mode.
+
+o Create a Random Controller Obj that automates actions
+of fake players as if they were real, this gives
+the feel of a community (NEXT [3]):
+
+	- Automate score increases, since the 
+	game requests the scores of other players
+	from the RoomManager, we can just change
+	that directly. To create this function
+	just pick a random fake name in the room
+	and increase it's score by a random number. 
+	When you do this also send a random number (1 - 5)
+	of meteors.
+
+	- If the room is full of fakes, dead it.
+
+	- Randomly pick a fake name/user and add it 
+	to rooms, 
+
+	- EDIT the send meteors code to make it always
+	res.send "done"(because send met. will keep trying
+	if fails)
 
 o Implement quick jab for box. It's the one 
 that reshuffles the order of the blocks. 

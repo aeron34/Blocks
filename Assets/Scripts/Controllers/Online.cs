@@ -3,17 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using System.Net.Http;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Threading;
 using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 
 public class Online : MonoBehaviour
 {
-    private static HttpClient h = new HttpClient();
     private static Dictionary<string, string> user_info;
     private static bool call, running_room;
     private static List<string[]> opponent_info;
@@ -54,34 +50,32 @@ public class Online : MonoBehaviour
         Restart();
     }
 
+    private IEnumerator Testpost()
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("myField", "myData");
+        form.AddField("Game Name", "Mario Kart");
+
+        UnityWebRequest www = UnityWebRequest.Post("http://localhost:3000/testing", form);
+        yield return www.SendWebRequest();
+        var content = www.downloadHandler.text;
+
+        Debug.Log(content);
+    }
+
     public void Get()
     {
-        Login();   
+        StartCoroutine(Login());   
     }
 
     public void SendMeteorsCaller(int x)
     {
-        SendMeteors(x);
+        StartCoroutine(SendMeteors(x));
     }
 
-    private static async Task GetOpponentsScore()
+    private void process_opp_info(string content)
     {
-        int score = FindObjectOfType<scorer>().GetScore();
-        string username = user_info["username"];
-        string room = "";//ser_info["room"];
-
-        if (user_info.ContainsKey("room"))
-        {
-            room = user_info["room"];
-        }
-        else { 
-            return; 
-        }
-        string a = $"http://localhost:3000/getopponentsscore?username={username}&room={room}&score={score}";
-        string content = "none";
-
-        content = await h.GetStringAsync(a);
-
+      
         opponent_info = new List<string[]>();
         var arr = content.Split('|');
 
@@ -91,50 +85,49 @@ public class Online : MonoBehaviour
             opponent_info.Add(sub_arr);
         }
 
-       // await FindObjectOfType<block_queue>().util.DisplayOpponentInfo(opponent_info);
-        
+        // await FindObjectOfType<block_queue>().util.DisplayOpponentInfo(opponent_info);
 
-        fetch_status = 2;
+
+        fetch_status = 2;    
     }
-    private static async Task SendMeteors(int x)
+
+    private IEnumerator SendMeteors(int x)
     {
-        //string u = na["username"];
-        var dict = new Dictionary<string, string>
-        {
-            { "username", user_info["username"] }, 
-            { "room", user_info["room"] }, 
-            { "mets", x.ToString()}, 
-        };
+        bool sent = false;
 
-        //form "postable object" if that makes any sense
-        var content = new FormUrlEncodedContent(dict);
-        string a = $"http://localhost:3000/send_mets";
+        while (!sent)//string u = na["username"];
+        { 
 
-        var response = await h.PostAsync(a, content);
-        var responseString = await response.Content.ReadAsStringAsync();
+            var form = CreateField(new string[] { "username", "room" });
+            form.AddField("mets", x.ToString());
+            var uwr = CreatePostReq("send_mets", form);
 
-        if (responseString == "error")
-        {
-            SendMeteors(x);
-            return;
+            yield return uwr.SendWebRequest();
+
+            var responseString = uwr.downloadHandler.text;
+
+            if (responseString != "error")
+            {
+                sent = true;
+            }
         }
     }
 
-    private async Task Login()
+    private IEnumerator Login()
     {
 
         var u = GameObject.Find("username").GetComponent<TMP_InputField>().text;
         var p = GameObject.Find("password").GetComponent<TMP_InputField>().text;
-        
-
-        string a = $"http://localhost:3000/login?username={u}&pass={p}";
-        string content = "none";
 
         var l = GameObject.Find("login");
 
         l.GetComponent<Button>().enabled = false;
 
-        content = await h.GetStringAsync(a);
+        string url = $"http://localhost:3000/login?username={u}&pass={p}";
+        UnityWebRequest uwr = UnityWebRequest.Get(url);
+        yield return uwr.SendWebRequest();
+
+        var content = uwr.downloadHandler.text;
 
         l.GetComponent<Button>().enabled = true;
 
@@ -211,66 +204,92 @@ public class Online : MonoBehaviour
             friend_box.SetActive(true);
         }
     }
-    public async Task GetOppInfo()
+     
+    public IEnumerator GetOppInfo()
     {
-        
-        await GetOpponentsScore();
-
-        if (opp_info_init == -1)
+        if (user_info.ContainsKey("room"))
         {
+            int score = FindObjectOfType<scorer>().GetScore();
+            string username = user_info["username"];
+            string room = user_info["room"];
 
-            opp_info_init = 1;
+            string url = $"http://localhost:3000/getopponentsscore?username={username}&room={room}&score={score}";
 
-            opp_infos = new List<GameObject>();
-            var prefab = GameObject.FindObjectOfType<block_queue>().opp_info_container;
-            var canvas = GameObject.Find("Canvas");
-            float x = -1175, y = -450;
-            int m = 0;
+            UnityWebRequest uwr = UnityWebRequest.Get(url);
+            yield return uwr.SendWebRequest();
 
-            for (int i = 0; i < opponent_info.Count-1; i++)
+            process_opp_info(uwr.downloadHandler.text);
+
+            if (opp_info_init == -1)
             {
-                if (i % 5 == 0)
+
+                opp_info_init = 1;
+
+                opp_infos = new List<GameObject>();
+                var prefab = GameObject.FindObjectOfType<block_queue>().opp_info_container;
+                var canvas = GameObject.Find("Canvas");
+                float x = -1175, y = -450;
+                int m = 0;
+
+                for (int i = 0; i < opponent_info.Count - 1; i++)
                 {
-                    m = 0;
+                    if (i % 5 == 0)
+                    {
+                        m = 0;
+                    }
+                    var g = GameObject.Instantiate(prefab, canvas.transform);
+                    g.transform.localPosition = new Vector3((x + (500 * m)), y - ((int)(i / 5) * 180),
+                    g.transform.localPosition.z);
+                    g.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = opponent_info[i][0];
+                    g.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text
+                        = $"SCORE: {opponent_info[i][1]}";
+                    m++;
+                    opp_infos.Add(g);
                 }
-                var g = GameObject.Instantiate(prefab, canvas.transform);
-                g.transform.localPosition = new Vector3((x + (500 * m)), y - ((int)(i / 5) * 180),
-                g.transform.localPosition.z);
-                g.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = opponent_info[i][0];
-                g.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text
-                    = $"SCORE: {opponent_info[i][1]}";
-                m++;
-                opp_infos.Add(g);
             }
-        }
 
-        foreach(GameObject g in opp_infos)
-        {
-            //g.transform.GetChild(0).GetComponent<Image>().color = new Color(255f, 0, 0, 183f);
-        }
+            foreach (GameObject g in opp_infos)
+            {
+                //g.transform.GetChild(0).GetComponent<Image>().color = new Color(255f, 0, 0, 183f);
+            }
 
-        for (int i = 0; i < opponent_info.Count; i++)
-        {
-            var obj = opp_infos.Find(a =>
-            a.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text == opponent_info[i][0]);
-            obj.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = opponent_info[i][1];
-            //obj.transform.GetChild(0).GetComponent<Image>().color = new Color(255f, 0, 0, 183f);
-        }
+            for (int i = 0; i < opp_infos.Count; i++)
+            {
+                var obj = opp_infos.Find(a =>
+                a.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text == opponent_info[i][0]);
+                obj.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = opponent_info[i][1];
+                //obj.transform.GetChild(0).GetComponent<Image>().color = new Color(255f, 0, 0, 183f);
+            }
 
-        /*
-         Use this for last man standing
-        
-        if(opponent_info.Count == 0)
-        {
-            FindObjectOfType<MainController>().LoadLoss();
-        }*/
+            /*
+             Use this for last man standing
+
+            if(opponent_info.Count == 0)
+            {
+                FindObjectOfType<MainController>().LoadLoss();
+            }*/
+        }
     }
-    private static async Task Logout()
-    {
-        var content = new FormUrlEncodedContent(user_info);
-        var response = await h.PostAsync("http://localhost:3000/logout", content);
-        //var responseString = await response.Content.ReadAsStringAsync();
 
+    private WWWForm CreateField(string[] keys)
+    {
+        WWWForm form = new WWWForm();
+
+        for (int i = 0; i < keys.Length; i++)
+        {
+            form.AddField($"{keys[i]}", $"{user_info[keys[i]]}");
+        }
+       
+        return form;
+    }
+    
+    private IEnumerator Logout()
+    {
+        WWWForm form = CreateField(new string[] {"username", "password"});
+
+        var uwr = CreatePostReq("logout", form);
+        yield return uwr.SendWebRequest();
+        //var responseString = await response.Content.ReadAsStringAsync();
     }
 
     private IEnumerator CheckRooms()
@@ -279,6 +298,7 @@ public class Online : MonoBehaviour
         {
             team_battle = true;
         }
+
         while (!running_room)
         {
             string b = user_info["username"], room_number = "-1";
@@ -377,12 +397,14 @@ public class Online : MonoBehaviour
         } 
     }
 
-    private static async Task CheckMeteors()
+    private IEnumerator CheckMeteors()
     {
         var b = user_info["username"];
-        HttpClient http = new HttpClient();
-        string a = $"http://localhost:3000/get_mets?username={b}";
-        var content = await http.GetStringAsync(a);
+        var url = $"http://localhost:3000/get_mets?username={b}";
+        UnityWebRequest uwr = UnityWebRequest.Get(url);
+        yield return uwr.SendWebRequest();
+
+        var content = uwr.downloadHandler.text;
 
         if (content != "none")
         {
@@ -421,7 +443,7 @@ public class Online : MonoBehaviour
         {
             if(fetch_status == 0)
             {
-                GetOppInfo();
+                StartCoroutine(GetOppInfo());
                 fetch_status = 1;
             }
             /*
@@ -458,9 +480,9 @@ public class Online : MonoBehaviour
                 var g = orderedlist.First();
 
                 place = GetPlace();
-                EndGame(team_battle);
+                StartCoroutine(EndGame(team_battle));
                 fetch_status = -1;
-                SendResults(team_battle);
+                StartCoroutine(SendResults(team_battle));
 
                 if (team_battle)
                 {
@@ -479,13 +501,11 @@ public class Online : MonoBehaviour
 
         return opponent_info.OrderByDescending(x => Int32.Parse(x[1])).ToList();
     }
-    public static async Task SendResults(bool team_battle = false)
+    public IEnumerator SendResults(bool team_battle = false)
     {
-        Dictionary<string, string> body = new Dictionary<string, string>();
-        body.Add("username", user_info["username"]);
-        body.Add("password", user_info["password"]);
-        body.Add("room", user_info["room"]);
 
+        var form = CreateField(new string[] { "username", "password", "room" });
+        
         string res = "win";
         if (!team_battle)
         {
@@ -494,14 +514,13 @@ public class Online : MonoBehaviour
                 res = "loss";
             }
 
-            body.Add("result", res);
+            form.AddField("result", res);
         }
 
-        var content = new FormUrlEncodedContent(body);
-        string a = $"http://localhost:3000/send_result";
-        var response = await h.PostAsync(a, content);
+        var uwr = CreatePostReq("send_result", form);
+        yield return uwr.SendWebRequest();
 
-        var res_string = await response.Content.ReadAsStringAsync();
+        var res_string = uwr.downloadHandler.text;
 
         if(team_battle)
         {
@@ -526,25 +545,38 @@ public class Online : MonoBehaviour
         int place = (list.FindIndex(x => x[0] == user_info["username"]))+1;
         return place;
     }
-    private static async Task DeleteFromRoom()
+
+    private UnityWebRequest CreatePostReq(string endpoint = "", WWWForm form= null)
     {
-        var content = new FormUrlEncodedContent(user_info);
-        string a = $"http://localhost:3000/delete_from_room";
-        var response = await h.PostAsync(a, content);
+        UnityWebRequest uwr = UnityWebRequest.Post($"http://localhost:3000/{endpoint}", form);
+
+        return uwr;
+    }
+    private IEnumerator DeleteFromRoom()
+    {
+        var form = CreateField(new string[] {"username", "password"});
+        var uwr = CreatePostReq("delete_from_room", form);
+        yield return uwr.SendWebRequest();        
     }
 
-    public static async Task EndGame(bool team_battle = false)
+    public IEnumerator EndGame(bool team_battle = false)
     {
+        var form = CreateField(new string[] { "username", "password"});
 
-        user_info.Add("score", FindObjectOfType<scorer>().GetScore().ToString());
-        var content = new FormUrlEncodedContent(user_info);
-        string a = $"http://localhost:3000/end_game";
-        var response = await h.PostAsync(a, content);
+        form.AddField("score", FindObjectOfType<scorer>().GetScore().ToString());
+        int score = FindObjectOfType<scorer>().GetScore();
 
-        var res_string = await response.Content.ReadAsStringAsync();
+        
+        var uwr = CreatePostReq("end_game", form);
+        yield return uwr.SendWebRequest();
 
+        var res_string = uwr.downloadHandler.text;
+
+        Debug.Log(res_string);
         var arr = res_string.Split(',');
+        FindObjectOfType<MainController>().SetTexts();
         var texts = FindObjectOfType<MainController>().texts;
+
         wins = Int32.Parse(arr[0]);
         losses = Int32.Parse(arr[1]);
 
@@ -561,7 +593,7 @@ public class Online : MonoBehaviour
         }
         texts[2].text = $"HIGHSCORE: {Int32.Parse(arr[2])}";
 
-        if(Int32.Parse(arr[2]) < Int32.Parse(user_info["score"]))
+        if (Int32.Parse(arr[2]) < score) 
         {
             FindObjectOfType<MainController>().new_record.SetActive(true);
         }
@@ -569,7 +601,11 @@ public class Online : MonoBehaviour
 
     public Dictionary<string, string> ReturnUser()
     {
-        return user_info;
+        if(user_info.ContainsKey("username"))
+        {
+            return user_info;
+        }
+        return new Dictionary<string, string>();
     }
 
     private void OnApplicationQuit()
@@ -580,10 +616,10 @@ public class Online : MonoBehaviour
             {
                 if (user_info["username"] != "")
                 {
-                    Logout();
+                    StartCoroutine(Logout());
                     if (!running_room)
                     {
-                        DeleteFromRoom();
+                        StartCoroutine(DeleteFromRoom());
                     }
                 }
             }
