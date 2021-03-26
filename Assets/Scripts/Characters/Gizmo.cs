@@ -211,12 +211,30 @@ public class Gizmo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+     
         if(!hurt_b && movable)
         { 
             UP_Logic();
+            Ani_Logic();
         }
     }
 
+    private void Ani_Logic()
+    {
+        if (ground && !Input.GetKey(KeyCode.A) &&
+        !Input.GetKey(KeyCode.D))
+        {
+            ani.Play("idle");
+        }
+        if (ground && (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)))
+        {
+            ani.Play("run");
+        }
+        if(!ground)
+        {
+            ani.Play("air");
+        }
+    }
     private void DropBlock()
     {
         var blk_col = dist_blk.GetComponent<block>().colm;
@@ -379,10 +397,10 @@ public class Gizmo : MonoBehaviour
         var np = transform.GetChild(0).transform.position;
       
         RaycastHit2D gc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks", "ground"));
+        Vector2.down, 2.25f, LayerMask.GetMask("blocks", "ground"));
 
         RaycastHit2D gc2 = Physics2D.Raycast(new Vector2(np.x + .8f, np.y),
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks", "ground"));
+        Vector2.down, 2.25f, LayerMask.GetMask("blocks", "ground"));
 
         if (gc.collider != null || gc2.collider != null)
         {
