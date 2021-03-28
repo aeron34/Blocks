@@ -1,14 +1,9 @@
-
-o Create the main menu.
-
 o Add a megaman style explode animation
 to the character when something fell on him.
 
 o Add the animations - NEXT(1)
 
 o Set up google Ads.
-
-o create the front end - NOW
 
 o Introduce level up system (AFTER LAUNCH)
 
@@ -22,22 +17,21 @@ o Sometime in the future update the site and add:
 	you to see your wins/losses.
 
 
+o Edit the Back to character select:
+
+	1. change the text to back to 
+	game modes	
+
+	2. change the image
+
 o Make it so that the when the column
 reaches a certain number, the column
 deletes it's blocks, restaring (AFTER LAUNCH AND 500+ Steady Player Base).
 
 
-o make a gameover animation by deleting
-the ground beneath the blocks to create
-a falling effect 
-
 o To fix last man standing, give it a countdown
 of 10 mins, and if you're both still alive
 then highest score wins.
-
-o  Add pause.
-
-o Finish box's ultimate (NEXT).
 
 
 ---------------- (LATER, AFTER RELEASE) --------------------

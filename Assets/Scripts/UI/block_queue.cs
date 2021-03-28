@@ -19,7 +19,7 @@ public class block_queue : MonoBehaviour
     scorer = null, opp_info_container;
     GameObject c_b = null, count_down_obj;
     int trialNumber = 1, minutes, seconds, seconds_to_start = 3;
-    float t_m = 0.05f, bts = 0.055f, time = (60*.5f), count_timer;
+    float t_m = 0.05f, bts = 0.055f, time = (60*1f), count_timer;
     System.Random random = new System.Random();
     public int meteors = 0, default_col_number = 19, max_trials=0;
     float[] minutes_passed = { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f };

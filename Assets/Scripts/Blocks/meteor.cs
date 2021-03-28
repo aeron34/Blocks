@@ -21,7 +21,7 @@ public class meteor : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         var g = collision.gameObject;
-        if (g.layer == 9)
+        if (g.layer == 9 || g.layer == 8)
         {
             try
             {

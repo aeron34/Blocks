@@ -365,8 +365,8 @@ public class block : MonoBehaviour
                     }
                 }
             }
-          
 
+            GameObject.Find("sound_fx").GetComponent<AudioSource>().Play();
             colm.GetComponent<column>().Takeoff(gameObject);
 
             spr.color = new Color(1, 1, 1);

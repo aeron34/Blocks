@@ -20,26 +20,7 @@ const knx = require('knex')({
 class RoomManager
 {
   rooms_dictionary = {
-    '0': [
-      //{ username: 'mono', score: 0 },
-      { username: 'sons', score: 0 },
-      { username: 'woj', score: 0 },
 
-      { username: 'remo', score:10 },
-         { username: 'claus', score: 20 },
-         { username: 'son', score: 21 }
-     ],
-     'team0':[
-       { username: 'sons', score: 0 },
-       { username: 'woj', score: 0 },
-
-       { username: 'remo', score:10 },
-          { username: 'claus', score: 120 },
-          { username: 'son', score: 21 },
-          { username: '12on', score: 21 },
-          { username: 'ms2on', score: 21 },
-
-     ],
      "michael":[
      {
            "username": "syad234a",
@@ -95,8 +76,31 @@ class RoomManager
           );
       }
 
+      let room_size = 6;
+      if(`${roomNumber}`.includes('team'))
+      {
+        room_size = 8;
+      }
+
+      let incScore = setInterval(methods.Auto_IncreaseScore, 3500, rooms_dictionary[`${roomNumber}`], room_size, knx);
+
+      let addTo = function()
+      {
+        setTimeout(() => {
+          if(rooms_dictionary[`${roomNumber}`].length < room_size)
+          {
+            methods.Auto_Addtoroom(`${roomNumber}`, room_manager.addUserToRoom, rooms_dictionary);// DEFAULT_ROOM_SIZE);
+            addTo();
+          }
+        }, 5000);
+      }
+
+      addTo();
+
+
       setTimeout(() => {
-        console.log(roomNumber);
+      //clearInterval(addTo);
+        clearInterval(incScore);
         delete this.rooms_dictionary[`${roomNumber}`];
       }, roomAutoDeleteTime);
     }
@@ -298,19 +302,20 @@ let room_manager = new RoomManager();
 
 const DEFAULT_ROOM_SIZE = 6;
 
+
 const app = express();
 
 app.use(express.urlencoded({extended: false})); //Parses the request body
 app.use(express.json());
+
 const cors = require('cors');
 app.use(cors());
 app.use('/files', express.static('static'));
 
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname+'/static/index.html'));
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname+'/static/register.html'));
 });
-
 
 var now = moment("2021-02-06T10:05:29");
 var a = moment_tz.utc(now).tz("Asia/Taipei");
@@ -436,9 +441,13 @@ app.post('/send_result', async (req, res) => {
   }
 })
 
+app.get('/', (req, res) => {
+	res.sendFile(__dirname + '/static/index.html');
+});
+
 app.use(express.static(__dirname + '/build/'));
 
-app.get('/super8', (req, res) => {
+app.get('/game', (req, res) => {
 	res.sendFile(__dirname + '/build/index.html');
 });
 
@@ -468,19 +477,36 @@ app.post('/send_mets', async (req, res) => {
     let room = req.body.room;
     let mets = req.body.mets;
 
-    console.log(`called by ${name}`);
+    let auto_count = 0;
 
+    console.log(`called by ${name}`);
     let user_arr;
     let user_exists = false;
     let user;
 
+    room_manager.rooms_dictionary[`${room}`].map(user =>
+    {
+      if(methods.AUTO_NAMES.includes(user.username))
+      {
+        auto_count += 1;
+      }
+    });
+
     if(room.includes('team'))
     {
+      if(auto_count >= 7)
+      {
+        return res.send('meteors sent');
+      }
       let me = methods.GetUserInRoom(room_manager, room, name)[0];
       user_arr = methods.GetOtherTeam(room_manager, room, me.team);
       user = user_arr[Math.floor(Math.random() * user_arr.length)];
     } else
     {
+      if(auto_count >= 5)
+      {
+        return res.send('meteors sent');
+      }
       user_arr = methods.FilterRoomForUser(room_manager, room, name);
       user = user_arr[Math.floor(Math.random() * user_arr.length)];
     }
@@ -489,7 +515,6 @@ app.post('/send_mets', async (req, res) => {
 
     await knx('users').where('username', user.username).
     then(found_user => {
-      console.log(found_user);
       if(found_user.length == 1)
       {
         user_exists = true;
@@ -517,6 +542,7 @@ app.get('/get_mets', async (req, res) => {
 
   let params = req.query;
   let mets = 0;
+
 
   const user = await knx('users').where('username', params.username).
   then(user => {
@@ -568,7 +594,7 @@ app.get('/login', (req, res) => {
   urls.login(req, res, u, knx);
 });
 
-app.post('/', (req, res) => {
+app.post('/register', (req, res) => {
   const u = req.body;
   urls.createUser(req, res, u, knx);
 });

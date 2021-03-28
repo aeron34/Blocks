@@ -7,7 +7,7 @@ const createUser = (req, res, u, knx) => {
     status: a
   }), a => {
     console.log('sop');
-    res.json(a)
+    res.json({resp: "already"})
   });
 }
 
@@ -53,7 +53,7 @@ async function SendResult(req, res, knx, user, sending=true)
 
   if(result_num != 0)
   {
-    let update_obj = {}
+    let update_obj = {meteors: 0}
     update_obj[user.result] = result_num;
 
     await knx('users').where('username', user.username)

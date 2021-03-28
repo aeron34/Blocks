@@ -203,6 +203,7 @@ public class Gizmo : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.W))
             {
                 rgb.velocity = new Vector2(rgb.velocity.x, xY);
+                GetComponent<AudioSource>().Play();
                 ground = false;
             }
         }
@@ -374,7 +375,7 @@ public class Gizmo : MonoBehaviour
             good_space = false;
 
             RaycastHit2D hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
-            Vector2.down, 1f, LayerMask.GetMask("blocks"));
+            Vector2.down, 1.75f, LayerMask.GetMask("blocks"));
 
             if (hit.collider != null)
             {

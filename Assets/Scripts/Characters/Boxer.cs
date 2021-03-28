@@ -370,6 +370,7 @@ public class Boxer : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.W))
             {
+                GetComponent<AudioSource>().Play();
                 rgb.velocity = new Vector2(rgb.velocity.x, xY);
                 ground = false;
             }
@@ -411,12 +412,29 @@ public class Boxer : MonoBehaviour
         }
      }
 
+    private void Ani_Logic()
+    {
+        if (ground && !Input.GetKey(KeyCode.A) &&
+        !Input.GetKey(KeyCode.D))
+        {
+            ani.Play("idle");
+        }
+        if (ground && (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)))
+        {
+            ani.Play("run");
+        }
+        if (!ground)
+        {
+            ani.Play("air");
+        }
+    }
     // Update is called once per frame
     void Update()
     {
         if (!hurt_b && movable)
         {
             UP_Logic();
+            Ani_Logic();
         }
     }
 
@@ -491,7 +509,7 @@ public class Boxer : MonoBehaviour
         good_space = false;
 
         RaycastHit2D hit = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.down, 1f, LayerMask.GetMask("blocks"));
+        Vector2.down, 1.75f, LayerMask.GetMask("blocks"));
 
         if (hit.collider != null)
         {
@@ -518,10 +536,10 @@ public class Boxer : MonoBehaviour
         var np = transform.GetChild(0).transform.position;
 
         RaycastHit2D gc = Physics2D.Raycast(transform.GetChild(0).transform.position,
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks", "ground"));
+        Vector2.down, 2.25f, LayerMask.GetMask("blocks", "ground"));
 
         RaycastHit2D gc2 = Physics2D.Raycast(new Vector2(np.x + .8f, np.y),
-        Vector2.down, 1.25f, LayerMask.GetMask("blocks", "ground"));
+        Vector2.down, 2.25f, LayerMask.GetMask("blocks", "ground"));
 
         if (gc.collider != null || gc2.collider != null)
         {

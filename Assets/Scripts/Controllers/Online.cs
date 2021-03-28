@@ -193,7 +193,7 @@ public class Online : MonoBehaviour
         {
             room_txt.GetComponent<TextMeshProUGUI>().text = "Looking for room...";
             GameObject.Find("Login Box").SetActive(false);
-            Debug.Log(team_battle);
+
             StartCoroutine(CheckRooms());
         }
         else
@@ -417,16 +417,16 @@ public class Online : MonoBehaviour
     public IEnumerator GetMeteors()
     {
 
-        while (true)
+        while (true && SceneManager.GetActiveScene().name == "Game")
         {
-            CheckMeteors();
+            StartCoroutine(CheckMeteors());
 
             if (metes > 0)
             {
                 StartCoroutine(FindObjectOfType<block_queue>().MeteorTime());
                 metes = 0;
             }
-            yield return new WaitForSeconds(4f);
+            yield return new WaitForSecondsRealtime(3);
         }
     }
 
@@ -480,9 +480,7 @@ public class Online : MonoBehaviour
                 var g = orderedlist.First();
 
                 place = GetPlace();
-                StartCoroutine(EndGame(team_battle));
                 fetch_status = -1;
-                StartCoroutine(SendResults(team_battle));
 
                 if (team_battle)
                 {
@@ -559,20 +557,18 @@ public class Online : MonoBehaviour
         yield return uwr.SendWebRequest();        
     }
 
-    public IEnumerator EndGame(bool team_battle = false)
+    public IEnumerator EndGame(bool team_battle = false, int score=0)
     {
         var form = CreateField(new string[] { "username", "password"});
 
-        form.AddField("score", FindObjectOfType<scorer>().GetScore().ToString());
-        int score = FindObjectOfType<scorer>().GetScore();
-
+        form.AddField("score", score.ToString());
         
         var uwr = CreatePostReq("end_game", form);
         yield return uwr.SendWebRequest();
 
         var res_string = uwr.downloadHandler.text;
 
-        Debug.Log(res_string);
+
         var arr = res_string.Split(',');
         FindObjectOfType<MainController>().SetTexts();
         var texts = FindObjectOfType<MainController>().texts;

@@ -201,6 +201,10 @@ public class MainController : MonoBehaviour
 
         if (scene.name == "Loss Screen")
         {
+            var online = FindObjectOfType<Online>();
+            StartCoroutine(online.EndGame());
+            StartCoroutine(online.SendResults());
+
             var btn = GameObject.Find("Char_select").GetComponent<Button>();
             btn.onClick.AddListener(ResultsScreenToModeSelect);
 
